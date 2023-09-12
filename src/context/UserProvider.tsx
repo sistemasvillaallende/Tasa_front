@@ -1,6 +1,7 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import menuIcon from "../assets/IconoMenu.svg";
 
 type UserType = {
   userName: string;
@@ -9,9 +10,17 @@ type UserType = {
   apellido: string;
 } | null;
 
+type MenuItem = {
+  texto: string;
+  url: string;
+  icono: string;
+};
+
 type UserContextType = {
   user: UserType;
   error: string | null;
+  menuItems: MenuItem[];
+  menuIcon: string;
   setUser: (user: UserType) => void;
   handleLogin: (username: string, password: string) => void;
   handleLogout: () => void;
@@ -20,9 +29,11 @@ type UserContextType = {
 const userContext = createContext<UserContextType>({
   user: null,
   error: null,
-  setUser: () => {},
-  handleLogin: () => {},
-  handleLogout: () => {},
+  menuItems: [],
+  menuIcon: "",
+  setUser: () => { },
+  handleLogin: () => { },
+  handleLogout: () => { },
 });
 
 export function useUserContext() {
@@ -33,6 +44,14 @@ export function UserProvider({ children }: any) {
   const [user, setUser] = useState<UserType>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const menuItems: MenuItem[] = [
+    { texto: "Inicio", url: "/", icono: "ArrowRightCircle" },
+    { texto: "Acerca de", url: "/acerca-de", icono: "Box" },
+    { texto: "Contacto", url: "/contacto", icono: "PieChart" },
+  ];
+
+
 
   const handleLogin = async (username: any, password: any) => {
     try {
@@ -77,7 +96,7 @@ export function UserProvider({ children }: any) {
 
   return (
     <userContext.Provider
-      value={{ user, error, setUser, handleLogin, handleLogout }}
+      value={{ user, error, menuItems, menuIcon, setUser, handleLogin, handleLogout }}
     >
       {children}
     </userContext.Provider>
