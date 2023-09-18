@@ -1,9 +1,11 @@
 import { useState } from "react";
+import Lucide from "../../base-components/Lucide";
 import {
     FormInput,
     FormLabel,
 } from "../../base-components/Form";
 import Button from "../../base-components/Button";
+import Table from "../../base-components/Table";
 import { useParams, useNavigate } from "react-router-dom";
 
 
@@ -122,7 +124,87 @@ const Tasas = () => {
                         )}
                     </div>
                 </div>
-            </div>
+                <div className="overflow-x-auto">
+                    <Table striped>
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th className="whitespace-nowrap">Nro BADEC</Table.Th>
+                                <Table.Th className="whitespace-nowrap">BADEC</Table.Th>
+                                <Table.Th className="whitespace-nowrap">CUIT</Table.Th>
+                                <Table.Th className="whitespace-nowrap">
+                                    Calle Frente
+                                </Table.Th>
+                                <Table.Th className="whitespace-nowrap">
+                                    Nro
+                                </Table.Th>
+                                <Table.Th className="whitespace-nowrap">
+                                    Barrio
+                                </Table.Th>
+                                <Table.Th className="whitespace-nowrap">
+                                    Acciones
+                                </Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                            <Table.Tr>
+                                <Table.Td>38658</Table.Td>
+                                <Table.Td>Arias Agapito Aurelio</Table.Td>
+                                <Table.Td>20351598647</Table.Td>
+                                <Table.Td>Matadero</Table.Td>
+                                <Table.Td>410</Table.Td>
+                                <Table.Td>Las Polinesias</Table.Td>
+                                <Table.Td className="first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]">
+                                    <Button
+                                        variant="secondary"
+                                        className="mb-2 mr-1"
+                                        onClick={() => handleVerContribuyente()}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <Lucide icon="Eye" className="w-5 h-5" />
+                                    </Button>
+                                </Table.Td>
+                            </Table.Tr>
+                            <Table.Tr>
+                                <Table.Td>38659</Table.Td>
+                                <Table.Td>Lopez Maria</Table.Td>
+                                <Table.Td>20351234567</Table.Td>
+                                <Table.Td>Calle Principal</Table.Td>
+                                <Table.Td>123</Table.Td>
+                                <Table.Td>Los Pinos</Table.Td>
+                                <Table.Td>
+                                    <Button
+                                        variant="secondary"
+                                        className="mb-2 mr-1"
+                                        onClick={() => handleVerContribuyente()}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <Lucide icon="Eye" className="w-5 h-5" />
+                                    </Button>
+                                </Table.Td>
+                            </Table.Tr>
+                            <Table.Tr>
+                                <Table.Td>38660</Table.Td>
+                                <Table.Td>Gonzalez Juan</Table.Td>
+                                <Table.Td>20352345678</Table.Td>
+                                <Table.Td>Avenida Central</Table.Td>
+                                <Table.Td>789</Table.Td>
+                                <Table.Td>El Rosario</Table.Td>
+                                <Table.Td>
+                                    <Button
+                                        variant="secondary"
+                                        className="mb-2 mr-1"
+                                        onClick={() => handleVerContribuyente()}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <Lucide icon="Eye" className="w-5 h-5" />
+                                    </Button>
+                                </Table.Td>
+                            </Table.Tr>
+                        </Table.Tbody>
+                    </Table>
+
+                </div>
+            </div >
         </div >
     );
 };
