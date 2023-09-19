@@ -47,8 +47,7 @@ export function UserProvider({ children }: any) {
 
   const menuItems: MenuItem[] = [
     { texto: "Inicio", url: "/", icono: "ArrowRightCircle" },
-    { texto: "Acerca de", url: "/acerca-de", icono: "Box" },
-    { texto: "Contacto", url: "/contacto", icono: "PieChart" },
+    { texto: "Editar", url: "/editar", icono: "Box" },
   ];
 
 

@@ -5,6 +5,7 @@ import Login from "../pages/Users/Login";
 import NotFound from "../pages/Errors/NotFound ";
 import Tasas from "../pages/Tasa/Tasas";
 import TasaVer from "../pages/Tasa/TasaVer";
+import TasaEditar from "../pages/Tasa/TasaEditar";
 //layouts
 import TopMenu from "../layouts/TopMenu";
 //Context
@@ -29,6 +30,7 @@ const Router = () => {
               <Route path="/" element={<TopMenu />}>
                 <Route path="/" element={<Tasas />} />
                 <Route path="/ver" element={<TasaVer />} />
+                <Route path="/editar" element={<TasaEditar />} />
               </Route>
               <Route path="/login" element={<Login />} />
               <Route path="/*" element={<NotFound />} />
