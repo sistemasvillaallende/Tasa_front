@@ -1,26 +1,8 @@
-import { useState } from "react"
 import defaultInputs from "../../utils/defaultInputs"
 import RenderTexts from "../../components/RenderTexts"
-// import { schema } from "../../utils/yupSchema"
-// import { useForm } from "react-hook-form"
-// import { yupResolver } from "@hookform/resolvers/yup"
 import Button from "../../base-components/Button"
-import ModalDatos from "./NuevoLegajo/ModalDatos"
-import ModalCalle from "./NuevoLegajo/ModalCalle"
 
 function TasaDetalle() {
-  // const {
-  // register,
-  // handleSubmit,
-  // reset,
-  // formState: { errors },
-  // } = useForm({
-  //   resolver: yupResolver(schema),
-  //   mode: "onChange",
-  // })
-  const [openModalDatos, setOpenModalDatos] = useState(false)
-  const [openModalCalle, setOpenModalCalle] = useState(false)
-
   return (
     <form className="mb-10">
       <div className="flex items-center mt-8 intro-y">
