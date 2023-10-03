@@ -1,11 +1,11 @@
-const plugin = require("tailwindcss/plugin");
-const colors = require("tailwindcss/colors");
-const { parseColor } = require("tailwindcss/lib/util/color");
+const plugin = require("tailwindcss/plugin")
+const colors = require("tailwindcss/colors")
+const { parseColor } = require("tailwindcss/lib/util/color")
 
 /** Converts HEX color to RGB */
 const toRGB = (value) => {
-  return parseColor(value).color.join(" ");
-};
+  return parseColor(value).color.join(" ")
+}
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -111,14 +111,16 @@ module.exports = {
         // Default colors
         ":root": {
           "--color-primary": toRGB("#0F99CA"),
-          "--color-secondary": toRGB(colors.slate["200"]),
-          "--color-success": toRGB(colors.teal["600"]),
-          "--color-info": toRGB(colors.cyan["500"]),
-          "--color-warning": toRGB(colors.amber["500"]),
-          "--color-pending": toRGB(colors.amber["600"]),
-          "--color-danger": toRGB(colors.red["700"]),
-          "--color-light": toRGB(colors.slate["100"]),
-          "--color-dark": toRGB(colors.slate["800"]),
+          "--color-secondary": toRGB("#6F6F6E"),
+          "--color-emphasis": toRGB("#FFD300"),
+          "--color-success": toRGB("#2BB728"),
+          "--color-info": toRGB("#FDC601"),
+          "--color-warning": toRGB("#D32525"),
+          "--color-pending": toRGB("#F8B114"),
+          "--color-danger": toRGB("#4A4A4A"),
+          "--color-light": toRGB("#E2E8F0"),
+          "--color-white": toRGB("#FFFFFF"),
+          "--color-dark": toRGB("#374254"),
         },
         // Default dark-mode colors
         ".dark": {
@@ -194,7 +196,7 @@ module.exports = {
             "--color-primary": toRGB(colors.indigo["700"]),
           },
         },
-      });
+      })
 
       // Animation delay utilities
       matchUtilities(
@@ -205,14 +207,14 @@ module.exports = {
         },
         {
           values: (() => {
-            const values = {};
+            const values = {}
             for (let i = 1; i <= 50; i++) {
-              values[i * 10] = `${i * 0.1}s`;
+              values[i * 10] = `${i * 0.1}s`
             }
-            return values;
+            return values
           })(),
         }
-      );
+      )
 
       // Animation fill mode utilities
       matchUtilities(
@@ -229,7 +231,7 @@ module.exports = {
             both: "both",
           },
         }
-      );
+      )
     }),
   ],
   variants: {
@@ -237,4 +239,4 @@ module.exports = {
       boxShadow: ["dark"],
     },
   },
-};
+}

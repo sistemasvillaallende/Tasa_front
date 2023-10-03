@@ -1,6 +1,6 @@
 import { useState } from "react"
 import defaultInputs from "../../utils/defaultInputs"
-import RenderInputs from "../../components/RenderInputs"
+import RenderTexts from "../../components/RenderTexts"
 // import { schema } from "../../utils/yupSchema"
 // import { useForm } from "react-hook-form"
 // import { yupResolver } from "@hookform/resolvers/yup"
@@ -8,7 +8,7 @@ import Button from "../../base-components/Button"
 import ModalDatos from "./NuevoLegajo/ModalDatos"
 import ModalCalle from "./NuevoLegajo/ModalCalle"
 
-function TasaEditar() {
+function TasaDetalle() {
   // const {
   // register,
   // handleSubmit,
@@ -27,24 +27,16 @@ function TasaEditar() {
         <h1 className="mr-auto ml-5 mb-3 text-lg font-medium">Gestión de Tasa a la Propiedad</h1>
       </div>
       <div className="box py-2">
-        <ModalDatos openModalDatos={openModalDatos} setOpenModalDatos={setOpenModalDatos} />
-        <ModalCalle openModalCalle={openModalCalle} setOpenModalCalle={setOpenModalCalle} />
         {/* BEGIN: Page Layout */}
-        <RenderInputs
-          list={defaultInputs.casaCentral}
-          setOpenModalDatos={setOpenModalDatos}
-          title="Casa Central"
+        <RenderTexts list={defaultInputs.casaCentral} title="Casa Central" bgSlate />
+        <RenderTexts list={defaultInputs.datosDomicilio} title="Datos del Domicilio" />
+        <RenderTexts
+          list={defaultInputs.datosLiquidacion}
+          title="Datos de Liquidación"
           bgSlate
-        />
-        <RenderInputs
-          list={defaultInputs.datosDomicilio}
-          setOpenModalCalle={setOpenModalCalle}
-          title="Datos del Domicilio"
-        />
-        <RenderInputs list={defaultInputs.datosLiquidacion} title="Datos de Liquidación" bgSlate />{" "}
-        <RenderInputs list={defaultInputs.datosFiscales} title="Datos Fiscales" />{" "}
-        <RenderInputs list={defaultInputs.footer} bgSlate /> {/* END: Page Layout */}
-        {/* END: Page Layout */}
+        />{" "}
+        <RenderTexts list={defaultInputs.datosFiscales} title="Datos Fiscales" />{" "}
+        <RenderTexts list={defaultInputs.footer} bgSlate /> {/* END: Page Layout */}
       </div>
       <div className="flex justify-end mr-5 mt-5">
         <Button variant="primary" className="text-xl">
@@ -58,4 +50,4 @@ function TasaEditar() {
   )
 }
 
-export default TasaEditar
+export default TasaDetalle
