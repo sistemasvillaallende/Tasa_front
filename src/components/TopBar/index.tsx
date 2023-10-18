@@ -1,37 +1,28 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Link } from "react-router-dom"
 import Lucide from "../../base-components/Lucide"
 import logoUrl from "../../assets/logo.png"
-import Breadcrumb from "../../base-components/Breadcrumb"
-import { Menu, Popover } from "../../base-components/Headless"
-import fakerData from "../../utils/faker"
-import _ from "lodash"
-import clsx from "clsx"
+import { Menu } from "../../base-components/Headless"
 import { useUserContext } from "../../context/UserProvider"
-import avatarUser from "../../assets/avatarUser.svg"
 import TituloTopBar from "./TituloTopBar"
+import { getSecureItem } from "../../modules/secureStorage"
+import { capitalizeFirstLetter } from "../../utils/helper"
 
 function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
-  const [searchDropdown, setSearchDropdown] = useState(false)
-  const showSearchDropdown = () => {
-    setSearchDropdown(true)
-  }
-  const hideSearchDropdown = () => {
-    setSearchDropdown(false)
-  }
-
   const { handleLogout, user, setUser } = useUserContext()
 
   useEffect(() => {
-    const usuarioLogeado = sessionStorage.getItem("usuarioLogeado")
+    const usuarioLogeado = localStorage.getItem("usuarioLogeado")
     if (usuarioLogeado) {
-      setUser(JSON.parse(usuarioLogeado))
+      const parsedUser = getSecureItem("isLoggedIn")
+      if (parsedUser) {
+        setUser(parsedUser)
+      }
     }
   }, [])
-
   return (
     <>
-      <div className="new_topbar" style={{ height: "90px" }}>
+      <div className="z-50 new_topbar" style={{ height: "90px" }}>
         <div
           className="flex justify-between items-center pl-10"
           style={{
@@ -65,17 +56,28 @@ function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
 
           {/* BEGIN: Account Menu */}
           <div className="flex justify-around items-center md:w-[290px] md:h-[69px] lg:w-[352px]  bg-secondary rounded-l-[20px]">
-            <Menu
-              className="menu_topbar h-full cursor-pointer flex align-center w-100 h-100 intro-x"
-              style={{ justifyContent: "right", backgroundColor: "inherit" }}
-            >
-              <Menu.Button className="elementTopbar w-full">
-                <img alt="Usuario" src={avatarUser} />
-                <h3>{user ? `${user.userName}` : `cargando...`}</h3>
+            <Menu>
+              <Menu.Button className="flex align-center w-100 h-100 intro-x">
+                {user?.img && (
+                  <img
+                    className="block w-12 h-12 lg:w-14 lg:h-14 image-fit object-cover  shadow-lg zoom-in rounded-full"
+                    alt="Perfil de Usuario"
+                    src={user.img}
+                  />
+                )}
+                <h3 className="text-white text-center self-center mr-5 ml-3 text-xl font-bold">
+                  {user ? `${user.nombre} ${user.apellido}` : `cargando...`}
+                </h3>
               </Menu.Button>
               <Menu.Items className="w-56 mt-px relative bg-primary/80 before:block before:absolute before:bg-black before:inset-0 before:rounded-md before:z-[-1] text-white">
+                <Menu.Header className="font-normal">
+                  <div className="text-xs text-white/70 mt-0.5 dark:text-slate-500">
+                    {user && capitalizeFirstLetter(user.userName)}
+                  </div>
+                </Menu.Header>
+                <Menu.Divider className="bg-white/[0.08]" />
                 <Menu.Item className="hover:bg-white/5" onClick={handleLogout}>
-                  <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Salir
+                  <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Cerrar Sesión
                 </Menu.Item>
               </Menu.Items>
             </Menu>

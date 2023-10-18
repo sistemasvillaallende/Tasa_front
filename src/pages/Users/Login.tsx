@@ -1,43 +1,43 @@
-import { useState, useEffect } from "react";
-import illustrationUrl from "../../assets/logo.svg";
-import { FormInput, FormCheck } from "../../base-components/Form";
-import Button from "../../base-components/Button";
-import clsx from "clsx";
-import { useUserContext } from "../../context/UserProvider";
-
+import { useState, useEffect } from "react"
+import illustrationUrl from "../../assets/logo.svg"
+import { FormInput, FormCheck } from "../../base-components/Form"
+import Button from "../../base-components/Button"
+import clsx from "clsx"
+import { useUserContext } from "../../context/UserProvider"
+import Cargando from "../../components/Cargando"
 
 type UserType = {
-  userName: string;
-  token: string;
-  nombre: string;
-  apellido: string;
-} | null;
+  userName: string
+  token: string
+  nombre: string
+  apellido: string
+} | null
 
 const Login = () => {
-  const { user, handleLogin, error } = useUserContext();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, handleLogin, error } = useUserContext()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    document.title = "Bienvenido";
-    const usuarioLogeado = sessionStorage.getItem("usuarioLogeado");
+    document.title = "Bienvenido"
+    const usuarioLogeado = localStorage.getItem("usuarioLogeado")
     if (usuarioLogeado) {
-      window.location.href = "/";
+      window.location.href = "/"
     }
-  }, []);
+  }, [])
 
   const onSubmit = async (e: any) => {
-    e.preventDefault();
-    setIsLoading(true);
-    await handleLogin(username, password);
-    setIsLoading(false);
-  };
+    e.preventDefault()
+    setIsLoading(true)
+    await handleLogin(username, password)
+    setIsLoading(false)
+  }
 
   return (
     <>
       {isLoading ? (
-        <div className="text-center">Cargando...</div>
+        <Cargando mensaje="Cargando intefaz" />
       ) : (
         <div
           className={clsx([
@@ -105,7 +105,7 @@ const Login = () => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Button from "../base-components/Button"
+import { useTasaContext } from "../context/TasaProvider"
 
 const RenderPagination = () => {
   const paginationItems: JSX.Element[] = []
   const pageRange = 5
-
-  const [cantPaginas] = useState<number>(5)
   const [paginaActual] = useState<number>(1)
   const { pagina, buscarPorURL, parametroURL } = useParams()
+  const { cantPaginas } = useTasaContext()
   const navigate = useNavigate()
   let startPage = Math.max(1, paginaActual - pageRange)
   let endPage = Math.min(cantPaginas, paginaActual + pageRange)

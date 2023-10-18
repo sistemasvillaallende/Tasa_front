@@ -1,44 +1,66 @@
-import { useState } from "react"
-import defaultInputs from "../../utils/defaultInputs"
+import { useEffect, useState } from "react"
+import defaultInputs, { fieldsState } from "../../utils/defaultInputs"
 import RenderInputs from "../../components/RenderInputs"
 import Button from "../../base-components/Button"
-import ModalDatos from "./NuevoLegajo/ModalDatos"
-import ModalCalle from "./NuevoLegajo/ModalCalle"
+import { useNavigate, useParams } from "react-router-dom"
+import { useTasaContext } from "../../context/TasaProvider"
 
 function TasaEditar() {
-  const [openModalDatos, setOpenModalDatos] = useState(false)
-  const [openModalCalle, setOpenModalCalle] = useState(false)
+  const { id } = useParams()
+  const { inmuebles } = useTasaContext()
+  const detalleInmueble: any = inmuebles?.find(
+    (inmueble: any) => inmueble.nro_bad.toString() === id
+  )
+  const navigate = useNavigate()
+  const handleCancelar = (e: any) => {
+    e.preventDefalut()
+    navigate(`/`)
+  }
 
+  const [inputs, setInputs] = useState<any>({})
+  useEffect(() => {
+    if (!inmuebles) window.location.href = "/"
+    const newState: any = {}
+    fieldsState.map((fieldName: string) => {
+      newState[fieldName] = detalleInmueble && detalleInmueble[fieldName]
+    })
+    setInputs(newState)
+  }, [])
   return (
     <form className="mb-10">
       <div className="flex items-center mt-8 intro-y">
         <h1 className="mr-auto ml-5 mb-3 text-lg font-medium">Gestión de Tasa a la Propiedad</h1>
       </div>
       <div className="box py-2">
-        <ModalDatos openModalDatos={openModalDatos} setOpenModalDatos={setOpenModalDatos} />
-        <ModalCalle openModalCalle={openModalCalle} setOpenModalCalle={setOpenModalCalle} />
-        {/* BEGIN: Page Layout */}
         <RenderInputs
+          data={inmuebles}
           list={defaultInputs.casaCentral}
-          setOpenModalDatos={setOpenModalDatos}
           title="Casa Central"
+          formInputs={inputs}
           bgSlate
         />
         <RenderInputs
+          data={inmuebles}
           list={defaultInputs.datosDomicilio}
-          setOpenModalCalle={setOpenModalCalle}
           title="Datos del Domicilio"
+          formInputs={inputs}
         />
-        <RenderInputs list={defaultInputs.datosLiquidacion} title="Datos de Liquidación" bgSlate />{" "}
-        <RenderInputs list={defaultInputs.datosFiscales} title="Datos Fiscales" />{" "}
-        <RenderInputs list={defaultInputs.footer} bgSlate /> {/* END: Page Layout */}
+        <RenderInputs
+          data={inmuebles}
+          list={defaultInputs.datosLiquidacion}
+          title="Datos de Liquidación"
+          formInputs={inputs}
+          bgSlate
+        />{" "}
+        <RenderInputs data={inmuebles} list={defaultInputs.footer} formInputs={inputs} bgSlate />{" "}
+        {/* END: Page Layout */}
         {/* END: Page Layout */}
       </div>
       <div className="flex justify-end mr-5 mt-5">
-        <Button variant="primary" className="text-xl">
+        <Button variant="outline-secondary" className="text-xl" onClick={handleCancelar}>
           Cancelar
         </Button>
-        <Button variant="secondary" className="ml-8 text-white text-xl" type="submit">
+        <Button variant="primary" className="ml-8 text-white text-xl" type="submit">
           Confirmar
         </Button>
       </div>

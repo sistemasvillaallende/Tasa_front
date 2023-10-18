@@ -1,127 +1,43 @@
-import { useState } from "react"
-import Lucide from "../../base-components/Lucide"
-import { FormInput, FormLabel } from "../../base-components/Form"
-import Button from "../../base-components/Button"
-import Table from "../../base-components/Table"
 import { useParams, useNavigate } from "react-router-dom"
 import TableConstructor from "../../components/TableConstructor"
 import RenderPagination from "../../components/RenderPagination"
 import SearchBar from "../../components/SearchBar"
+import { useTasaContext } from "../../context/TasaProvider"
 
 const fields = [
-  { name: "Nro BADEC" },
-  { name: "Nombre" },
-  { name: "CUIT" },
-  { name: "Calle Frente" },
-  { name: "Nro" },
-  { name: "Barrio" },
-  { name: "Acciones" },
+  {
+    name: "Propietario",
+    fieldsArray: [
+      { fieldName: "nombre", frontName: "Nombre" },
+      { fieldName: "cuil", frontName: "Cuil" },
+    ],
+  },
+  {
+    name: "Inmueble",
+    fieldsArray: [
+      { fieldName: "nom_calle_dom_esp", frontName: "Calle" },
+      { fieldName: "nro_dom_esp", frontName: "Nro" },
+      { fieldName: "nom_barrio_dom_esp", frontName: "Barrio" },
+    ],
+  },
+  { name: "Estado", field: "cuil" },
+  { name: "Último periodo de liquidación", field: "nom_barrio_dom_esp" },
+  { name: "Situación", field: "cod_situacion_judicial" },
+  { name: "Saldo", field: "saldo_adeudado" },
+  { name: "Multas", field: "con_deuda" },
+  { name: "Acciones", field: "" },
 ]
-
-const data = [
-  {
-    "Nro BADEC": 38658,
-    Nombre: "Arias Agapito Aurelio",
-    CUIT: 20351598647,
-    "Calle Frente": "Matadero",
-    Nro: 410,
-    Barrio: "Las Polinesias",
-  },
-  {
-    "Nro BADEC": 38659,
-    Nombre: "Lopez Maria",
-    CUIT: 20351234567,
-    "Calle Frente": "Calle Principal",
-    Nro: 123,
-    Barrio: "Los Pinos",
-  },
-  {
-    "Nro BADEC": 38659,
-    Nombre: "Gonzalez Juan",
-    CUIT: 20352345678,
-    "Calle Frente": "Avenida Central",
-    Nro: 789,
-    Barrio: "El Rosario",
-  },
-  {
-    "Nro BADEC": 38658,
-    Nombre: "Arias Agapito Aurelio",
-    CUIT: 20351538647,
-    "Calle Frente": "Matadero",
-    Nro: 410,
-    Barrio: "Las Polinesias",
-  },
-  {
-    "Nro BADEC": 38659,
-    Nombre: "Lopez Maria",
-    CUIT: 20357234567,
-    "Calle Frente": "Calle Principal",
-    Nro: 123,
-    Barrio: "Los Pinos",
-  },
-]
-
-interface Contribuyente {
-  nombre: string
-  apellido: string
-  cuit: string
-  direccion: string
-  telefono: string
-  email: string
-}
 
 const Tasas = () => {
-  const [nombre, setNombre] = useState("")
-  const [apellido, setApellido] = useState("")
-  const [cuit, setCuit] = useState("")
-  const [searchResult, setSearchResult] = useState<Contribuyente | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
-
-  const handleSearch = () => {
-    const cuitRegex = /^\d{11}$/
-
-    if (cuit) {
-      if (!cuitRegex.test(cuit)) {
-        setError("El CUIT debe tener 11 dígitos numéricos.")
-        return
-      }
-
-      const result: Contribuyente = {
-        nombre: "",
-        apellido: "",
-        cuit: cuit,
-        direccion: "Av. Siempre Viva 123",
-        telefono: "555-1234",
-        email: "juan.perez@example.com",
-      }
-
-      setSearchResult(result)
-      setError(null)
-    } else if (nombre) {
-      if (nombre.length < 3) {
-        setError("El nombre debe tener al menos 3 caracteres.")
-        return
-      }
-
-      const result: Contribuyente = {
-        nombre: nombre,
-        apellido: "Perez",
-        cuit: "20351598647",
-        direccion: "Av. Siempre Viva 123",
-        telefono: "555-1234",
-        email: "juan.perez@example.com",
-      }
-
-      setSearchResult(result)
-      setError(null)
-    } else {
-      setError("Debe ingresar un nombre o un CUIT.")
-    }
+  const { inmuebles } = useTasaContext()
+  const handleNuevaTasa = () => {
+    navigate(`/nuevaTasa`)
   }
 
-  const handleVerContribuyente = () => {
-    navigate("/detalle")
+  const handleVerContribuyente = (inmueble: any) => {
+    console.log("inmueble", inmueble)
+    navigate(`detalle/${inmueble.nro_bad}`)
   }
 
   return (
@@ -181,10 +97,14 @@ const Tasas = () => {
               </div>
             </div>
           </section> */}
-        <SearchBar />
+        <SearchBar handleNuevaTasa={handleNuevaTasa} />
         <div className="conScroll h-2/5">
-          {data.length > 0 && (
-            <TableConstructor fields={fields} data={data} action={handleVerContribuyente} />
+          {inmuebles && inmuebles.length > 0 && (
+            <TableConstructor
+              fields={fields}
+              data={inmuebles}
+              handleClick={handleVerContribuyente}
+            />
           )}
         </div>
       </div>

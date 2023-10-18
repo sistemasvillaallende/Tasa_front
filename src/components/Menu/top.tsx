@@ -1,25 +1,25 @@
-import { useState, useEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { selectTopMenu } from "../../stores/topMenuSlice";
-import { useAppSelector } from "../../stores/hooks";
-import _ from "lodash";
-import { FormattedMenu, linkTo, nestedMenu } from "./top-menu";
-import Lucide from "../../base-components/Lucide";
-import clsx from "clsx";
-import TopBar from "../TopBar";
-import MobileMenu from "../MobileMenu";
-import DarkModeSwitcher from "../DarkModeSwitcher";
-import MainColorSwitcher from "../MainColorSwitcher";
+import { useState, useEffect } from "react"
+import { Outlet, useLocation, useNavigate } from "react-router-dom"
+import { selectTopMenu } from "../../stores/topMenuSlice"
+import { useAppSelector } from "../../stores/hooks"
+import _ from "lodash"
+import { FormattedMenu, linkTo, nestedMenu } from "./top-menu"
+import Lucide from "../../base-components/Lucide"
+import clsx from "clsx"
+import TopBar from "../TopBar"
+import MobileMenu from "../MobileMenu"
+import DarkModeSwitcher from "../DarkModeSwitcher"
+import MainColorSwitcher from "../MainColorSwitcher"
 
 function Main() {
-  const location = useLocation();
-  const [formattedMenu, setFormattedMenu] = useState<Array<FormattedMenu>>([]);
-  const topMenuStore = useAppSelector(selectTopMenu);
-  const topMenu = () => nestedMenu(topMenuStore, location);
+  const location = useLocation()
+  const [formattedMenu, setFormattedMenu] = useState<Array<FormattedMenu>>([])
+  const topMenuStore = useAppSelector(selectTopMenu)
+  const topMenu = () => nestedMenu(topMenuStore, location)
 
   useEffect(() => {
-    setFormattedMenu(topMenu());
-  }, [topMenuStore, location.pathname]);
+    setFormattedMenu(topMenu())
+  }, [topMenuStore, location.pathname])
 
   return (
     <div className="py-5 md:py-0">
@@ -30,7 +30,7 @@ function Main() {
       {/* BEGIN: Top Menu */}
       <nav
         className={clsx([
-          "relative z-50 hidden pt-32 -mt-4 md:block",
+          "relative z-50 hidden pt-20 -mt-4 md:block",
 
           // Animation
           "opacity-0 animate-[0.4s_ease-in-out_0.2s_intro-top-menu] animate-fill-mode-forwards",
@@ -41,18 +41,18 @@ function Main() {
             <li
               className={clsx([
                 "relative [&:hover>ul]:block [&:hover>a>div:nth-child(2)>svg]:rotate-180",
+                !menu.active && "[&:hover>a]:bg-slate-100 [&:hover>a]:dark:bg-transparent",
                 !menu.active &&
-                "[&:hover>a]:bg-slate-100 [&:hover>a]:dark:bg-transparent",
-                !menu.active &&
-                "[&:hover>a]:before:content-[''] [&:hover>a]:before:block [&:hover>a]:before:inset-0 [&:hover>a]:before:rounded-full [&:hover>a]:xl:before:rounded-xl [&:hover>a]:before:absolute [&:hover>a]:before:z-[-1] [&:hover>a]:before:border-b-[3px] [&:hover>a]:before:border-solid [&:hover>a]:before:border-black/[0.08] [&:hover>a]:before:dark:bg-darkmode-700",
+                  "[&:hover>a]:before:content-[''] [&:hover>a]:before:block [&:hover>a]:before:inset-0 [&:hover>a]:before:rounded-full [&:hover>a]:xl:before:rounded-xl [&:hover>a]:before:absolute [&:hover>a]:before:z-[-1] [&:hover>a]:before:border-b-[3px] [&:hover>a]:before:border-solid [&:hover>a]:before:border-black/[0.08] [&:hover>a]:before:dark:bg-darkmode-700",
               ])}
               key={menuKey}
             >
               <MenuLink
                 className={clsx({
                   // Animation
-                  [`opacity-0 translate-y-[50px] animate-[0.4s_ease-in-out_0.3s_intro-menu] animate-fill-mode-forwards animate-delay-${(menuKey + 1) * 10
-                    }`]: !menu.active,
+                  [`opacity-0 translate-y-[50px] animate-[0.4s_ease-in-out_0.3s_intro-menu] animate-fill-mode-forwards animate-delay-${
+                    (menuKey + 1) * 10
+                  }`]: !menu.active,
                 })}
                 menu={menu}
                 level="first"
@@ -81,19 +81,14 @@ function Main() {
                             "after:content-[''] after:w-full after:h-1 after:absolute after:top-0 after:left-0 after:-mt-1 after:cursor-pointer",
                           ])}
                         >
-                          {subMenu.subMenu.map(
-                            (lastSubMenu, lastSubMenuKey) => (
-                              <li
-                                className="px-5 relative [&:hover>ul]:block [&:hover>a>div:nth-child(2)>svg]:-rotate-90"
-                                key={lastSubMenuKey}
-                              >
-                                <MenuLink
-                                  menu={lastSubMenu}
-                                  level="third"
-                                ></MenuLink>
-                              </li>
-                            )
-                          )}
+                          {subMenu.subMenu.map((lastSubMenu, lastSubMenuKey) => (
+                            <li
+                              className="px-5 relative [&:hover>ul]:block [&:hover>a>div:nth-child(2)>svg]:-rotate-90"
+                              key={lastSubMenuKey}
+                            >
+                              <MenuLink menu={lastSubMenu} level="third"></MenuLink>
+                            </li>
+                          ))}
                         </ul>
                       )}
                       {/* END: Third Child */}
@@ -118,15 +113,15 @@ function Main() {
       </div>
       {/* END: Content */}
     </div>
-  );
+  )
 }
 
 function MenuLink(props: {
-  className?: string;
-  menu: FormattedMenu;
-  level: "first" | "second" | "third";
+  className?: string
+  menu: FormattedMenu
+  level: "first" | "second" | "third"
 }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <a
       href={props.menu.subMenu ? "#" : props.menu.pathname}
@@ -149,8 +144,8 @@ function MenuLink(props: {
         props.className,
       ])}
       onClick={(event) => {
-        event.preventDefault();
-        linkTo(props.menu, navigate);
+        event.preventDefault()
+        linkTo(props.menu, navigate)
       }}
     >
       <div
@@ -158,8 +153,8 @@ function MenuLink(props: {
           "z-10 dark:text-slate-400",
           props.level == "first" && "-mt-[3px]",
           props.level == "first" &&
-          props.menu.active &&
-          "dark:text-white text-primary xl:text-primary",
+            props.menu.active &&
+            "dark:text-white text-primary xl:text-primary",
         ])}
       >
         <Lucide icon={props.menu.icon} />
@@ -169,8 +164,8 @@ function MenuLink(props: {
           "ml-3 flex items-center whitespace-nowrap z-10 dark:text-slate-400",
           props.level == "first" && "-mt-[3px]",
           props.level == "first" &&
-          props.menu.active &&
-          "font-medium dark:text-white text-slate-800 xl:text-primary",
+            props.menu.active &&
+            "font-medium dark:text-white text-slate-800 xl:text-primary",
           props.level != "first" && "w-full",
         ])}
       >
@@ -187,7 +182,7 @@ function MenuLink(props: {
         )}
       </div>
     </a>
-  );
+  )
 }
 
-export default Main;
+export default Main
