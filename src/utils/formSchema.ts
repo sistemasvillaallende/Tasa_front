@@ -2,27 +2,24 @@ import * as yup from "yup"
 import { validateCuil } from "./cuilValidator"
 
 export const formSchema = yup.object({
-  datosPropietario: yup
-    .number()
-    .typeError("Ingresa un número de CUIT/CUIL")
+  nombre: yup.number().typeError("Ingresa un nombre").required("Este campo es obligatorio"),
+  cuil: yup
+    .string()
+    .typeError("Selecciona la notificación que quieres enviar")
     .required("Este campo es obligatorio")
     .test("validate-cuil", "Ingresa un número de CUIT/CUIL válido", (value) =>
       validateCuil(value?.toString() as string)
     ),
-  nombreComercio: yup
+  fechaCambioDomicilio: yup
+    .date()
+    .typeError("Selecciona una fecha")
+    .required("Este campo es obligatorio"),
+  ocupante: yup
     .string()
     .typeError("Selecciona la notificación que quieres enviar")
     .required("Este campo es obligatorio"),
-  transporte: yup
-    .string()
-    .typeError("Selecciona la notificación que quieres enviar")
-    .required("Este campo es obligatorio"),
-  descripcion: yup
-    .string()
-    .typeError("Selecciona la notificación que quieres enviar")
-    .required("Este campo es obligatorio"),
-  fechaCarga: yup
-    .string()
+  codigoPostal: yup
+    .number()
     .typeError("Selecciona la notificación que quieres enviar")
     .required("Este campo es obligatorio"),
   legajo: yup

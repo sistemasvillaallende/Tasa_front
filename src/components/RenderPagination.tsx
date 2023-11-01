@@ -1,35 +1,63 @@
-import { useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
 import Button from "../base-components/Button"
+import { useTasaContext } from "../context/TasaProvider"
+import axios from "axios"
+import Swal from "sweetalert2"
 
 const RenderPagination = () => {
   const paginationItems: JSX.Element[] = []
   const pageRange = 5
+  const { cantPaginas, searchForm, setInmuebles, setCantPaginas, setSearch } = useTasaContext()
 
-  const [cantPaginas] = useState<number>(5)
-  const [paginaActual] = useState<number>(1)
-  const { pagina, buscarPorURL, parametroURL } = useParams()
-  const navigate = useNavigate()
-  let startPage = Math.max(1, paginaActual - pageRange)
-  let endPage = Math.min(cantPaginas, paginaActual + pageRange)
+  const { buscarPor, searchParametro, activos, pagina, registrosPorPagina } = searchForm
+
+  let startPage = Math.max(1, pagina - pageRange)
+
+  let endPage = Math.min(cantPaginas, pagina + pageRange)
+  console.log("startPage", startPage, "endPage", endPage)
   const handlePageChange = (newPage: number) => {
-    navigate(`/tasas/${newPage}`)
+    const paginaNum = newPage
+    setSearch({ ...searchForm, pagina: paginaNum })
+
+    if (buscarPor && searchParametro) {
+      const fetchData = async () => {
+        const URL = `${
+          import.meta.env.VITE_URL_TASA
+        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&activo=${activos}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
+        const response = await axios.get(URL)
+        if (response.data === "") {
+          Swal.fire({
+            title: "Error",
+            text: "Al parecer ya no hay páginas.",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+          })
+
+          return
+        }
+        setInmuebles(response.data.resultado)
+        setCantPaginas(response.data.totalPaginas)
+        setCantPaginas(response.data.totalPaginas)
+      }
+
+      fetchData()
+    }
   }
 
-  if (paginaActual > 1) {
+  if (pagina > 1) {
     paginationItems.push(
       <Button
         key="prev"
         variant="primary"
         className="mr-2"
-        onClick={() => handlePageChange(paginaActual - 1)}
+        onClick={() => handlePageChange(pagina - 1)}
       >
         &lt;
       </Button>
     )
   }
-
-  if (startPage > 1) {
+  console.log("cantPaginas", cantPaginas)
+  if (cantPaginas > 1 && startPage > 1) {
     paginationItems.push(
       <Button key={1} variant="soft-primary" className="mr-2" onClick={() => handlePageChange(1)}>
         1
@@ -46,16 +74,18 @@ const RenderPagination = () => {
   }
 
   for (let i = startPage; i <= endPage; i++) {
-    paginationItems.push(
-      <Button
-        key={i}
-        variant={i === paginaActual ? "primary" : "soft-primary"}
-        className="mr-2"
-        onClick={() => handlePageChange(i)}
-      >
-        {i}
-      </Button>
-    )
+    if (cantPaginas > 1) {
+      paginationItems.push(
+        <Button
+          key={i}
+          variant={i === pagina ? "primary" : "soft-primary"}
+          className="mr-2"
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Button>
+      )
+    }
   }
 
   if (endPage < cantPaginas) {
@@ -79,13 +109,13 @@ const RenderPagination = () => {
     )
   }
 
-  if (paginaActual < cantPaginas) {
+  if (pagina < cantPaginas) {
     paginationItems.push(
       <Button
         key="next"
         variant="primary"
         className="mr-2"
-        onClick={() => handlePageChange(paginaActual + 1)}
+        onClick={() => handlePageChange(pagina + 1)}
       >
         &gt;
       </Button>

@@ -18,7 +18,6 @@ const ModalCalle = ({
   const handleRadio = (e: any) => {
     e.preventDefault()
     const { value } = e.target
-    console.log(value)
     setValueRadio(value)
   }
   return (

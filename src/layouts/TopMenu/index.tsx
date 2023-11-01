@@ -4,7 +4,7 @@ import { selectTopMenu } from "../../stores/topMenuSlice"
 import { useAppSelector } from "../../stores/hooks"
 import _ from "lodash"
 import { FormattedMenu, linkTo, nestedMenu } from "./top-menu"
-import MenuAutos from "../Menu/Menu"
+import SideMenu from "../../layouts/SideMenu"
 import Lucide from "../../base-components/Lucide"
 import clsx from "clsx"
 import TopBar from "../../components/TopBar"
@@ -20,7 +20,7 @@ function Main() {
 
   useEffect(() => {
     setFormattedMenu(topMenu())
-    if (location.pathname == "/" || paginacion()) {
+    if (location.pathname == "/" || location.pathname == "/nuevaTasa" || paginacion()) {
       setShowLista(true)
       setShowEdicion(false)
     } else {
@@ -33,8 +33,8 @@ function Main() {
     return location.pathname.includes("autos")
   }
 
-  const nuevoVehiculo = () => {
-    return location.pathname.includes("nuevoVehiculo")
+  const nuevaTasa = () => {
+    return location.pathname.includes("nuevaTasa")
   }
 
   return (
@@ -48,7 +48,7 @@ function Main() {
             <nav
               style={{ paddingLeft: "35px" }}
               className={clsx([
-                "relative z-50 hidden pt-10 -mt-4 md:block",
+                "relative hidden pt-10 -mt-4 md:block",
 
                 // Animation
                 "opacity-0 animate-[0.4s_ease-in-out_0.2s_intro-top-menu] animate-fill-mode-forwards",
@@ -144,7 +144,7 @@ function Main() {
             }}
           >
             <div
-              className="col-span-12 intro-y lg:col-span-2 content"
+              className="col-span-2 intro-y content"
               style={{
                 padding: "25px !important",
                 backgroundColor: "white",
@@ -156,10 +156,10 @@ function Main() {
                 marginLeft: "20px",
               }}
             >
-              <MenuAutos />
+              <SideMenu />
             </div>
             <div
-              className="conScroll col-span-12 intro-y lg:col-span-10 box content"
+              className="conScroll intro-y col-span-10 box content"
               style={{
                 padding: "25px !important",
                 backgroundColor: "white",

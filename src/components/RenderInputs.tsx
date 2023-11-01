@@ -1,8 +1,9 @@
-import { FormInput, FormSelect } from "../base-components/Form"
+import { FormInput, FormSelect, FormSwitch } from "../base-components/Form"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { formSchema } from "../utils/formSchema"
 import Lucide from "../base-components/Lucide"
+import { useEffect } from "react"
 
 export interface InputType {
   name: string
@@ -11,38 +12,57 @@ export interface InputType {
   label?: string
   disabled?: boolean
   minWidth?: string
+  field?: string
+  fields?: any
 }
 
 interface RenderInputsProps {
   list: any[]
-  setOpenModalDatos?: Function
-  setOpenModalCalle?: Function
   title?: string
   bgSlate?: boolean
+  data: any
+  formInputs: any
+  setInputs: Function
 }
 
-const RenderInputs = ({
-  list,
-  setOpenModalDatos,
-  setOpenModalCalle,
-  title,
-  bgSlate,
-}: RenderInputsProps) => {
-  const {
-    register,
-    // handleSubmit,
-    // reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(formSchema),
-    mode: "onChange",
-  })
-
+const RenderInputs = ({ list, title, bgSlate, data, formInputs, setInputs }: RenderInputsProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const target = e.target
+    const { name, value } = target
+    setInputs({ ...formInputs, [name]: value })
+    if (target.type === "checkbox") {
+      setInputs({ ...formInputs, [name]: target.checked })
+    }
+  }
+  useEffect(() => {}, [])
   return (
     <div className={`p-5 mt-5 intro-y ${bgSlate && "bg-slate-50"}`}>
       {title && <h2 className="font-bold text-xl">{title}</h2>}
       <div className="flex flex-wrap justify-between">
         {list?.map((input: InputType, idx: number) => {
+          if (input.fields) {
+            return input.fields.map((inputField: { fieldName: string; frontName: string }) => {
+              return (
+                <label
+                  key={`${idx}-${inputField.fieldName}`}
+                  className="flex flex-col items-center grow mx-2 my-3"
+                >
+                  {inputField.frontName}
+                  <FormSwitch.Input
+                    name={inputField.fieldName}
+                    className="shadow-md mt-2"
+                    type="checkbox"
+                    value={formInputs[inputField.fieldName as keyof typeof formInputs]}
+                    checked={formInputs[inputField.fieldName as keyof typeof formInputs]}
+                    onChange={handleChange}
+                  />
+                  <span className="text-warning text-right">
+                    {/* {errors[input?.name]?.message as string} */}
+                  </span>
+                </label>
+              )
+            })
+          }
           if (input?.type == "select")
             return (
               <label key={`${idx}-${input.name}`} className="flex flex-col grow mx-2 my-3">
@@ -62,7 +82,7 @@ const RenderInputs = ({
                   <option value="1">Seleccionar1</option>
                 </FormSelect>
                 <span className="text-warning text-right">
-                  {errors[input?.name]?.message as string}
+                  {/* {errors[input?.name]?.message as string} */}
                 </span>
               </label>
             )
@@ -73,9 +93,15 @@ const RenderInputs = ({
                 className="flex flex-col items-center grow mx-2 my-3"
               >
                 {input.label}
-                <FormInput className="shadow-md mt-2" type="checkbox" {...register(input.name)} />
+                <FormSwitch.Input
+                  name={input.name}
+                  className="shadow-md mt-2"
+                  type="checkbox"
+                  value={formInputs[input.field as keyof typeof formInputs]}
+                  onChange={handleChange}
+                />
                 <span className="text-warning text-right">
-                  {errors[input?.name]?.message as string}
+                  {/* {errors[input?.name]?.message as string} */}
                 </span>
               </label>
             )
@@ -86,14 +112,9 @@ const RenderInputs = ({
                 className="flex flex-col items-center grow mx-2 my-3"
               >
                 {input.label}
-                <FormInput
-                  className="shadow-md mt-2"
-                  type="radio"
-                  rounded
-                  {...register(input.name)}
-                />
+                <FormInput className="shadow-md mt-2" type="radio" rounded />
                 <span className="text-warning text-right">
-                  {errors[input?.name]?.message as string}
+                  {/* {errors[input?.name]?.message as string} */}
                 </span>
               </label>
             )
@@ -111,10 +132,31 @@ const RenderInputs = ({
                   }`}
                   placeholder={input.placeholder}
                   type="textarea"
-                  {...register(input.name)}
+                  value={formInputs[input.name as keyof typeof formInputs]}
                 />
                 <span className="text-warning text-right">
-                  {errors[input?.name]?.message as string}
+                  {/* {errors[input?.name]?.message as string} */}
+                </span>
+              </label>
+            )
+          if (input.type === "date")
+            return (
+              <label key={`${idx}-${input.name}`} className="flex flex-col grow mx-2 my-3">
+                {input.label}
+                <FormInput
+                  className={`shadow-md h-full px-3 ${
+                    input.minWidth == "m"
+                      ? "min-w-[20vw]"
+                      : input.minWidth == "l"
+                      ? "min-w-[30vw]"
+                      : ""
+                  }`}
+                  placeholder={input.placeholder}
+                  type="date"
+                  value={formInputs[input.name as keyof typeof formInputs]}
+                />
+                <span className="text-warning text-right">
+                  {/* {errors[input?.name]?.message as string} */}
                 </span>
               </label>
             )
@@ -123,6 +165,7 @@ const RenderInputs = ({
               <label key={`${idx}-${input.name}`} className="flex flex-col relative grow mx-2 my-3">
                 {input.label}
                 <FormInput
+                  name={input.name}
                   className={`shadow-md ${
                     input.minWidth == "m"
                       ? "min-w-[20vw]"
@@ -132,11 +175,8 @@ const RenderInputs = ({
                   }`}
                   type={input.type}
                   placeholder={input.placeholder}
-                  onFocus={(e: any) => {
-                    if (e.target.name === "datosPropietario") setOpenModalDatos?.(true)
-                    else if (e.target.name === "calle") setOpenModalCalle?.(true)
-                  }}
-                  {...register(input.name)}
+                  onChange={handleChange}
+                  value={formInputs?.[input.field as keyof typeof formInputs]}
                 />
                 {(input.name === "datosPropietario" || input.name === "calle") && (
                   <Lucide
@@ -145,7 +185,7 @@ const RenderInputs = ({
                   />
                 )}
                 <span className="text-warning text-right">
-                  {errors[input?.name]?.message as string}
+                  {/* {errors[input?.name]?.message as string} */}
                 </span>
               </label>
             )

@@ -1,39 +1,23 @@
-import { twMerge } from "tailwind-merge";
-import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge"
+import { Menu as HeadlessMenu, Transition } from "@headlessui/react"
+import { Fragment } from "react"
+import clsx from "clsx"
 
-function Menu({
-  children,
-  className,
-  ...props
-}: ExtractProps<typeof HeadlessMenu>) {
+function Menu({ children, className, ...props }: ExtractProps<typeof HeadlessMenu>) {
   return (
-    <HeadlessMenu
-      as="div"
-      className={twMerge(["relative", className])}
-      {...props}
-    >
+    <HeadlessMenu as="div" className={twMerge(["relative", className])} {...props}>
       {children}
     </HeadlessMenu>
-  );
+  )
 }
 
-Menu.Button = ({
-  children,
-  className,
-  ...props
-}: ExtractProps<typeof HeadlessMenu.Button>) => {
+Menu.Button = ({ children, className, ...props }: ExtractProps<typeof HeadlessMenu.Button>) => {
   return (
-    <HeadlessMenu.Button
-      as="div"
-      className={twMerge(["cursor-pointer", className])}
-      {...props}
-    >
+    <HeadlessMenu.Button as="div" className={twMerge(["cursor-pointer", className])} {...props}>
       {children}
     </HeadlessMenu.Button>
-  );
-};
+  )
+}
 
 Menu.Items = ({
   children,
@@ -53,7 +37,7 @@ Menu.Items = ({
     | "bottom-start"
     | "left-start"
     | "left"
-    | "left-end";
+    | "left-end"
 }) => {
   return (
     <Transition
@@ -67,7 +51,7 @@ Menu.Items = ({
     >
       <div
         className={clsx([
-          "absolute z-30",
+          "absolute z-30 pointer",
           placement == "top-start" && "left-0 bottom-[100%]",
           placement == "top" && "left-[50%] translate-x-[-50%] bottom-[100%]",
           placement == "top-end" && "right-0 bottom-[100%]",
@@ -94,14 +78,10 @@ Menu.Items = ({
         </HeadlessMenu.Items>
       </div>
     </Transition>
-  );
-};
+  )
+}
 
-Menu.Item = ({
-  children,
-  className,
-  ...props
-}: ExtractProps<typeof HeadlessMenu.Item>) => {
+Menu.Item = ({ children, className, ...props }: ExtractProps<typeof HeadlessMenu.Item>) => {
   return (
     <HeadlessMenu.Item
       as="a"
@@ -113,38 +93,23 @@ Menu.Item = ({
     >
       {children}
     </HeadlessMenu.Item>
-  );
-};
+  )
+}
 
 Menu.Divider = (props: React.ComponentPropsWithoutRef<"div">) => {
   return (
     <div
-      className={twMerge([
-        "h-px my-2 -mx-2 bg-slate-200/60 dark:bg-darkmode-400",
-        props.className,
-      ])}
+      className={twMerge(["h-px my-2 -mx-2 bg-slate-200/60 dark:bg-darkmode-400", props.className])}
     ></div>
-  );
-};
+  )
+}
 
-Menu.Header = (
-  props: React.PropsWithChildren & React.ComponentPropsWithoutRef<"div">
-) => {
-  return (
-    <div className={twMerge(["p-2 font-medium", props.className])}>
-      {props.children}
-    </div>
-  );
-};
+Menu.Header = (props: React.PropsWithChildren & React.ComponentPropsWithoutRef<"div">) => {
+  return <div className={twMerge(["p-2 font-medium", props.className])}>{props.children}</div>
+}
 
-Menu.Footer = (
-  props: React.PropsWithChildren & React.ComponentPropsWithoutRef<"div">
-) => {
-  return (
-    <div className={twMerge(["flex p-1", props.className])}>
-      {props.children}
-    </div>
-  );
-};
+Menu.Footer = (props: React.PropsWithChildren & React.ComponentPropsWithoutRef<"div">) => {
+  return <div className={twMerge(["flex p-1", props.className])}>{props.children}</div>
+}
 
-export default Menu;
+export default Menu
