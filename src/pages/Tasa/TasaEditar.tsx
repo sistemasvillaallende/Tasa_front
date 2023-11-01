@@ -26,8 +26,12 @@ function TasaEditar() {
     })
     setInputs(newState)
   }, [])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
   return (
-    <form className="mb-10">
+    <form onSubmit={handleSubmit} className="mb-10">
       <div className="flex items-center mt-8 intro-y">
         <h1 className="mr-auto ml-5 mb-3 text-lg font-medium">Gestión de Tasa a la Propiedad</h1>
       </div>
@@ -37,6 +41,7 @@ function TasaEditar() {
           list={defaultInputs.casaCentral}
           title="Casa Central"
           formInputs={inputs}
+          setInputs={setInputs}
           bgSlate
         />
         <RenderInputs
@@ -44,15 +49,23 @@ function TasaEditar() {
           list={defaultInputs.datosDomicilio}
           title="Datos del Domicilio"
           formInputs={inputs}
+          setInputs={setInputs}
         />
         <RenderInputs
           data={inmuebles}
           list={defaultInputs.datosLiquidacion}
           title="Datos de Liquidación"
           formInputs={inputs}
+          setInputs={setInputs}
           bgSlate
         />{" "}
-        <RenderInputs data={inmuebles} list={defaultInputs.footer} formInputs={inputs} bgSlate />{" "}
+        <RenderInputs
+          data={inmuebles}
+          list={defaultInputs.footer}
+          formInputs={inputs}
+          setInputs={setInputs}
+          bgSlate
+        />{" "}
         {/* END: Page Layout */}
         {/* END: Page Layout */}
       </div>

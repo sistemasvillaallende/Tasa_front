@@ -101,7 +101,8 @@ function NuevaTasa() {
       emite_cedulon: false,
       clave_pago: "",
     }
-    console.log("input", inputs, urlApi, requestBody)
+    // TODO: Falta endpoint
+    console.log(urlApi, requestBody)
   }
 
   return (

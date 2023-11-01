@@ -29,15 +29,12 @@ const RenderInputs = ({ list, title, bgSlate, data, formInputs, setInputs }: Ren
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target
     const { name, value } = target
-    console.log("name", name, "value", value)
     setInputs({ ...formInputs, [name]: value })
-    console.log(formInputs)
     if (target.type === "checkbox") {
       setInputs({ ...formInputs, [name]: target.checked })
     }
   }
   useEffect(() => {}, [])
-
   return (
     <div className={`p-5 mt-5 intro-y ${bgSlate && "bg-slate-50"}`}>
       {title && <h2 className="font-bold text-xl">{title}</h2>}
@@ -45,7 +42,6 @@ const RenderInputs = ({ list, title, bgSlate, data, formInputs, setInputs }: Ren
         {list?.map((input: InputType, idx: number) => {
           if (input.fields) {
             return input.fields.map((inputField: { fieldName: string; frontName: string }) => {
-              console.log("inputField", inputField.frontName)
               return (
                 <label
                   key={`${idx}-${inputField.fieldName}`}
@@ -57,6 +53,7 @@ const RenderInputs = ({ list, title, bgSlate, data, formInputs, setInputs }: Ren
                     className="shadow-md mt-2"
                     type="checkbox"
                     value={formInputs[inputField.fieldName as keyof typeof formInputs]}
+                    checked={formInputs[inputField.fieldName as keyof typeof formInputs]}
                     onChange={handleChange}
                   />
                   <span className="text-warning text-right">
@@ -179,6 +176,7 @@ const RenderInputs = ({ list, title, bgSlate, data, formInputs, setInputs }: Ren
                   type={input.type}
                   placeholder={input.placeholder}
                   onChange={handleChange}
+                  value={formInputs?.[input.field as keyof typeof formInputs]}
                 />
                 {(input.name === "datosPropietario" || input.name === "calle") && (
                   <Lucide

@@ -323,7 +323,7 @@ export const domicilioComercialInputs = [
 ]
 
 export const fieldsState = [
-  "nombrePropietario",
+  "nombre",
   "cuil",
   "fecha_cambio_domicilio",
   "ocupante",

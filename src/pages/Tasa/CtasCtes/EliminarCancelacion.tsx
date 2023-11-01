@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react"
 import { useTasaContext } from "../../../context/TasaProvider"
 import Table from "../../../base-components/Table"
-import { ReLiquidacion } from "../../../interfaces/Vehiculo"
+import { ReLiquidacion } from "../../../interfaces/Inmueble"
 import axios from "axios"
 import Swal from "sweetalert2"
 import Button from "../../../base-components/Button"
 import Lucide from "../../../base-components/Lucide"
 import { useNavigate, useParams } from "react-router-dom"
 import { useUserContext } from "../../../context/UserProvider"
-import { formatNumberToARS, formatDateToDDMMYYYY } from "../../../utils/Operaciones"
-import { FormSelect, FormLabel, FormInline } from "../../../base-components/Form"
+import { formatNumberToARS } from "../../../utils/Operaciones"
 
 const EliminarCancelacion = () => {
   const { inmuebles } = useTasaContext()
@@ -84,8 +83,7 @@ const EliminarCancelacion = () => {
     return formattedDate
   }
 
-  const handleCancelarCtaCte = (auditoria: String) => {
-    console.log(reLiquidacionesSeleccionadas)
+  const handleCancelarCtaCte = (auditoria: string) => {
     const consulta = {
       cir: circunscripcion,
       sec: seccion,
@@ -117,7 +115,7 @@ const EliminarCancelacion = () => {
           confirmButtonColor: "#27a3cf",
         })
         setReLiquidacionesSeleccionadas([])
-        navigate(`/detalle/${detalleInmueble.nro_bad}/`)
+        navigate(`/detalle/${detalleInmueble?.nro_bad}/`)
       })
       .catch((error) => {
         Swal.fire({
@@ -127,7 +125,7 @@ const EliminarCancelacion = () => {
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
         })
-        console.log(error)
+        console.error(error)
       })
   }
 
@@ -154,7 +152,7 @@ const EliminarCancelacion = () => {
 
   const handleCancelar = () => {
     setReLiquidacionesSeleccionadas([])
-    navigate(`/detalle/${detalleInmueble.nro_bad}/`)
+    navigate(`/detalle/${detalleInmueble?.nro_bad}/`)
   }
 
   const sumarMontosSeleccionados = () => {

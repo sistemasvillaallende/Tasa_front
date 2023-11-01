@@ -58,25 +58,23 @@ function Main() {
     },
     {
       icon: "FileText",
-      pathname: "/cedulones",
+      pathname: `/cedulones/${id ?? ""}`,
       title: "Cedulones",
     },
     {
       icon: "Rewind",
-      pathname: "/reliquida",
+      pathname: `/reliquida/${id ?? ""}`,
       title: "ReLiquida",
     },
   ]
 
   useEffect(() => {
-    console.log("actualizo el menú")
     dispatch(updateSideMenu(updatedMenu))
   }, [window.location])
 
   useEffect(() => {
     setFormattedMenu(sideMenu())
   }, [sideMenuStore, location.pathname])
-  console.log("sideMenuStore", sideMenuStore)
   return (
     <div
       className="containerctacte menu-auto"

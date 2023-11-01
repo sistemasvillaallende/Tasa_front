@@ -27,7 +27,6 @@ const RenderTexts = ({ data, list, title, bgSlate }: RenderInputsProps) => {
       {title && <h2 className="font-bold text-xl">{title}</h2>}
       <div className="flex flex-wrap justify-between">
         {list?.map((input: InputType, idx: number) => {
-          console.log("data[input.name]", data, input.name)
           return (
             <div key={`${idx}-${input.name}`} className="flex flex-col relative grow mx-2 my-3">
               <h3 className="font-bold">{input.label}</h3>

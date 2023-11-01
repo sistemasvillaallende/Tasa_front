@@ -12,8 +12,10 @@ const SearchBar = ({
 }) => {
   const [error, setError] = useState<string | null>(null)
   const [paginaActual, setPaginaActual] = useState(1)
-
   const { setInmuebles, setCantPaginas, searchForm, setSearch } = useTasaContext()
+  const { buscarPor, searchParametro, denominacion, activos } = searchForm
+  const { cir, sec, man, p_h, par } = denominacion
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setSearch({ ...searchForm, [id]: value })
@@ -24,9 +26,7 @@ const SearchBar = ({
   }
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    const { buscarPor, searchParametro, activos } = searchForm
-    if (!buscarPor || !searchParametro || buscarPor === "0") {
+    if (buscarPor != "denominacion" && (!buscarPor || !searchParametro || buscarPor === "0")) {
       Swal.fire({
         title: "Faltan parámetros o criterios de búsqueda",
         text: "Por favor, ingrese criterios de búsqueda válidos.",
@@ -41,11 +41,20 @@ const SearchBar = ({
       const registrosPorPagina = 10
       const paginaNum = 0
       setPaginaActual(paginaNum)
-      const URL = `${
-        import.meta.env.VITE_URL_TASA
-      }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
+      let URL
+      if (buscarPor === "denominacion") {
+        URL = `${
+          import.meta.env.VITE_URL_TASA
+        }GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
+      } else {
+        URL = `${
+          import.meta.env.VITE_URL_TASA
+        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
+      }
+
       const response = await axios.get(URL)
       setCantPaginas(response.data.totalPaginas)
+      setSearch({ ...searchForm, pagina: response.data.paginaActual })
       setInmuebles(response.data.resultado)
       if (response.status === 204) {
         Swal.fire({
@@ -59,10 +68,13 @@ const SearchBar = ({
       setError(null)
     }
     fetchData()
-    // }
-    // else {
-    //   setError("Debe ingresar un nombre o un CUIT.")
-    // }
+  }
+
+  const handleChangeDenominacion = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const target = e.target
+    const { value, name } = target
+    setSearch({ ...searchForm, denominacion: { ...searchForm.denominacion, [name]: value } })
   }
 
   const handleLimpiar = () => {
@@ -70,13 +82,13 @@ const SearchBar = ({
   }
   return (
     <div className="mb-5">
-      <div className="flex w-full justify-between items-center intro-y">
-        <div className="flex justify-start items-center">
-          <form
-            id="formBuscar"
-            className="ml-1 flex justify-start items-center"
-            onSubmit={handleSubmit}
-          >
+      <div className="flex justify-start items-center">
+        <form
+          id="formBuscar"
+          className="ml-1 flex flex-col justify-start items-center gap-2"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex">
             <div className="relative hidden sm:block">
               <FormLabel htmlFor="vertical-form-1">Buscar por</FormLabel>
               <FormSelect
@@ -87,8 +99,8 @@ const SearchBar = ({
                 onChange={(e) => handleSelectChange(e)}
               >
                 <option value="titular">Titutlar</option>
-                <option value="cuit">CUIT</option>
-                <option value="badec">Badec</option>
+                <option value="cuil">CUIT</option>
+                <option value="denominacion">Denominación</option>
               </FormSelect>
               <FormLabel htmlFor="vertical-form-1">Estado</FormLabel>
               <FormSelect
@@ -114,14 +126,71 @@ const SearchBar = ({
             <Button variant="primary" className="h-10 mx-3">
               Buscar
             </Button>
-          </form>
-          <Button variant="soft-primary" className="h-10 mx-3" onClick={handleLimpiar}>
-            Limpiar
-          </Button>
-        </div>
-        <Button variant="primary" className="h-10 mx-4" onClick={handleNuevaTasa}>
-          Nueva Tasa
-        </Button>
+
+            <Button variant="soft-primary" className="h-10 mx-3" onClick={handleLimpiar}>
+              Limpiar
+            </Button>
+          </div>
+          {buscarPor === "denominacion" && (
+            <div className="self-start intro-y">
+              <FormLabel>
+                Circunscripcion
+                <FormInput
+                  className="mx-5 mt-2 w-12"
+                  placeholder="00"
+                  value={cir}
+                  name="cir"
+                  type="number"
+                  onChange={handleChangeDenominacion}
+                />
+              </FormLabel>
+              <FormLabel>
+                Sección
+                <FormInput
+                  className="mx-5 mt-2 w-12"
+                  placeholder="00"
+                  type="number"
+                  value={sec}
+                  name="sec"
+                  onChange={handleChangeDenominacion}
+                />
+              </FormLabel>
+              <FormLabel>
+                Manzana
+                <FormInput
+                  className="mx-5 mt-2 w-12"
+                  placeholder="00"
+                  type="number"
+                  value={man}
+                  name="man"
+                  onChange={handleChangeDenominacion}
+                />
+              </FormLabel>
+              <FormLabel>
+                Parcela
+                <FormInput
+                  className="mx-5 mt-2 w-12"
+                  placeholder="00"
+                  type="number"
+                  value={par}
+                  name="par"
+                  onChange={handleChangeDenominacion}
+                />
+              </FormLabel>
+              <FormLabel>
+                PH
+                <FormInput
+                  className="mx-5 mt-2 w-12"
+                  placeholder="00"
+                  type="number"
+                  value={p_h}
+                  name="p_h"
+                  onChange={handleChangeDenominacion}
+                />
+              </FormLabel>
+            </div>
+          )}
+        </form>
       </div>
     </div>
   )

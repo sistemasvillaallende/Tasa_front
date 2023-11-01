@@ -1,13 +1,14 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from "react"
 import axios from "axios"
 import Swal from "sweetalert2"
-import { Inmueble } from "../interfaces/Tasa"
-import { useLocation } from "react-router-dom"
+import { Inmueble } from "../interfaces/Inmueble"
+import { useLocation, useParams } from "react-router-dom"
 
 type TasaContextType = {
   inmuebles: Inmueble[] | null
+  detalleInmueble: Inmueble | null
   traerInmuebles: any
-  setInmuebles: (tasa: Inmueble) => void
+  setInmuebles: Dispatch<SetStateAction<Inmueble[] | null>>
   setCantPaginas: (nroPagina: number) => void
   cantPaginas: number
   searchForm: any
@@ -16,6 +17,7 @@ type TasaContextType = {
 
 const TasaContext = createContext<TasaContextType>({
   inmuebles: null,
+  detalleInmueble: null,
   traerInmuebles: () => {},
   setInmuebles: () => {},
   setCantPaginas: () => {},
@@ -29,15 +31,24 @@ export function useTasaContext() {
 }
 
 export function TasaProvider({ children }: any) {
-  const [inmuebles, setInmuebles] = useState<Inmueble | null>(null)
-  const [cantPaginas, setCantPaginas] = useState(1)
+  const [inmuebles, setInmuebles] = useState<Inmueble[] | null>(null)
+  const [cantPaginas, setCantPaginas] = useState<number>(0)
   const [searchForm, setSearch] = useState({
     buscarPor: "titular",
     searchParametro: "",
-    pagina: "",
-    registrosPorPagina: "",
+    pagina: 0,
+    registrosPorPagina: 10,
     activos: 1,
+    denominacion: {
+      cir: 0,
+      sec: 0,
+      man: 0,
+      par: 0,
+      p_h: 0,
+    },
   })
+  const [detalleInmueble, setDetalleInmueble] = useState<any>()
+  const { id } = useParams()
   const location = useLocation()
   useEffect(() => {
     !inmuebles &&
@@ -48,13 +59,18 @@ export function TasaProvider({ children }: any) {
         searchForm.pagina,
         searchForm.registrosPorPagina
       )
-    console.log("cambio la url")
+    if (id && inmuebles) {
+      const dataInmueble = inmuebles?.find((inmueble: any) => inmueble.nro_bad.toString() === id)
+      setDetalleInmueble(dataInmueble)
+    }
+    return () => setDetalleInmueble({})
   }, [location.pathname])
+
   const traerInmuebles = async (
     buscarPor: string,
     parametro: string,
-    pagina: string,
-    registrosPorPagina: string
+    pagina: number,
+    registrosPorPagina: number
   ) => {
     try {
       const response = await axios.get(
@@ -63,6 +79,9 @@ export function TasaProvider({ children }: any) {
         }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${parametro}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
       )
       setInmuebles(response.data)
+      console.log("totalPaginas", response.data.totalPaginas)
+      setCantPaginas(response.data.totalPaginas)
+      setSearch({ ...searchForm, pagina: response.data.paginaActual })
     } catch (error) {
       Swal.fire({
         title: "Error",
@@ -79,6 +98,7 @@ export function TasaProvider({ children }: any) {
       value={{
         traerInmuebles,
         inmuebles,
+        detalleInmueble,
         setInmuebles,
         cantPaginas,
         setCantPaginas,

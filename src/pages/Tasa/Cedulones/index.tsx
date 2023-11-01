@@ -13,7 +13,8 @@ import Button from "../../../base-components/Button"
 import LoadingIcon from "../../../base-components/LoadingIcon"
 import { VCtasctes } from "../../../interfaces/VCtasctes"
 import { CreateCedulones } from "../../../interfaces/CreateCedulones"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
+import Swal from "sweetalert2"
 
 interface LstProcuraciones {
   nroProc: number
@@ -29,10 +30,18 @@ const Cedulones = () => {
   const { id } = useParams()
   const { inmuebles } = useTasaContext()
   const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
+    circunscripcion: 0,
+    parcela: 0,
+    seccion: 0,
+    manzana: 0,
+    p_h: 0,
+  }
+
   const [deuda, setDeuda] = useState<LstDeuda[]>([])
   const [deudaSeleccionada, setDeudaSeleccionada] = useState<LstDeuda[]>([])
   const [checkout, setCheckout] = useState<CheckOut>()
-
+  const navigate = useNavigate()
   function setDescripcionPlanes(planes_con_descripcion: Planes_Cobro[]) {
     planes_con_descripcion?.forEach((element) => {
       if (element.con_dto_interes == 1) {
@@ -98,17 +107,25 @@ const Cedulones = () => {
       fecha_vencimiento: "",
     }
     let cedulon: CreateCedulones = {
-      dominio: "",
+      cir: 0,
+      sec: 0,
+      man: 0,
+      par: 0,
+      p_h: 0,
       vencimiento: "",
       monto_cedulon: 0,
       nroProc: 0,
       listaDeuda: [],
       nroCedulon: 0,
     }
-    cedulon.dominio = detalleInmueble?.dominio ? detalleInmueble?.dominio : ""
-    cedulon.nroProc = proc ? proc[0] : 0
-    var montocedulon: number = 0
 
+    cedulon.cir = circunscripcion
+    cedulon.sec = seccion
+    cedulon.man = manzana
+    cedulon.par = parcela
+    cedulon.p_h = p_h
+    cedulon.nroProc = proc ? proc[0] : 0
+    let montocedulon: number = 0
     deudaSeleccionada.map(
       (deu, index) => (
         (objDeuda.categoria_deuda = deu.categoriaDeuda),
@@ -128,16 +145,26 @@ const Cedulones = () => {
     cedulon.monto_cedulon = montocedulon
     cedulon.listaDeuda = lstDeuda
     const fecha = new Date()
-    const hoy = fecha.getDate()
     cedulon.vencimiento = fecha.toLocaleDateString()
-    alert(cedulon.vencimiento)
-    const urlApi = `${import.meta.env.VITE_URL_CEDULONES}EmitoCedulondetalleInmueble`
-    const requestBody = { cedulon }
+    alert(cedulon)
+    const urlApi = `${import.meta.env.VITE_URL_CEDULONES}EmitoCedulonTasa`
     axios
       .post(urlApi, cedulon)
       .then((response) => {
-        if (response.data) {
-          console.log(response.data)
+        if (response) {
+          Swal.fire({
+            title: "Cedulón generado",
+            text: `Se ha generado el cedulón Nro. ${response.data}`,
+            icon: "success",
+            confirmButtonText: "Imprimir Cedulón",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            confirmButtonColor: "#27a3cf",
+          }).then((result: any) => {
+            if (result.isConfirmed) {
+              navigate(`/cedulonTasa/${response.data}`)
+            }
+          })
         }
       })
       .catch((error) => {})
@@ -145,7 +172,9 @@ const Cedulones = () => {
   useEffect(() => {
     const fetchData2 = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_CTACTE}getListDeudaAuto?dominio=` + detalleInmueble?.dominio
+        `${
+          import.meta.env.VITE_URL_CTACTE
+        }getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
       )
       setDeuda(response.data)
     }
@@ -158,7 +187,7 @@ const Cedulones = () => {
         setTarjetas(data)
         let url2 =
           `${import.meta.env.VITE_URL_TARJETAS}getPlanBySubsistema?subsistema=` +
-          4 +
+          1 +
           `&deuda=0&cod_tarjeta=` +
           data[0].cod_tarjeta
         fetch(url2)
@@ -175,7 +204,9 @@ const Cedulones = () => {
     if (value == "1") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${import.meta.env.VITE_URL_CTACTE}getListDeudaAuto?dominio=` + detalleInmueble?.dominio
+          `${
+            import.meta.env.VITE_URL_CTACTE
+          }getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
         setProc(null)
@@ -185,8 +216,9 @@ const Cedulones = () => {
     if (value == "2") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${import.meta.env.VITE_URL_CTACTE}getListDeudaAutoNoVencida?dominio=` +
-            detalleInmueble?.dominio
+          `${
+            import.meta.env.VITE_URL_CTACTE
+          }getListDeudaTasaNoVencida?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
         setProc(null)
@@ -196,42 +228,39 @@ const Cedulones = () => {
     if (value == "3") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${import.meta.env.VITE_URL_CTACTE}getListDeudaAutoProcurada?dominio=` +
-            detalleInmueble?.dominio
+          `${
+            import.meta.env.VITE_URL_CTACTE
+          }getListDeudaTasaProcurada?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
         setProc(
           response.data
-            .map((obj: { nro_proc: any }) => obj.nro_proc) // Obtenemos un array con solo los valores de la propiedad tipo
+            .map((obj: { nro_proc: any }) => obj.nro_proc)
             .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index)
         )
       }
       fetchData2()
-      var anula: LstDeuda[] = []
+      let anula: LstDeuda[] = []
       setDeudaSeleccionada(anula)
     }
   }
-  function handleChangeSelectCheckAll(event: React.ChangeEvent<HTMLInputElement>) {
-    const obj = deuda?.find(
-      (d: { nroTtransaccion: number }) => d.nroTtransaccion == Number.parseInt(event.target.name)
-    )
+  const handleChangeSelectCheckAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      if (obj != null && deudaSeleccionada != null) {
-        const newArray = [...deudaSeleccionada, obj]
-        setDeudaSeleccionada(newArray)
-        if (PlanCobro != undefined && PlanCobro) {
-          setCheckout(selectCalculaMontos(newArray, PlanCobro))
-        }
+      setDeudaSeleccionada([...deuda])
+      if (PlanCobro !== undefined && PlanCobro) {
+        setCheckout(selectCalculaMontos(deuda, PlanCobro))
       }
+      document
+        .querySelectorAll("#checkbox-switch-7")
+        .forEach((element: any) => (element.checked = true))
     } else {
-      const result = deudaSeleccionada?.findIndex(
-        (o) => o.nroTtransaccion == Number.parseInt(event.target.name)
-      )
-      const deuda_nueva = deudaSeleccionada.splice(result, 1)
-      setDeudaSeleccionada(deudaSeleccionada)
-      if (PlanCobro != undefined && PlanCobro) {
-        setCheckout(selectCalculaMontos(deudaSeleccionada, PlanCobro))
+      setDeudaSeleccionada([])
+      if (PlanCobro !== undefined && PlanCobro) {
+        setCheckout(selectCalculaMontos([], PlanCobro))
       }
+      document
+        .querySelectorAll("#checkbox-switch-7")
+        .forEach((element: any) => (element.checked = false))
     }
   }
   function handleChangeSelectCheck(event: React.ChangeEvent<HTMLInputElement>) {
@@ -328,7 +357,11 @@ const Cedulones = () => {
                         <Table.Th>
                           {" "}
                           <FormSwitch>
-                            <FormSwitch.Input id="checkbox-switch-7" type="checkbox" />
+                            <FormSwitch.Input
+                              id="checkbox-switch"
+                              type="checkbox"
+                              onChange={handleChangeSelectCheckAll}
+                            />
                             <FormSwitch.Label htmlFor="checkbox-switch-7"></FormSwitch.Label>
                           </FormSwitch>
                         </Table.Th>
@@ -336,7 +369,7 @@ const Cedulones = () => {
                     </Table.Thead>
 
                     <Table.Tbody style={{ marginBottom: "10px" }}>
-                      {deuda?.map((auto, index) => (
+                      {deuda?.map((inmueble, index) => (
                         <Table.Tr key={index}>
                           <Table.Td
                             style={{
@@ -367,7 +400,7 @@ const Cedulones = () => {
                                   display: "inline-grid",
                                 }}
                               >
-                                {auto.desCategoria} - {auto.periodo}
+                                {inmueble.desCategoria} - {inmueble.periodo}
                                 <br />
                                 <p
                                   style={{
@@ -376,7 +409,7 @@ const Cedulones = () => {
                                     fontWeight: "400",
                                   }}
                                 >
-                                  Venció el: {auto.vencimiento}
+                                  Venció el: {inmueble.vencimiento}
                                 </p>
                               </span>
                             </div>
@@ -389,7 +422,7 @@ const Cedulones = () => {
                               fontWeight: "600",
                             }}
                           >
-                            {currencyFormat(auto.debe)}
+                            {currencyFormat(inmueble.debe)}
                           </Table.Td>
                           <Table.Td
                             style={{
@@ -403,7 +436,7 @@ const Cedulones = () => {
                                 <FormSwitch.Input
                                   id="checkbox-switch-7"
                                   type="checkbox"
-                                  name={auto.nroTtransaccion.toString()}
+                                  name={inmueble.nroTtransaccion.toString()}
                                   onChange={handleChangeSelectCheck}
                                 />
                                 <FormSwitch.Label htmlFor="checkbox-switch-7"></FormSwitch.Label>

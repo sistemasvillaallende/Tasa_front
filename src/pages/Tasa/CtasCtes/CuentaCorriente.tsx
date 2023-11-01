@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 import Table from "../../../base-components/Table"
 import classNames from "classnames"
@@ -54,6 +54,12 @@ const CuentaCorriente = () => {
     seccion: "",
     manzana: "",
     p_h: "",
+  }
+
+  const navigate = useNavigate()
+
+  const handleCancelar = () => {
+    navigate(-1)
   }
 
   useEffect(() => {
@@ -273,7 +279,7 @@ const CuentaCorriente = () => {
                 >
                   <Lucide icon="ArrowUpRight" className="w-4 h-4 mr-2" /> Imprimir
                 </Button>
-                <Menu.Button
+                {/* <Menu.Button
                   as={Button}
                   style={{
                     backgroundColor: "rgb(22, 78, 99)",
@@ -299,9 +305,9 @@ const CuentaCorriente = () => {
                   <Menu.Item>
                     <Lucide icon="Printer" className="w-4 h-4 mr-2" /> Informe de Pagos
                   </Menu.Item>
-                </Menu.Items>
+                </Menu.Items> */}
               </Menu>
-              <Button
+              {/* <Button
                 as={Button}
                 style={{
                   backgroundColor: "rgb(22, 78, 99)",
@@ -310,13 +316,14 @@ const CuentaCorriente = () => {
                 }}
               >
                 <Lucide icon="Calculator" className="w-4 h-4 mr-2" /> Simulación descuentos
-              </Button>
+              </Button> */}
               <Button
                 as={Button}
                 style={{
                   backgroundColor: "rgb(22, 78, 99)",
                   color: "white",
                 }}
+                onClick={handleCancelar}
               >
                 <Lucide icon="ArrowUpRight" className="w-4 h-4 mr-2" /> Salir
               </Button>
@@ -345,7 +352,7 @@ const CuentaCorriente = () => {
                 <option value="2">Solo deudas</option>
               </FormSelect>
             </div>
-            <div className="col-span-12 lg:col-span-3 2xl:col-span-3">
+            <div className="col-span-12 lg:col-span-3 2xl:col-span-3 flex flex-col">
               <strong>Saldo Original</strong>
               <FormInput
                 style={{
@@ -529,7 +536,7 @@ const CuentaCorriente = () => {
                           >
                             ...
                           </Menu.Button>
-                          <Menu.Items className="w-48" placement="left-end">
+                          <Menu.Items className="w-48" placement="left">
                             <Menu.Item>
                               <Button
                                 style={{
