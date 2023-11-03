@@ -114,6 +114,19 @@ export interface ReLiquidacion {
   sub_total: number
 }
 
+export interface InformeCompleto {
+  vencimiento: Date
+  nro_transaccion: number
+  tipo_transaccion: number
+  des_transaccion: string
+  categoria: string
+  periodo: string
+  debe: number
+  haber: number
+  nro_plan: number
+  nro_procuracion: number
+}
+
 export interface Valuacion {
   anio: number
   base_imponible: number
