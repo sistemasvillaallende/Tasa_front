@@ -16,8 +16,9 @@ const IniciarCtaCorriente = () => {
   const navigate = useNavigate()
   const [cargando, setCargando] = useState<boolean>(false)
   const { id } = useParams()
-  const { inmuebles } = useTasaContext()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+  const { getInmueble } = useTasaContext()
+
+  const detalleInmueble = getInmueble(id)
 
   const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
     circunscripcion: "",
@@ -117,39 +118,12 @@ const IniciarCtaCorriente = () => {
     const fechaActual = new Date()
     const lstCtasTes = periodosIncluidos.map((periodo) => {
       return {
-        tipo_transaccion: 0,
-        nro_transaccion: 0,
-        nro_pago_parcial: 0,
-        dominio: "string",
-        fecha_transaccion: fechaActual.toISOString(),
         periodo: periodo.periodo,
-        monto_original: 0,
-        nro_plan: 0,
-        pagado: true,
-        debe: 0,
-        haber: 0,
-        nro_procuracion: 0,
-        pago_parcial: true,
+        nro_transaccion: periodo.nro_transaccion,
+        monto_original: periodo.monto_original,
+        debe: periodo.debe,
         vencimiento: devolverVencimiento(periodo.vencimiento),
-        nro_cedulon: 0,
-        categoria_deuda: 0,
-        monto_pagado: 0,
-        recargo: 0,
-        honorarios: 0,
-        iva_hons: 0,
-        tipo_deuda: 0,
-        decreto: "",
-        observaciones: "",
-        nro_cedulon_paypertic: 0,
-        deuda_activa: 0,
-        des_movimiento: "",
-        des_categoria: "",
-        deuda: 0,
-        sel: 0,
-        costo_financiero: 0,
-        des_rubro: "",
-        cod_tipo_per: 0,
-        sub_total: 0,
+        tipo_transaccion: periodo.tipo_transaccion,
       }
     })
 

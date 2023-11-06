@@ -127,12 +127,15 @@ export interface InformeCompleto {
   nro_procuracion: number
 }
 
+<<<<<<< HEAD
 export interface CategoriasDeudaTasa {
   value: string
   text: string
   campo_enlace: string
 }
 
+=======
+>>>>>>> fa24d688bc56c3e65adf7d8667dfd56e14f0c31f
 export interface Valuacion {
   anio: number
   base_imponible: number

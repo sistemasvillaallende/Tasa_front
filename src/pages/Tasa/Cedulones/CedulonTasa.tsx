@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Barcode from "react-barcode"
 import html2canvas from "html2canvas"
 import "../../../assets/css/style.css"
@@ -20,7 +20,9 @@ const CedulonTasa = () => {
   const [subTotal, setSubTotal] = useState<number>(0)
   const [interesMoraTotal, setInteresMoraTotal] = useState<number>(0)
   const [descuentoTotal, setDescuentoTotal] = useState<number>(0)
+  const [barcodeData, setBarcodeData] = useState<number>()
   const [costoFinancieroTotal, setCostoFinancieroTotal] = useState<number>(0)
+
   useEffect(() => {
     if (nrocedulon) {
       obtenerCabecera(parseInt(nrocedulon))
@@ -37,6 +39,7 @@ const CedulonTasa = () => {
       .get(urlApi)
       .then((response) => {
         setCabecera(response.data)
+        setBarcodeData(response.data?.codigo_barra)
       })
       .catch((error) => {
         console.log(error)
@@ -77,7 +80,6 @@ const CedulonTasa = () => {
   }
 
   const divRef = useRef(null)
-  const barcodeData = "05490000000000000072080590007574010092023000000103"
   const generatePDF = () => {
     const element = divRef.current
 
@@ -247,7 +249,7 @@ const CedulonTasa = () => {
                               Sub total
                             </td>
                             <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_medium">
-                              {currencyFormat(cedulonParaImpresion?.montoOriginal || 0)}
+                              {currencyFormat(subTotal)}
                             </td>
                           </tr>
                           <tr>
@@ -255,7 +257,7 @@ const CedulonTasa = () => {
                               Interes Mora
                             </td>
                             <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              {currencyFormat(cedulonParaImpresion?.interesMora || 0)}
+                              {currencyFormat(interesMoraTotal)}
                             </td>
                           </tr>
                           <tr>
@@ -263,7 +265,7 @@ const CedulonTasa = () => {
                               Descuento
                             </td>
                             <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              {currencyFormat(cedulonParaImpresion?.descuento || 0)}
+                              {currencyFormat(descuentoTotal)}
                             </td>
                           </tr>
                           <tr>
@@ -271,7 +273,7 @@ const CedulonTasa = () => {
                               Costo financiero:
                             </td>
                             <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              $ {currencyFormat(cedulonParaImpresion?.costoFinanciero || 0)}
+                              ${currencyFormat(costoFinancieroTotal)}
                             </td>
                           </tr>
                           <tr className="tm_accent_border_20 tm_border">
@@ -279,7 +281,7 @@ const CedulonTasa = () => {
                               Total{" "}
                             </td>
                             <td className="tm_width_3 tm_bold tm_f16 tm_border_top_0 tm_accent_color tm_text_right tm_accent_bg_10">
-                              {currencyFormat(cedulonParaImpresion?.total || 0)}
+                              {currencyFormat(cabecera?.montoPagar ?? 0)}
                             </td>
                           </tr>
                         </tbody>
@@ -347,7 +349,7 @@ const CedulonTasa = () => {
                           style={{ paddingTop: "0" }}
                           className="tm_width_3 tm_border_left tm_border_top_0"
                         >
-                          Dominio: {cabecera?.denominacion}
+                          Denominación: {cabecera?.denominacion}
                         </td>
                         <td
                           style={{ paddingTop: "0" }}
@@ -359,7 +361,7 @@ const CedulonTasa = () => {
                           style={{ paddingTop: "0" }}
                           className="tm_width_3 tm_border_top_0 tm_border_left tm_border_right tm_accent_border_20"
                         >
-                          Dominio: {cabecera?.denominacion}
+                          Denominación: {cabecera?.denominacion}
                         </td>
                       </tr>
                       <tr>

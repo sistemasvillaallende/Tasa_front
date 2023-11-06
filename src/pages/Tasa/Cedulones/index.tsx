@@ -317,7 +317,7 @@ const Cedulones = () => {
                     <option value="4">Periodo anual</option>
                   </FormSelect>
                 </div>
-                <div className="col-span-12 lg:col-span-6 2xl:col-span-6">
+                {/* <div className="col-span-12 lg:col-span-6 2xl:col-span-6">
                   <strong>Procuración</strong>
                   <br />
                   <FormSelect className="mt-2 sm:mr-2">
@@ -326,7 +326,7 @@ const Cedulones = () => {
                       <option value={pr}>{"Procuración Nro.: " + pr}</option>
                     ))}
                   </FormSelect>
-                </div>
+                </div> */}
               </div>
               <div
                 className="containerctacte box"
@@ -467,7 +467,9 @@ const Cedulones = () => {
                   <br />
                   <FormSelect className="mt-2 sm:mr-2" onChange={handleTarjetaChange}>
                     {tarjetas.map((cate, index) => (
-                      <option value={cate.cod_tarjeta}>{cate.des_tarjeta}</option>
+                      <option key={cate.cod_tarjeta} value={cate.cod_tarjeta}>
+                        {cate.des_tarjeta}
+                      </option>
                     ))}
                   </FormSelect>
                 </div>
@@ -483,7 +485,9 @@ const Cedulones = () => {
                   <br />
                   <FormSelect className="mt-2 sm:mr-2" onChange={handlePlanChange}>
                     {PlanesCobro?.map((cate, index) => (
-                      <option value={cate.cod_plan}>{cate.descripcion}</option>
+                      <option key={cate.cod_plan} value={cate.cod_plan}>
+                        {cate.descripcion}
+                      </option>
                     ))}
                   </FormSelect>
                 </div>

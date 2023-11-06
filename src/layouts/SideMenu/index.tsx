@@ -1,35 +1,94 @@
-import { Transition } from "react-transition-group";
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { selectSideMenu } from "../../stores/sideMenuSlice";
-import { useAppSelector } from "../../stores/hooks";
-import { FormattedMenu, linkTo, nestedMenu, enter, leave } from "./side-menu";
-import Lucide from "../../base-components/Lucide";
-import clsx from "clsx";
-import TopBar from "../../components/TopBar";
-import MobileMenu from "../../components/MobileMenu";
-import DarkModeSwitcher from "../../components/DarkModeSwitcher";
-import SideMenuTooltip from "../../components/SideMenuTooltip";
+import { Transition } from "react-transition-group"
+import { useState, useEffect, Dispatch, SetStateAction } from "react"
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { selectSideMenu, updateSideMenu } from "../../stores/sideMenuSlice"
+import { useAppSelector } from "../../stores/hooks"
+import { FormattedMenu, linkTo, nestedMenu, enter, leave } from "./side-menu"
+import Lucide from "../../base-components/Lucide"
+import clsx from "clsx"
+import TopBar from "../../components/TopBar"
+import MobileMenu from "../../components/MobileMenu"
+import DarkModeSwitcher from "../../components/DarkModeSwitcher"
+import SideMenuTooltip from "../../components/SideMenuTooltip"
+import { useDispatch } from "react-redux"
 
 function Main() {
-  const location = useLocation();
-  const [formattedMenu, setFormattedMenu] = useState<
-    Array<FormattedMenu | "divider">
-  >([]);
-  const sideMenuStore = useAppSelector(selectSideMenu);
-  const sideMenu = () => nestedMenu(sideMenuStore, location);
+  const location = useLocation()
+  const { id } = useParams()
+  const [formattedMenu, setFormattedMenu] = useState<Array<FormattedMenu | "divider">>([])
+  const sideMenuStore = useAppSelector(selectSideMenu)
+  const sideMenu = () => nestedMenu(sideMenuStore, location)
+  const dispatch = useDispatch()
+
+  const updatedMenu: any = [
+    {
+      icon: "ArrowLeftCircle",
+      pathname: "/",
+      title: "Inicio",
+    },
+    {
+      icon: "Eye",
+      pathname: `/detalle/${id ?? ""}`,
+      title: "Detalle",
+    },
+    {
+      icon: "Edit",
+      pathname: `/editar/${id ?? ""}`,
+      title: "Editar",
+    },
+    {
+      icon: "FilePlus",
+      pathname: `/iniciarctacte/${id ?? ""}`,
+      title: "Inicia Cta. Corriente",
+    },
+    {
+      icon: "DollarSign",
+      pathname: `/cuenta-corriente/${id ?? ""}`,
+      title: "Cta. Corriente",
+    },
+    {
+      icon: "ThumbsUp",
+      pathname: `/cancelar-cuenta/${id ?? ""}`,
+      title: "Cancelar Cta.Cte.",
+    },
+    {
+      icon: "Slash",
+      pathname: `/eliminar-cancelacion/${id ?? ""}`,
+      title: "Eliminar Cancelación",
+    },
+    {
+      icon: "FileText",
+      pathname: `/cedulones/${id ?? ""}`,
+      title: "Cedulones",
+    },
+    {
+      icon: "Rewind",
+      pathname: `/reliquida/${id ?? ""}`,
+      title: "ReLiquida",
+    },
+    {
+      icon: "Save",
+      pathname: `/informes/${id ?? ""}`,
+      title: "Informes",
+    },
+  ]
 
   useEffect(() => {
-    setFormattedMenu(sideMenu());
-  }, [sideMenuStore, location.pathname]);
+    dispatch(updateSideMenu(updatedMenu))
+  }, [window.location])
 
+  useEffect(() => {
+    setFormattedMenu(sideMenu())
+  }, [sideMenuStore, location.pathname])
   return (
-    <div className="py-5 md:py-0">
+    <div
+      className="containerctacte menu-auto"
+      style={{ overflowY: "scroll", backgroundColor: "#164e63" }}
+    >
       <MobileMenu />
-      <TopBar layout="side-menu" />
       <div className="flex overflow-hidden">
         {/* BEGIN: Side Menu */}
-        <nav className="w-[105px] xl:w-[260px] px-5 pb-16 overflow-x-hidden z-50 pt-32 -mt-4 hidden md:block">
+        <nav className="w-full px-5 pb-8 overflow-x-hidden z-50 pt-8 -mt-4 hidden md:block">
           <ul>
             {/* BEGIN: First Child */}
             {formattedMenu.map((menu, menuKey) =>
@@ -85,10 +144,7 @@ function Main() {
                                 }`]: !subMenu.active,
                               })}
                               menu={subMenu}
-                              formattedMenuState={[
-                                formattedMenu,
-                                setFormattedMenu,
-                              ]}
+                              formattedMenuState={[formattedMenu, setFormattedMenu]}
                               level="second"
                             ></Menu>
                             {/* BEGIN: Third Child */}
@@ -107,26 +163,21 @@ function Main() {
                                     { hidden: !subMenu.activeDropdown },
                                   ])}
                                 >
-                                  {subMenu.subMenu.map(
-                                    (lastSubMenu, lastSubMenuKey) => (
-                                      <li key={lastSubMenuKey}>
-                                        <Menu
-                                          className={clsx({
-                                            // Animation
-                                            [`opacity-0 translate-x-[50px] animate-[0.4s_ease-in-out_0.1s_intro-menu] animate-fill-mode-forwards animate-delay-${
-                                              (lastSubMenuKey + 1) * 10
-                                            }`]: !lastSubMenu.active,
-                                          })}
-                                          menu={lastSubMenu}
-                                          formattedMenuState={[
-                                            formattedMenu,
-                                            setFormattedMenu,
-                                          ]}
-                                          level="third"
-                                        ></Menu>
-                                      </li>
-                                    )
-                                  )}
+                                  {subMenu.subMenu.map((lastSubMenu, lastSubMenuKey) => (
+                                    <li key={lastSubMenuKey}>
+                                      <Menu
+                                        className={clsx({
+                                          // Animation
+                                          [`opacity-0 translate-x-[50px] animate-[0.4s_ease-in-out_0.1s_intro-menu] animate-fill-mode-forwards animate-delay-${
+                                            (lastSubMenuKey + 1) * 10
+                                          }`]: !lastSubMenu.active,
+                                        })}
+                                        menu={lastSubMenu}
+                                        formattedMenuState={[formattedMenu, setFormattedMenu]}
+                                        level="third"
+                                      ></Menu>
+                                    </li>
+                                  ))}
                                 </ul>
                               </Transition>
                             )}
@@ -144,32 +195,22 @@ function Main() {
           </ul>
         </nav>
         {/* END: Side Menu */}
-        {/* BEGIN: Content */}
-        <div
-          className={clsx([
-            "max-w-full md:max-w-none rounded-[30px] md:rounded-none px-4 md:px-[22px] min-w-0 min-h-screen bg-slate-100 flex-1 md:pt-20 pb-10 mt-5 md:mt-1 relative dark:bg-darkmode-700",
-            "before:content-[''] before:w-full before:h-px before:block",
-          ])}
-        >
-          <Outlet />
-        </div>
-        {/* END: Content */}
       </div>
     </div>
-  );
+  )
 }
 
 function Menu(props: {
-  className?: string;
-  menu: FormattedMenu;
+  className?: string
+  menu: FormattedMenu
   formattedMenuState: [
     (FormattedMenu | "divider")[],
     Dispatch<SetStateAction<(FormattedMenu | "divider")[]>>
-  ];
-  level: "first" | "second" | "third";
+  ]
+  level: "first" | "second" | "third"
 }) {
-  const navigate = useNavigate();
-  const [formattedMenu, setFormattedMenu] = props.formattedMenuState;
+  const navigate = useNavigate()
+  const [formattedMenu, setFormattedMenu] = props.formattedMenuState
 
   return (
     <SideMenuTooltip
@@ -177,20 +218,16 @@ function Menu(props: {
       content={props.menu.title}
       href={props.menu.subMenu ? "#" : props.menu.pathname}
       className={clsx([
-        "h-[50px] flex items-center pl-5 text-slate-600 mb-1 relative rounded-xl dark:text-slate-300",
+        "h-[50px] flex items-center pl-5 text-white hover:text-slate-600 mb-1 relative rounded-xl",
         {
-          "text-slate-600 dark:text-slate-400":
-            !props.menu.active && props.level != "first",
-          "bg-slate-100 dark:bg-transparent":
-            props.menu.active && props.level == "first",
+          "text-slate-600 dark:text-slate-400": !props.menu.active && props.level != "first",
+          "bg-slate-100 dark:bg-transparent": props.menu.active && props.level == "first",
           "before:content-[''] before:block before:inset-0 before:rounded-xl before:absolute before:border-b-[3px] before:border-solid before:border-black/[0.08] before:dark:border-black/[0.08] before:dark:bg-darkmode-700":
             props.menu.active && props.level == "first",
           "after:content-[''] after:w-[20px] after:h-[80px] after:mr-[-27px] after:bg-menu-active after:bg-no-repeat after:bg-cover after:absolute after:top-0 after:bottom-0 after:right-0 after:my-auto after:dark:bg-menu-active-dark":
             props.menu.active && props.level == "first",
           "hover:bg-slate-100 hover:dark:bg-transparent hover:before:content-[''] hover:before:block hover:before:inset-0 hover:before:rounded-xl hover:before:absolute hover:before:z-[-1] hover:before:border-b-[3px] hover:before:border-solid hover:before:border-black/[0.08] hover:before:dark:bg-darkmode-700":
-            !props.menu.active &&
-            !props.menu.activeDropdown &&
-            props.level == "first",
+            !props.menu.active && !props.menu.activeDropdown && props.level == "first",
 
           // Animation
           "after:-mr-[47px] after:opacity-0 after:animate-[0.4s_ease-in-out_0.1s_active-side-menu-chevron] after:animate-fill-mode-forwards":
@@ -199,17 +236,15 @@ function Menu(props: {
         props.className,
       ])}
       onClick={(event: React.MouseEvent) => {
-        event.preventDefault();
-        linkTo(props.menu, navigate);
-        setFormattedMenu([...formattedMenu]);
+        event.preventDefault()
+        linkTo(props.menu, navigate)
+        setFormattedMenu([...formattedMenu])
       }}
     >
       <div
         className={clsx({
-          "text-primary z-10 dark:text-slate-300":
-            props.menu.active && props.level == "first",
-          "text-slate-700 dark:text-slate-300":
-            props.menu.active && props.level != "first",
+          "text-primary z-10 dark:text-slate-300": props.menu.active && props.level == "first",
+          "text-slate-700 dark:text-slate-300": props.menu.active && props.level != "first",
           "dark:text-slate-400": !props.menu.active,
         })}
       >
@@ -240,14 +275,14 @@ function Menu(props: {
         )}
       </div>
     </SideMenuTooltip>
-  );
+  )
 }
 
 function Divider<C extends React.ElementType>(
   props: { as?: C } & React.ComponentPropsWithoutRef<C>
 ) {
-  const { className, ...computedProps } = props;
-  const Component = props.as || "div";
+  const { className, ...computedProps } = props
+  const Component = props.as || "div"
 
   return (
     <Component
@@ -257,7 +292,7 @@ function Divider<C extends React.ElementType>(
         "w-full h-px bg-black/[0.06] z-10 relative dark:bg-white/[0.07]",
       ])}
     ></Component>
-  );
+  )
 }
 
-export default Main;
+export default Main

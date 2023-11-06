@@ -21,14 +21,16 @@ import { useTasaContext } from "../../context/TasaProvider"
 const InformeDeDeuda = () => {
   const [informeCompleto, setInformeCompleto] = React.useState<InformeCompleto[]>([])
   const [periodo, setPeriodo] = React.useState<string>("")
-  const { detalleInmueble } = useTasaContext()
+  const { getInmueble } = useTasaContext()
   const [mostrarTabla, setMostrarTabla] = React.useState<boolean>(false)
   const [cargando, setCargando] = React.useState<boolean>(false)
-  const [categoriasDeudaAuto, setCategoriasDeudaAuto] = React.useState<CategoriasDeudaTasa[]>([])
+  const [categoriasDeudaTasa, setCategoriasDeudaTasa] = React.useState<CategoriasDeudaTasa[]>([])
   const [categoriaDeuda, setCategoriaDeuda] = React.useState<any>()
   const [tipoDeInforme, setTipoDeInforme] = React.useState<string>("1")
 
   const [btnImprimir, setBtnImprimir] = React.useState<boolean>(false)
+
+  const detalleInmueble = getInmueble()
   const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
     circunscripcion: 0,
     parcela: 0,
@@ -37,7 +39,7 @@ const InformeDeDeuda = () => {
     p_h: 0,
   }
   useEffect(() => {
-    conseguirListaCategoriasDeudaAuto()
+    conseguirListaCategoriasDeudaTasa()
   }, [])
 
   const handleAuditoria = async () => {
@@ -140,7 +142,6 @@ const InformeDeDeuda = () => {
       const URL = `${
         import.meta.env.VITE_URL_TASA
       }Resumendeuda?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=${tipoDeInforme}&periodo=${periodo}&cate_deuda_desde=${deudaDesde}&cate_deuda_hasta=${deudaHasta}`
-      console.log(URL)
 
       const response = await axios.post(URL, bodyConsulta)
       setInformeCompleto(response.data)
@@ -179,13 +180,13 @@ const InformeDeDeuda = () => {
     }
   }
 
-  const conseguirListaCategoriasDeudaAuto = async () => {
+  const conseguirListaCategoriasDeudaTasa = async () => {
     try {
-      const URL = `${import.meta.env.VITE_URL_AUTO}ListarCategoriasAuto`
+      const URL = `${import.meta.env.VITE_URL_TASA}ListarCategoriasTasa`
       const response = await axios.get(URL)
-      setCategoriasDeudaAuto(response.data)
+      setCategoriasDeudaTasa(response.data)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -279,8 +280,8 @@ const InformeDeDeuda = () => {
                 onChange={(e) => setCategoriaDeuda(e.target.value)}
               >
                 <option>seleccionar categoria</option>
-                {Array.isArray(categoriasDeudaAuto) &&
-                  categoriasDeudaAuto.map((tipo: any) => (
+                {Array.isArray(categoriasDeudaTasa) &&
+                  categoriasDeudaTasa.map((tipo: any) => (
                     <option key={tipo.value} value={tipo.value}>
                       {tipo.text}
                     </option>

@@ -3,7 +3,7 @@ import { LstDeuda } from "../interfaces/LstDeuda"
 import { Planes_Cobro } from "../interfaces/Planes_Cobro"
 import { Tarjetas } from "../interfaces/Tarjetas"
 import { CheckOut } from "../interfaces/CheckOut"
-import { CedulonImpresion } from "../interfaces/Vehiculo"
+import { CedulonImpresion } from "../interfaces/Inmueble"
 
 type CedulonesContextType = {
   //En grilla deuda

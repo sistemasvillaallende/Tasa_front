@@ -25,10 +25,13 @@ const RenderInputs = ({ list, title, bgSlate, formInputs, setInputs }: RenderInp
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target
     const { name, value } = target
-    setInputs({ ...formInputs, [name]: value })
-    if (target.type === "checkbox") {
+    if (target.type === "date") {
+      const newDateValue = new Date(value)
+      const formattedDate = newDateValue.toISOString()
+      setInputs({ ...formInputs, [name]: formattedDate })
+    } else if (target.type === "checkbox") {
       setInputs({ ...formInputs, [name]: target.checked })
-    }
+    } else setInputs({ ...formInputs, [name]: value })
   }
   useEffect(() => {}, [])
   return (
@@ -140,6 +143,7 @@ const RenderInputs = ({ list, title, bgSlate, formInputs, setInputs }: RenderInp
               <label key={`${idx}-${input.name}`} className="flex flex-col grow mx-2 my-3">
                 {input.label}
                 <FormInput
+                  name={input.field}
                   className={`shadow-md h-full px-3 ${
                     input.minWidth == "m"
                       ? "min-w-[20vw]"
@@ -149,7 +153,8 @@ const RenderInputs = ({ list, title, bgSlate, formInputs, setInputs }: RenderInp
                   }`}
                   placeholder={input.placeholder}
                   type="date"
-                  value={formInputs[input.name as keyof typeof formInputs]}
+                  value={formInputs[input.field as keyof typeof formInputs]?.split("T")[0]}
+                  onChange={handleChange}
                 />
                 <span className="text-warning text-right">
                   {/* {errors[input?.name]?.message as string} */}
@@ -161,7 +166,7 @@ const RenderInputs = ({ list, title, bgSlate, formInputs, setInputs }: RenderInp
               <label key={`${idx}-${input.name}`} className="flex flex-col relative grow mx-2 my-3">
                 {input.label}
                 <FormInput
-                  name={input.name}
+                  name={input.field}
                   className={`shadow-md ${
                     input.minWidth == "m"
                       ? "min-w-[20vw]"

@@ -114,7 +114,7 @@ const CancelarCtaCte = () => {
           confirmButtonColor: "#27a3cf",
         })
         setReLiquidacionesSeleccionadas([])
-        navigate(`/detalle/${detalleInmueble.nro_bad}`)
+        navigate(`/detalle/${detalleInmueble?.nro_bad}`)
       })
       .catch((error) => {
         Swal.fire({
@@ -150,7 +150,7 @@ const CancelarCtaCte = () => {
 
   const handleCancelar = () => {
     setReLiquidacionesSeleccionadas([])
-    navigate(`/detalle/${detalleInmueble.nro_bad}`)
+    navigate(`/detalle/${detalleInmueble?.nro_bad}`)
   }
 
   const sumarMontosSeleccionados = () => {
@@ -277,7 +277,7 @@ const CancelarCtaCte = () => {
               <Button variant="primary" className="ml-3" onClick={handleAuditoria}>
                 Confirmar
               </Button>
-              <Button variant="secondary" className="ml-3" onClick={handleCancelar}>
+              <Button variant="outline-secondary" className="ml-3" onClick={handleCancelar}>
                 Cancelar
               </Button>
             </div>

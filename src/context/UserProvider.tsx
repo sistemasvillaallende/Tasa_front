@@ -2,18 +2,28 @@ import { useState, useContext, createContext, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import menuIcon from "../assets/IconoMenu.svg"
+import { capitalizeFirstLetter } from "../utils/helper"
+import { setSecureItem } from "../modules/secureStorage"
 
 type UserType = {
-  userName: string
-  token: string
   nombre: string
   apellido: string
+  email: string
+  userName: string
+  cuit: string | null
+  nombre_oficina: string
+  cod_oficina: number
+  cod_usuario: string
+  administrador: boolean
+  img?: string
+  token: string
 } | null
 
 type MenuItem = {
   texto: string
   url: string
   icono: string
+  submenu: any
 }
 
 type UserContextType = {
@@ -43,29 +53,53 @@ export function useUserContext() {
 export function UserProvider({ children }: any) {
   const [user, setUser] = useState<UserType>(null)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const menuItems: MenuItem[] = [
     { texto: "Inicio", url: "/", icono: "ArrowRightCircle" },
-    { texto: "Editar", url: "/editar", icono: "Box" },
+    { texto: "Editar", url: "/editar", icono: "Edit" },
+    { texto: "Inicia Cta. Corriente", url: "/iniciar", icono: "FilePlus" },
+    {
+      texto: "Cta. Corriente",
+      url: "/iniciar",
+      icono: "DollarSign",
+      submenu: [{ texto: "Cta. Corriente", url: "/iniciar", icono: "DollarSign" }],
+    },
+    { texto: "Cancelar Cta.Cte.", url: "/editar", icono: "ThumbsUp" },
+    { texto: "Eliminar Cancelación", url: "/editar", icono: "Slash" },
+    { texto: "Cedulones", url: "/editar", icono: "FileText" },
+    { texto: "ReLiquida", url: "/editar", icono: "Rewind" },
   ]
 
   const handleLogin = async (username: any, password: any) => {
+    setError(null)
+    setLoading(true)
     try {
-      const response = await axios.get(`${import.meta.env.VITE_URL_BASE}/Login/ValidaUsuario`, {
-        params: {
-          user: username,
-          password: password,
-        },
-      })
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL_USER}/Login/ValidaUsuarioConOficina`,
+        {
+          params: {
+            user: username,
+            password: password,
+          },
+        }
+      )
 
-      if (response.data) {
+      if (response?.statusText === "OK") {
+        const userData = response?.data
         const token = "token generado por react"
         setUser({
-          userName: username,
+          nombre: capitalizeFirstLetter(userData?.nombre_completo?.split(" ")[0]) ?? "",
+          apellido: capitalizeFirstLetter(userData?.nombre_completo?.split(" ")[1]) ?? "",
+          email: userData?.email,
+          userName: userData?.nombre,
+          cuit: userData?.cuit,
+          administrador: userData?.administrador,
+          cod_oficina: userData?.cod_oficina,
+          cod_usuario: userData?.cod_usuario,
+          nombre_oficina: userData?.nombre_oficina,
           token: token,
-          nombre: "Nombre de usuario",
-          apellido: "Apellido de usuario",
         })
       } else {
         setError("Usuario o contraseña incorrectos")
@@ -77,13 +111,14 @@ export function UserProvider({ children }: any) {
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem("usuarioLogeado")
+    localStorage.removeItem("usuarioLogeado")
+    setUser(null)
     navigate("/")
   }
 
   useEffect(() => {
     if (user) {
-      sessionStorage.setItem("usuarioLogeado", JSON.stringify(user))
+      setSecureItem("usuarioLogeado", user)
       navigate("/")
     }
   }, [user])
