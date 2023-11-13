@@ -6,6 +6,7 @@ import Button from "../../../base-components/Button"
 import { useTasaContext } from "../../../context/TasaProvider"
 import axios from "axios"
 import Cargando from "../../../components/Cargando"
+import { useUserContext } from "../../../context/UserProvider"
 
 interface Periodo {
   periodo: string
@@ -17,6 +18,7 @@ const IniciarCtaCorriente = () => {
   const [cargando, setCargando] = useState<boolean>(false)
   const { id } = useParams()
   const { getInmueble } = useTasaContext()
+  const { user } = useUserContext()
 
   const detalleInmueble = getInmueble(id)
 
@@ -115,7 +117,6 @@ const IniciarCtaCorriente = () => {
   }
 
   const iniciarCtaCte = () => {
-    const fechaActual = new Date()
     const lstCtasTes = periodosIncluidos.map((periodo) => {
       return {
         periodo: periodo.periodo,
@@ -137,7 +138,7 @@ const IniciarCtaCorriente = () => {
       auditoria: {
         id_auditoria: 0,
         fecha: devolverFechaActual(),
-        usuario: "prueba",
+        usuario: user?.userName,
         proceso: "",
         identificacion: "",
         autorizaciones: "",

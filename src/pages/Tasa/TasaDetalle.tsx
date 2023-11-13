@@ -2,15 +2,21 @@ import defaultInputs from "../../utils/defaultInputs"
 import RenderTexts from "../../components/RenderTexts"
 import { useParams } from "react-router-dom"
 import { useTasaContext } from "../../context/TasaProvider"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { Inmueble } from "../../interfaces/Inmueble"
 
 function TasaDetalle() {
   const { id } = useParams()
   const { inmuebles } = useTasaContext()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+  const [detalleInmueble, setDetalleInmueble] = useState<Inmueble | undefined>()
   useEffect(() => {
     if (!inmuebles) window.location.href = "/"
   }, [])
+  useEffect(() => {
+    if (!detalleInmueble) {
+      setDetalleInmueble(inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id))
+    }
+  }, [inmuebles])
   return (
     <form className="mb-10">
       <div className="flex items-center mt-8 intro-y">

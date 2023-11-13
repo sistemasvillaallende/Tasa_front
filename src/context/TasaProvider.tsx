@@ -52,27 +52,16 @@ export function TasaProvider({ children }: any) {
     return inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
   }
   useEffect(() => {
-    !inmuebles &&
-      searchForm.searchParametro != "" &&
-      traerInmuebles(
-        searchForm.buscarPor,
-        searchForm.searchParametro,
-        searchForm.pagina,
-        searchForm.registrosPorPagina
-      )
+    !inmuebles && searchForm.searchParametro != "" && traerInmuebles()
   }, [location])
 
-  const traerInmuebles = async (
-    buscarPor: string,
-    parametro: string,
-    pagina: number,
-    registrosPorPagina: number
-  ) => {
+  const traerInmuebles = async () => {
     try {
+      const { buscarPor, searchParametro, pagina, registrosPorPagina } = searchForm
       const response = await axios.get(
         `${
           import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${parametro}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
+        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
       )
       setInmuebles(response.data)
       setCantPaginas(response.data.totalPaginas)

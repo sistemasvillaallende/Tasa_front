@@ -146,7 +146,6 @@ const Cedulones = () => {
     cedulon.listaDeuda = lstDeuda
     const fecha = new Date()
     cedulon.vencimiento = fecha.toLocaleDateString()
-    alert(cedulon)
     const urlApi = `${import.meta.env.VITE_URL_CEDULONES}EmitoCedulonTasa`
     axios
       .post(urlApi, cedulon)

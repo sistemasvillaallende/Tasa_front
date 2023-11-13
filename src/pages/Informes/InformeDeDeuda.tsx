@@ -8,7 +8,7 @@ import _ from "lodash"
 
 import { InformeCompleto, CategoriasDeudaTasa } from "../../interfaces/Inmueble"
 
-import { currencyFormat } from "../../utils/helper"
+import { currencyFormat, verFechaActual } from "../../utils/helper"
 
 import Table from "../../base-components/Table"
 import Button from "../../base-components/Button"
@@ -17,6 +17,7 @@ import Lucide from "../../base-components/Lucide"
 import Cargando from "../../components/Cargando"
 
 import { useTasaContext } from "../../context/TasaProvider"
+import { useUserContext } from "../../context/UserProvider"
 
 const InformeDeDeuda = () => {
   const [informeCompleto, setInformeCompleto] = React.useState<InformeCompleto[]>([])
@@ -29,7 +30,7 @@ const InformeDeDeuda = () => {
   const [tipoDeInforme, setTipoDeInforme] = React.useState<string>("1")
 
   const [btnImprimir, setBtnImprimir] = React.useState<boolean>(false)
-
+  const { user } = useUserContext()
   const detalleInmueble = getInmueble()
   const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
     circunscripcion: 0,
@@ -100,20 +101,20 @@ const InformeDeDeuda = () => {
     parcela: number,
     periodo: string,
     categoriaDeuda: string,
-    observaciones: string
+    autorizaciones: string
   ) => {
     try {
       setCargando(true)
       const bodyConsulta = {
         id_auditoria: 0,
-        fecha: "string",
-        usuario: "string",
+        fecha: verFechaActual(),
+        usuario: user?.userName,
         proceso: "string",
-        identificacion: "string",
-        autorizaciones: "string",
-        observaciones: observaciones,
-        detalle: "string",
-        ip: "string",
+        identificacion: "Generar Informes",
+        autorizaciones: autorizaciones,
+        observaciones: "",
+        detalle: "",
+        ip: "",
       }
 
       let deudaDesde = categoriaDeuda
@@ -236,6 +237,13 @@ const InformeDeDeuda = () => {
       head: [columns],
       body: body,
     })
+    const nombreUsuario = user?.userName
+    const fechaImpresion = fecha.toLocaleDateString()
+    const horaImpresion = fecha.toLocaleTimeString()
+
+    doc.text(`Usuario: ${nombreUsuario}`, 15, 280)
+    doc.text(`Fecha: ${fechaImpresion}`, 15, 284)
+    doc.text(`Hora: ${horaImpresion}`, 15, 288)
 
     doc.save(`informe_de_deuda_${detalleInmueble?.cuil}_${fechaActual}.pdf`)
   }

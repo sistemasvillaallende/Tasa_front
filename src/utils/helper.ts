@@ -21,6 +21,19 @@ const formatDate = (date: string, format: string) => {
   return dayjs(date).format(format)
 }
 
+const verFechaActual = () => {
+  const currentDate = new Date()
+  const year = currentDate.getFullYear()
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0") // Sumamos 1 ya que en JavaScript los meses comienzan en 0
+  const day = String(currentDate.getDate()).padStart(2, "0")
+  const hours = String(currentDate.getHours()).padStart(2, "0")
+  const minutes = String(currentDate.getMinutes()).padStart(2, "0")
+  const seconds = String(currentDate.getSeconds()).padStart(2, "0")
+  const milliseconds = String(currentDate.getMilliseconds()).padStart(3, "0")
+  const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
+  return formattedDate
+}
+
 const capitalizeFirstLetter = (string: string) => {
   if (string) {
     const strigLowerCase = string.toLocaleLowerCase()
@@ -273,6 +286,7 @@ const selectCalculaMontos = (lstDeudaSeleccionada: LstDeuda[], plan_cobro: Plane
 export {
   cutText,
   formatDate,
+  verFechaActual,
   capitalizeFirstLetter,
   transformarDinero,
   onlyNumber,

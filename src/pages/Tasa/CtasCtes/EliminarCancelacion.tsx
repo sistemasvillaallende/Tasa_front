@@ -95,7 +95,7 @@ const EliminarCancelacion = () => {
         id_auditoria: 0,
         fecha: verFechaActual(),
         usuario: user?.userName,
-        proceso: "Reliquidación de deuda",
+        proceso: "Eliminar cancelación",
         identificacion: "string",
         autorizaciones: "string",
         observaciones: auditoria,

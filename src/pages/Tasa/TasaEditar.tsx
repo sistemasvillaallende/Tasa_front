@@ -6,9 +6,13 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useTasaContext } from "../../context/TasaProvider"
 import Swal from "sweetalert2"
 import axios from "axios"
+import { useUserContext } from "../../context/UserProvider"
+import { verFechaActual } from "../../utils/helper"
+import { fechaActual } from "../../utils/GeneralUtils"
 
 function TasaEditar() {
-  const { getInmueble } = useTasaContext()
+  const { getInmueble, traerInmuebles } = useTasaContext()
+  const { user } = useUserContext()
   const { id } = useParams()
   const detalleInmueble = getInmueble(id)
   const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
@@ -97,19 +101,26 @@ function TasaEditar() {
       cod_categoria_zona_liq:
         inputs.cod_categoria_zona_liq ?? detalleInmueble.cod_categoria_zona_liq,
       tipo_ph: inputs.tipo_ph ?? detalleInmueble.tipo_ph,
-      fecha_tipo_ph: inputs.fecha_tipo_ph ?? detalleInmueble.fecha_tipo_ph,
+      fecha_tipo_ph:
+        (inputs.fecha_tipo_ph && inputs.fecha_tipo_ph) ?? detalleInmueble.fecha_tipo_ph
+          ? detalleInmueble.fecha_tipo_ph
+          : new Date(),
       cuil: inputs.cuil ?? detalleInmueble.cuil,
-      fechA_VECINO_DIGITAL: inputs.fechA_VECINO_DIGITAL ?? detalleInmueble.fechA_VECINO_DIGITAL,
-      cuiT_VECINO_DIGITAL: inputs.cuiT_VECINO_DIGITAL ?? detalleInmueble.cuiT_VECINO_DIGITAL,
+      fecha_vecino_digital:
+        (inputs.fecha_vecino_digital != "" && inputs.fecha_vecino_digital) ??
+        detalleInmueble.fecha_vecino_digital
+          ? detalleInmueble.fecha_vecino_digital
+          : new Date(),
+      cuit_vecino_digital: inputs.cuit_vecino_digital ?? detalleInmueble.cuit_vecino_digital,
       lat: inputs.lat ?? detalleInmueble.lat,
       long: inputs.long ?? detalleInmueble.long,
       diR_GOOGLE: inputs.diR_GOOGLE ?? detalleInmueble.diR_GOOGLE,
       total_row: inputs.total_row ?? detalleInmueble.total_row,
       objAuditoria: {
         id_auditoria: 0,
-        fecha: "string",
-        usuario: "yo",
-        proceso: "string",
+        fecha: verFechaActual(),
+        usuario: user?.userName,
+        proceso: "Editar Tasa",
         identificacion: "string",
         autorizaciones: "string",
         observaciones: "string",
@@ -127,6 +138,7 @@ function TasaEditar() {
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
         })
+        traerInmuebles()
         navigate(`/detalle/${detalleInmueble?.nro_bad}`)
       })
       .catch((error) => {

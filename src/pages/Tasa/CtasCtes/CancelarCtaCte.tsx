@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useUserContext } from "../../../context/UserProvider"
 import { formatNumberToARS, formatDateToDDMMYYYY } from "../../../utils/Operaciones"
 import { FormSelect, FormLabel, FormInline } from "../../../base-components/Form"
+import { verFechaActual } from "../../../utils/helper"
 
 const CancelarCtaCte = () => {
   const [reLiquidaciones, setReLiquidaciones] = useState<any[]>([])
@@ -67,20 +68,7 @@ const CancelarCtaCte = () => {
     }
   }
 
-  const verFechaActual = () => {
-    const currentDate = new Date()
-    const year = currentDate.getFullYear()
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0") // Sumamos 1 ya que en JavaScript los meses comienzan en 0
-    const day = String(currentDate.getDate()).padStart(2, "0")
-    const hours = String(currentDate.getHours()).padStart(2, "0")
-    const minutes = String(currentDate.getMinutes()).padStart(2, "0")
-    const seconds = String(currentDate.getSeconds()).padStart(2, "0")
-    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, "0")
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
-    return formattedDate
-  }
-
-  const handleCancelarCtaCte = (auditoria: String) => {
+  const handleCancelarCtaCte = (auditoria: string) => {
     const consulta = {
       cir: circunscripcion,
       sec: seccion,
@@ -268,13 +256,19 @@ const CancelarCtaCte = () => {
                   aria-label=".form-select-lg example"
                   onChange={(e) => setMotivo(Number(e.target.value))}
                 >
+                  <option value="">Seleccione un tipo de transacción</option>
                   <option value={7}>Cancelación Operativa</option>
                   <option value={8}>Decreto/Resolución</option>
                 </FormSelect>
               </FormInline>
             </div>
             <div className="col-span-12 intro-y lg:col-span-6 mr-2 mt-2">
-              <Button variant="primary" className="ml-3" onClick={handleAuditoria}>
+              <Button
+                variant="primary"
+                className="ml-3"
+                onClick={handleAuditoria}
+                disabled={motivo === 0}
+              >
                 Confirmar
               </Button>
               <Button variant="outline-secondary" className="ml-3" onClick={handleCancelar}>

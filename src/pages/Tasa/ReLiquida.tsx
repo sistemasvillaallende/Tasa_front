@@ -114,7 +114,6 @@ const ReLiquida = () => {
           confirmButtonColor: "#27a3cf",
         })
         setReLiquidacionesSeleccionadas([])
-        navigate(`/detalle/${detalleInmueble?.nro_bad}`)
       })
       .catch((error) => {
         Swal.fire({
