@@ -39,7 +39,7 @@ const SearchBar = ({
 
     const fetchData = async () => {
       const registrosPorPagina = 10
-      const paginaNum = 0
+      const paginaNum = 1
       setPaginaActual(paginaNum)
       let URL
       if (buscarPor === "denominacion") {

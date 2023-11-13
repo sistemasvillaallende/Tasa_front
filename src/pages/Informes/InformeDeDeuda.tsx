@@ -5,6 +5,7 @@ import Swal from "sweetalert2"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import _ from "lodash"
+import Logo from "../../assets/logo.png"
 
 import { InformeCompleto, CategoriasDeudaTasa } from "../../interfaces/Inmueble"
 
@@ -18,6 +19,7 @@ import Cargando from "../../components/Cargando"
 
 import { useTasaContext } from "../../context/TasaProvider"
 import { useUserContext } from "../../context/UserProvider"
+import { useParams } from "react-router-dom"
 
 const InformeDeDeuda = () => {
   const [informeCompleto, setInformeCompleto] = React.useState<InformeCompleto[]>([])
@@ -31,7 +33,8 @@ const InformeDeDeuda = () => {
 
   const [btnImprimir, setBtnImprimir] = React.useState<boolean>(false)
   const { user } = useUserContext()
-  const detalleInmueble = getInmueble()
+  const { id } = useParams()
+  const detalleInmueble = getInmueble(id)
   const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
     circunscripcion: 0,
     parcela: 0,
@@ -194,11 +197,14 @@ const InformeDeDeuda = () => {
   const handleImprimir = () => {
     const doc = new jsPDF()
     doc.setFontSize(8)
-    doc.text(`INFORME COMPLETO`, 15, 10)
+    doc.addImage(Logo, "PNG", 15, 10, 50, 13)
+    doc.text(`INFORME COMPLETO DE Inmueble`, 70, 15)
     const fecha = new Date()
     const fechaActual = fecha.toLocaleDateString()
-    // doc.text(`DOMINIO: ${dominioSinEspacios}`, 15, 15)
-    // doc.text(`CONTRIBUYENTE: ${vehiculo?.nombre}`, 15, 20)
+    const denominacion = `CIR:${circunscripcion} - SEC: ${seccion} - MAN: ${manzana} - PAR: ${parcela} - P_H: ${p_h}`
+    console.log("detalleInmueble", detalleInmueble)
+    doc.text(`DENOMINACIÓN: ${denominacion}`, 70, 19)
+    doc.text(`CONTRIBUYENTE: ${detalleInmueble?.nombre}`, 70, 23)
 
     const columns = [
       "#",

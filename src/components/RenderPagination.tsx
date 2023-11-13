@@ -21,7 +21,7 @@ const RenderPagination = () => {
       const fetchData = async () => {
         const URL = `${
           import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&activo=${activos}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
+        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&activo=${activos}&pagina=${newPage}&registros_por_pagina=${registrosPorPagina}`
         const response = await axios.get(URL)
         if (response.data === "") {
           Swal.fire({

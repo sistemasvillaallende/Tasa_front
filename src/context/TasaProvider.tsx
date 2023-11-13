@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, createContext, useContext, useEffect, useStat
 import axios from "axios"
 import Swal from "sweetalert2"
 import { Inmueble } from "../interfaces/Inmueble"
-import { useLocation, useParams } from "react-router-dom"
 
 type TasaContextType = {
   inmuebles: Inmueble[] | null
@@ -36,7 +35,7 @@ export function TasaProvider({ children }: any) {
   const [searchForm, setSearch] = useState({
     buscarPor: "titular",
     searchParametro: "",
-    pagina: 0,
+    pagina: 1,
     registrosPorPagina: 10,
     activos: 1,
     denominacion: {
