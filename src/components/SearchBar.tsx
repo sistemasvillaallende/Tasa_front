@@ -100,7 +100,7 @@ const SearchBar = ({
               >
                 <option value="titular">Titutlar</option>
                 <option value="cuil">CUIT</option>
-                <option value="denominacion">Denominación</option>
+                {/* <option value="denominacion">Denominación</option> */}
               </FormSelect>
               <FormLabel htmlFor="vertical-form-1">Estado</FormLabel>
               <FormSelect

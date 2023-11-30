@@ -31,11 +31,11 @@ function Main() {
       pathname: `/detalle/${id ?? ""}`,
       title: "Detalle",
     },
-    {
-      icon: "Edit",
-      pathname: `/editar/${id ?? ""}`,
-      title: "Editar",
-    },
+    // {
+    //   icon: "Edit",
+    //   pathname: `/editar/${id ?? ""}`,
+    //   title: "Editar",
+    // },
     {
       icon: "FilePlus",
       pathname: `/iniciarctacte/${id ?? ""}`,
@@ -61,11 +61,11 @@ function Main() {
       pathname: `/cedulones/${id ?? ""}`,
       title: "Cedulones",
     },
-    {
-      icon: "Rewind",
-      pathname: `/reliquida/${id ?? ""}`,
-      title: "ReLiquida",
-    },
+    // {
+    //   icon: "Rewind",
+    //   pathname: `/reliquida/${id ?? ""}`,
+    //   title: "ReLiquida",
+    // },
     {
       icon: "Save",
       pathname: `/informes/${id ?? ""}`,
