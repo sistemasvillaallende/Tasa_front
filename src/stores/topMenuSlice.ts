@@ -15,13 +15,7 @@ export interface TopMenuState {
 }
 
 const initialState: TopMenuState = {
-  menu: [
-    {
-      icon: "Home",
-      pathname: "/",
-      title: "Tasa a la propiedad",
-    },
-  ],
+  menu: [],
 }
 
 export const topMenuSlice = createSlice({

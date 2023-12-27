@@ -46,9 +46,8 @@ function Main() {
         {showLista && (
           <div className="h-4/5">
             <nav
-              style={{ paddingLeft: "35px" }}
               className={clsx([
-                "relative hidden pt-10 -mt-4 md:block",
+                "relative hidden",
 
                 // Animation
                 "opacity-0 animate-[0.4s_ease-in-out_0.2s_intro-top-menu] animate-fill-mode-forwards",

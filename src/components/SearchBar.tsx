@@ -45,7 +45,7 @@ const SearchBar = ({
       if (buscarPor === "denominacion") {
         URL = `${
           import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
+        }getByPk?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
       } else {
         URL = `${
           import.meta.env.VITE_URL_TASA
@@ -53,9 +53,10 @@ const SearchBar = ({
       }
 
       const response = await axios.get(URL)
-      setCantPaginas(response.data.totalPaginas)
-      setSearch({ ...searchForm, pagina: response.data.paginaActual })
-      setInmuebles(response.data.resultado)
+      console.log(response)
+      setCantPaginas(response.data.totalPaginas ?? 1)
+      setSearch({ ...searchForm, pagina: response.data.paginaActual ?? 1 })
+      setInmuebles(response.data.resultado ?? [response.data])
       if (response.status === 204) {
         Swal.fire({
           title: "Sin resultados",
@@ -100,7 +101,7 @@ const SearchBar = ({
               >
                 <option value="titular">Titutlar</option>
                 <option value="cuil">CUIT</option>
-                {/* <option value="denominacion">Denominación</option> */}
+                <option value="denominacion">Denominación</option>
               </FormSelect>
               <FormLabel htmlFor="vertical-form-1">Estado</FormLabel>
               <FormSelect
@@ -113,15 +114,17 @@ const SearchBar = ({
                 <option value="1">activos</option>
                 <option value="0">inactivos</option>
               </FormSelect>
-              <FormInput
-                type="text"
-                className="mr-5 mt-2 border-transparent w-56 shadow-none rounded-5 pr-8"
-                placeholder="Buscar..."
-                value={searchForm.searchParametro}
-                onChange={(e) => handleChange(e)}
-                name="parametro"
-                id="searchParametro"
-              />
+              {buscarPor !== "denominacion" && (
+                <FormInput
+                  type="text"
+                  className="mr-5 mt-2 border-transparent w-56 shadow-none rounded-5 pr-8"
+                  placeholder="Buscar..."
+                  value={searchForm.searchParametro}
+                  onChange={(e) => handleChange(e)}
+                  name="parametro"
+                  id="searchParametro"
+                />
+              )}
             </div>
             <Button variant="primary" className="h-10 mx-3">
               Buscar
