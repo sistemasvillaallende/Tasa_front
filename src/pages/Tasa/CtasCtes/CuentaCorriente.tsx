@@ -66,14 +66,13 @@ const CuentaCorriente = () => {
     setShowModal(false)
     const fetchData = async () => {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_URL_CTACTE
-        }ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=1&cate_deuda_desde=1&cate_deuda_hasta=1000`
+        `${import.meta.env.VITE_URL_BASE
+        }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=1&cate_deuda_desde=1&cate_deuda_hasta=1000`
       )
 
       setAutos(response.data)
 
-      const response2 = await axios.get(`${import.meta.env.VITE_URL_CTACTE}ListarCategoriasTasa`)
+      const response2 = await axios.get(`${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCategoriasTasa`)
       setCate_deuda(response2.data)
     }
 
@@ -102,9 +101,8 @@ const CuentaCorriente = () => {
       hasta = cateDeuda
     }
     let url =
-      `${
-        import.meta.env.VITE_URL_CTACTE
-      }ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
+      `${import.meta.env.VITE_URL_BASE
+      }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
       `&tipo_consulta=` +
       value +
       `&cate_deuda_desde=` +
@@ -123,9 +121,9 @@ const CuentaCorriente = () => {
     const fetchData = async () => {
       const response = await axios.get(
         `${import.meta.env.VITE_URL_CTACTE}Datos_transaccion?tipo_transaccion=` +
-          tipo_transaccion +
-          `&nro_transaccion=` +
-          nro_transaccion
+        tipo_transaccion +
+        `&nro_transaccion=` +
+        nro_transaccion
       )
 
       setDetalle(response.data)
@@ -138,9 +136,9 @@ const CuentaCorriente = () => {
     const fetchData = async () => {
       const response = await axios.get(
         `${import.meta.env.VITE_URL_CTACTE}DetallePago?nro_cedulon=` +
-          nro_cedulon +
-          `&nro_transaccion=` +
-          nro_transaccion
+        nro_cedulon +
+        `&nro_transaccion=` +
+        nro_transaccion
       )
 
       setDetallePago(response.data)
@@ -193,9 +191,8 @@ const CuentaCorriente = () => {
       hasta = Number.parseInt(value)
     }
     let url =
-      `${
-        import.meta.env.VITE_URL_CTACTE
-      }ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
+      `${import.meta.env.VITE_URL_BASE
+      }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
       `&tipo_consulta=` +
       filtro +
       `&cate_deuda_desde=` +
@@ -573,24 +570,24 @@ const CuentaCorriente = () => {
                             )}
                             {(auto.des_movimiento == "Pago" ||
                               auto.des_movimiento == "Fin de Plan") && (
-                              <Menu.Item>
-                                <Button
-                                  style={{
-                                    textAlign: "left",
-                                    border: "None",
-                                    padding: "5px",
-                                    paddingLeft: "0",
-                                    fontWeight: "700",
-                                  }}
-                                  onClick={() =>
-                                    handledetPago(auto.nro_cedulon, auto.nro_transaccion)
-                                  }
-                                >
-                                  <Lucide icon="FileSearch" className="w-4 h-4 mr-2" />
-                                  Detalle de Pago
-                                </Button>
-                              </Menu.Item>
-                            )}
+                                <Menu.Item>
+                                  <Button
+                                    style={{
+                                      textAlign: "left",
+                                      border: "None",
+                                      padding: "5px",
+                                      paddingLeft: "0",
+                                      fontWeight: "700",
+                                    }}
+                                    onClick={() =>
+                                      handledetPago(auto.nro_cedulon, auto.nro_transaccion)
+                                    }
+                                  >
+                                    <Lucide icon="FileSearch" className="w-4 h-4 mr-2" />
+                                    Detalle de Pago
+                                  </Button>
+                                </Menu.Item>
+                              )}
                             {auto.nro_procuracion != 0 && (
                               <Menu.Item>
                                 <Button

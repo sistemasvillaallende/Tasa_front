@@ -16,13 +16,13 @@ type TasaContextType = {
 
 const TasaContext = createContext<TasaContextType>({
   inmuebles: null,
-  getInmueble: () => {},
-  traerInmuebles: () => {},
-  setInmuebles: () => {},
-  setCantPaginas: () => {},
+  getInmueble: () => { },
+  traerInmuebles: () => { },
+  setInmuebles: () => { },
+  setCantPaginas: () => { },
   cantPaginas: 0,
   searchForm: {},
-  setSearch: () => {},
+  setSearch: () => { },
 })
 
 export function useTasaContext() {
@@ -58,9 +58,8 @@ export function TasaProvider({ children }: any) {
     try {
       const { buscarPor, searchParametro, pagina, registrosPorPagina } = searchForm
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
+        `${import.meta.env.VITE_URL_BASE
+        }Inmuebles/GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${pagina}&registros_por_pagina=${registrosPorPagina}`
       )
       setInmuebles(response.data)
       setCantPaginas(response.data.totalPaginas)

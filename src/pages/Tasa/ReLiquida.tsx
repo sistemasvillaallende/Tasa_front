@@ -28,9 +28,8 @@ const ReLiquida = () => {
     p_h: "",
   }
   useEffect(() => {
-    const apiUrl = `${
-      import.meta.env.VITE_URL_CTACTE
-    }Listar_periodos_a_reliquidar?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+    const apiUrl = `${import.meta.env.VITE_URL_BASE
+      }Ctasctes_inmuebles/Listar_periodos_a_reliquidar?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
     axios
       .get(apiUrl)
       .then((response) => {

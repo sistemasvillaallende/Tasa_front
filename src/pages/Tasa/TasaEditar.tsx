@@ -40,7 +40,7 @@ function TasaEditar() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const urlApi = `${import.meta.env.VITE_URL_TASA}Updateinmueble`
+    const urlApi = `${import.meta.env.VITE_URL_BASE}Inmuebles/Updateinmueble`
     const requestBody = {
       circunscripcion: circunscripcion,
       seccion: seccion,
@@ -108,7 +108,7 @@ function TasaEditar() {
       cuil: inputs.cuil ?? detalleInmueble.cuil,
       fecha_vecino_digital:
         (inputs.fecha_vecino_digital != "" && inputs.fecha_vecino_digital) ??
-        detalleInmueble.fecha_vecino_digital
+          detalleInmueble.fecha_vecino_digital
           ? detalleInmueble.fecha_vecino_digital
           : new Date(),
       cuit_vecino_digital: inputs.cuit_vecino_digital ?? detalleInmueble.cuit_vecino_digital,

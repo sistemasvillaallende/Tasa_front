@@ -43,13 +43,11 @@ const SearchBar = ({
       setPaginaActual(paginaNum)
       let URL
       if (buscarPor === "denominacion") {
-        URL = `${
-          import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
+        URL = `${import.meta.env.VITE_URL_BASE
+          }GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
       } else {
-        URL = `${
-          import.meta.env.VITE_URL_TASA
-        }GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
+        URL = `${import.meta.env.VITE_URL_BASE
+          }Inmuebles/GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
       }
 
       const response = await axios.get(URL)
@@ -102,6 +100,8 @@ const SearchBar = ({
                 <option value="cuil">CUIT</option>
                 <option value="denominacion">Denominación</option>
               </FormSelect>
+
+              {/*
               <FormLabel htmlFor="vertical-form-1">Estado</FormLabel>
               <FormSelect
                 className="ml-3 sm:mr-2 w-100"
@@ -113,9 +113,11 @@ const SearchBar = ({
                 <option value="1">activos</option>
                 <option value="0">inactivos</option>
               </FormSelect>
+              */}
+
               <FormInput
                 type="text"
-                className="mr-5 mt-2 border-transparent w-56 shadow-none rounded-5 pr-8"
+                className="mr-5 ml-5 border-transparent w-56 shadow-none rounded-5 pr-8"
                 placeholder="Buscar..."
                 value={searchForm.searchParametro}
                 onChange={(e) => handleChange(e)}

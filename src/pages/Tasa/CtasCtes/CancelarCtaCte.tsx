@@ -28,9 +28,8 @@ const CancelarCtaCte = () => {
     p_h: "",
   }
   useEffect(() => {
-    const apiUrl = `${
-      import.meta.env.VITE_URL_CTACTE
-    }Listar_periodos_a_cancelar?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+    const apiUrl = `${import.meta.env.VITE_URL_CTACTE
+      }Listar_periodos_a_cancelar?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
     axios
       .get(apiUrl)
       .then((response) => {
@@ -88,9 +87,8 @@ const CancelarCtaCte = () => {
         ip: "string",
       },
     }
-    const apiUrl = `${
-      import.meta.env.VITE_URL_CTACTE
-    }Confirma_cancelacion_ctasctes?tipo_transaccion=${motivo}`
+    const apiUrl = `${import.meta.env.VITE_URL_BASE
+      }Ctasctes_inmuebles/Confirma_cancelacion_ctasctes?tipo_transaccion=${motivo}`
     axios
       .post(apiUrl, consulta)
       .then((response) => {

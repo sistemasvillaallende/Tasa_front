@@ -72,9 +72,8 @@ const IniciarCtaCorriente = () => {
 
   const traerPeriodos = async () => {
     try {
-      const apiUrl = `${
-        import.meta.env.VITE_URL_CTACTE
-      }IniciarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+      const apiUrl = `${import.meta.env.VITE_URL_BASE
+        }Ctasctes_inmuebles/IniciarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
       const response = await axios.get(apiUrl)
       setPeriodosExistentes(response.data)
       setCargando(true)
@@ -148,7 +147,7 @@ const IniciarCtaCorriente = () => {
       },
     }
 
-    const urlApi = `${import.meta.env.VITE_URL_CTACTE}Confirma_iniciar_ctacte`
+    const urlApi = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Confirma_iniciar_ctacte`
 
     axios
       .post(urlApi, consulta)

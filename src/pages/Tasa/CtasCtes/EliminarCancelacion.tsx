@@ -30,9 +30,8 @@ const EliminarCancelacion = () => {
   const { user } = useUserContext()
 
   useEffect(() => {
-    const apiUrl = `${
-      import.meta.env.VITE_URL_CTACTE
-    }Listar_Periodos_cancelados?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+    const apiUrl = `${import.meta.env.VITE_URL_BASE
+      }Ctasctes_inmuebles/Listar_Periodos_cancelados?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
     axios
       .get(apiUrl)
       .then((response) => {
@@ -103,7 +102,7 @@ const EliminarCancelacion = () => {
         ip: "string",
       },
     }
-    const apiUrl = `${import.meta.env.VITE_URL_CTACTE}Confirma_elimina_cancelacion`
+    const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Confirma_elimina_cancelacion`
     axios
       .post(apiUrl, consulta)
       .then((response) => {

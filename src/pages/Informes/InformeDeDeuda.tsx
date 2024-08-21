@@ -143,9 +143,8 @@ const InformeDeDeuda = () => {
         deudaHasta = "50"
       }
 
-      const URL = `${
-        import.meta.env.VITE_URL_TASA
-      }Resumendeuda?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=${tipoDeInforme}&periodo=${periodo}&cate_deuda_desde=${deudaDesde}&cate_deuda_hasta=${deudaHasta}`
+      const URL = `${import.meta.env.VITE_URL_BASE
+        }Inmuebles/Resumendeuda?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=${tipoDeInforme}&periodo=${periodo}&cate_deuda_desde=${deudaDesde}&cate_deuda_hasta=${deudaHasta}`
 
       const response = await axios.post(URL, bodyConsulta)
       setInformeCompleto(response.data)
@@ -186,7 +185,7 @@ const InformeDeDeuda = () => {
 
   const conseguirListaCategoriasDeudaTasa = async () => {
     try {
-      const URL = `${import.meta.env.VITE_URL_TASA}ListarCategoriasTasa`
+      const URL = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCategoriasTasa`
       const response = await axios.get(URL)
       setCategoriasDeudaTasa(response.data)
     } catch (error) {

@@ -166,14 +166,13 @@ const Cedulones = () => {
           })
         }
       })
-      .catch((error) => {})
+      .catch((error) => { })
   }
   useEffect(() => {
     const fetchData2 = async () => {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_URL_CTACTE
-        }getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+        `${import.meta.env.VITE_URL_BASE
+        }Ctasctes_inmuebles/getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
       )
       setDeuda(response.data)
     }
@@ -203,8 +202,7 @@ const Cedulones = () => {
     if (value == "1") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_URL_CTACTE
+          `${import.meta.env.VITE_URL_CTACTE
           }getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
@@ -215,8 +213,7 @@ const Cedulones = () => {
     if (value == "2") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_URL_CTACTE
+          `${import.meta.env.VITE_URL_CTACTE
           }getListDeudaTasaNoVencida?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
@@ -227,8 +224,7 @@ const Cedulones = () => {
     if (value == "3") {
       const fetchData2 = async () => {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_URL_CTACTE
+          `${import.meta.env.VITE_URL_CTACTE
           }getListDeudaTasaProcurada?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
         )
         setDeuda(response.data)
