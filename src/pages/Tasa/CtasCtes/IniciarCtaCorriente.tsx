@@ -115,6 +115,19 @@ const IniciarCtaCorriente = () => {
     return `${anio}-${mes}-${dia}T00:00:00.000Z`
   }
 
+  const getCurrentFormattedDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
+  }
+
   const iniciarCtaCte = () => {
     const lstCtasTes = periodosIncluidos.map((periodo) => {
       return {
@@ -124,6 +137,38 @@ const IniciarCtaCorriente = () => {
         debe: periodo.debe,
         vencimiento: devolverVencimiento(periodo.vencimiento),
         tipo_transaccion: periodo.tipo_transaccion,
+        circunscripcion: circunscripcion,
+        seccion: seccion,
+        manzana: manzana,
+        parcela: parcela,
+        p_h: p_h,
+        fecha_transaccion: getCurrentFormattedDate(),
+        cedulon_impreso: false,
+        nro_pago_parcial: 0,
+        nro_plan: 0,
+        pagado: false,
+        haber: 0.00,
+        deuda_activa: false,
+        pago_parcial: false,
+        categoria_deuda: 0,
+        nro_procuracion: 0,
+        nro_cedulon: 0,
+        monto_pagado: 0,
+        recargo: 0,
+        honorarios: 0,
+        iva_hons: 0,
+        tipo_deud: 0,
+        decret: "",
+        observacione: "",
+        nro_cedulon_payperti: 0,
+        des_movimient: "Deuda",
+        des_categori: "TASA POR SERVICIOS A LA PROPIEDAD",
+        deuda: 0,
+        sel: 0,
+        costo_financiero: 0,
+        des_rubro: "",
+        cod_tipo_per: 0,
+        sub_total: periodo.debe
       }
     })
 
@@ -133,7 +178,7 @@ const IniciarCtaCorriente = () => {
       man: manzana,
       par: parcela,
       p_h: p_h,
-      lstCtasTes: lstCtasTes,
+      lstCtastes: lstCtasTes,
       auditoria: {
         id_auditoria: 0,
         fecha: devolverFechaActual(),

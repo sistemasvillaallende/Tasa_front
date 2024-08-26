@@ -1,92 +1,124 @@
-import { useEffect } from "react"
-import { Link } from "react-router-dom"
-import Lucide from "../../base-components/Lucide"
-import logoUrl from "../../assets/logo.png"
-import { Menu } from "../../base-components/Headless"
-import { useUserContext } from "../../context/UserProvider"
-import TituloTopBar from "./TituloTopBar"
-import { getSecureItem } from "../../modules/secureStorage"
-import { capitalizeFirstLetter } from "../../utils/helper"
+import { useEffect, useState } from "react";
+import Lucide from "../../base-components/Lucide";
+import logoUrl from "../../assets/logo.png";
+import Breadcrumb from "../../base-components/Breadcrumb";
+import { Menu } from "../../base-components/Headless";
+import _ from "lodash";
+import clsx from "clsx";
+import { useUserContext } from "../../context/UserProvider";
+import avatarUser from "../../assets/avatarUser.svg";
+import TituloTopBar from "./TituloTopBar";
 
 function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
-  const { handleLogout, user, setUser } = useUserContext()
+  const [searchDropdown, setSearchDropdown] = useState(false);
+  const showSearchDropdown = () => {
+    setSearchDropdown(true);
+  };
+  const hideSearchDropdown = () => {
+    setSearchDropdown(false);
+  };
+
+  const { handleLogout, user, setUser } = useUserContext();
 
   useEffect(() => {
-    const usuarioLogeado = localStorage.getItem("usuarioLogeado")
+    const usuarioLogeado = sessionStorage.getItem("usuarioLogeado");
     if (usuarioLogeado) {
-      const parsedUser = getSecureItem("isLoggedIn")
-      if (parsedUser) {
-        setUser(parsedUser)
-      }
+      setUser(JSON.parse(usuarioLogeado));
     }
-  }, [])
+  }, []);
+
   return (
     <>
-      <div className="z-50 new_topbar" style={{ height: "90px" }}>
+      <div className="new_topbar" style={{ height: "90px" }}>
         <div
-          className="flex justify-between items-center pl-10"
+          className="grid grid-cols-12"
           style={{
             boxShadow: "0px 7px 5px -2px rgba(73,73,73,0.75)",
             height: "90px",
           }}
         >
-          {/* BEGIN: Logo */}
           <div
-            className="flex items-center"
+            className="col-span-12 lg:col-span-3 2xl:col-span-3"
             style={{
               height: "90px",
-              width: "240px",
             }}
           >
-            <Link to="/" className="logo_topbar">
-              <img alt="Logo" src={logoUrl} style={{ height: "50px", width: "auto" }} />
-            </Link>
+            {/* BEGIN: Breadcrumb */}
+            <Breadcrumb
+              light
+              className={clsx([
+                "h-[180px] md:ml-10 md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x",
+                props.layout != "top-menu" && "md:pl-6",
+                props.layout == "top-menu" && "md:pl-10",
+              ])}
+            >
+              <Breadcrumb.Link
+                to="/"
+                className="logo_topbar"
+                style={{
+                  width: "240px",
+                  height: "64px",
+                  position: "absolute",
+                  left: "auto",
+                  top: "20px",
+                }}
+              >
+                <img
+                  alt="Logo"
+                  src={logoUrl}
+                  style={{ height: "50px", width: "auto" }}
+                />
+                <span
+                  className={clsx([
+                    "ml-3 text-lg text-white",
+                    props.layout == "side-menu" && "hidden xl:block",
+                    props.layout == "simple-menu" && "hidden",
+                  ])}
+                ></span>
+              </Breadcrumb.Link>
+            </Breadcrumb>
+            {/* END: Breadcrumb */}
           </div>
-          {/* END: Logo */}
-
           <div
-            className=""
+            className="col-span-12 lg:col-span-6 2xl:col-span-6"
             style={{
               height: "90px",
-              textAlign: "center",
+              textAlign: "center"
             }}
           >
             <TituloTopBar />
           </div>
-
-          {/* BEGIN: Account Menu */}
-          <div className="flex justify-around items-center md:w-[290px] md:h-[69px] lg:w-[352px]  bg-secondary rounded-l-[20px]">
-            <Menu>
-              <Menu.Button className="flex align-center w-100 h-100 intro-x">
-                {user?.img && (
-                  <img
-                    className="block w-12 h-12 lg:w-14 lg:h-14 image-fit object-cover  shadow-lg zoom-in rounded-full"
-                    alt="Perfil de Usuario"
-                    src={user.img}
-                  />
-                )}
-                <h3 className="text-white text-center self-center mr-5 ml-3 text-xl font-bold">
-                  {user ? `${user.nombre} ${user.apellido}` : `cargando...`}
-                </h3>
-              </Menu.Button>
-              <Menu.Items className="w-56 mt-px relative bg-primary/80 before:block before:absolute before:bg-black before:inset-0 before:rounded-md before:z-[-1] text-white">
-                <Menu.Header className="font-normal">
-                  <div className="text-xs text-white/70 mt-0.5 dark:text-slate-500">
-                    {user && capitalizeFirstLetter(user.userName)}
+          <div
+            className="col-span-12 lg:col-span-3 2xl:col-span-3"
+            style={{
+              height: "90px",
+            }}
+          >
+            {/* BEGIN: Account Menu */}
+            <Menu
+              className="menu_topbar"
+              style={{ justifyContent: "right", backgroundColor: "inherit" }}
+            >
+              <div className="superposicion">
+                <Menu.Button>
+                  <div className="col-span-6 sm:col-span-3 lg:col-span-2 xl:col-span-1">
+                    <Lucide icon="User" className="block mx-auto" />
+                    <div className="mt-2 text-xs text-center">{user ? `${user.userName}` : `cargando...`}</div>
                   </div>
-                </Menu.Header>
-                <Menu.Divider className="bg-white/[0.08]" />
-                <Menu.Item className="hover:bg-white/5" onClick={handleLogout}>
-                  <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Cerrar Sesión
-                </Menu.Item>
-              </Menu.Items>
+                </Menu.Button>
+                <Menu.Items className="w-56 mt-px relative bg-primary/80 before:block before:absolute before:bg-black before:inset-0 before:rounded-md before:z-[-1] text-white">
+                  <Menu.Item className="hover:bg-white/5" onClick={handleLogout}>
+                    <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Salir
+                  </Menu.Item>
+                </Menu.Items>
+              </div>
             </Menu>
+            {/* END: Account Menu */}
           </div>
-          {/* END: Account Menu */}
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Main
+export default Main;

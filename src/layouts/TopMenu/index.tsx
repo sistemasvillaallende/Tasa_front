@@ -9,6 +9,8 @@ import Lucide from "../../base-components/Lucide"
 import clsx from "clsx"
 import TopBar from "../../components/TopBar"
 import MobileMenu from "../../components/MobileMenu"
+import MenuElemento from "../MenuElemento/MenuElemento";
+
 
 function Main() {
   const location = useLocation()
@@ -39,10 +41,8 @@ function Main() {
 
   return (
     <div className="principal">
-      <div className="py-5 md:py-0 h-full">
+      <div className="py-5 md:py-0 h-full mt-5">
         <MobileMenu />
-        <TopBar layout="top-menu" />
-        {/* BEGIN: Top Menu */}
         {showLista && (
           <div className="h-4/5">
             <nav
@@ -135,26 +135,20 @@ function Main() {
           </div>
         )}
         {showEdicion && (
-          <div
-            className="grid grid-cols-12 mt-5 grilla"
-            style={{
-              marginTop: "0",
-              paddingTop: "20px",
-            }}
-          >
+          <div className="grid grid-cols-12 mt-15 grilla mb-9">
             <div
               className="col-span-2 intro-y content"
               style={{
-                padding: "25px !important",
                 backgroundColor: "white",
-                marginTop: "0px",
                 overflow: "hidden",
                 borderRadius: "0px",
-                borderTopLeftRadius: "20px",
-                borderBottomLeftRadius: "20px",
                 marginLeft: "20px",
+                paddingTop: "20px",
+                paddingRight: "20px",
+                boxShadow: "4px 4px 8px 0 rgba(0, 0, 0, 0.2)",
               }}
             >
+              <MenuElemento />
               <SideMenu />
             </div>
             <div

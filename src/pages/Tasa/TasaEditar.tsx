@@ -7,7 +7,7 @@ import { useTasaContext } from "../../context/TasaProvider"
 import Swal from "sweetalert2"
 import axios from "axios"
 import { useUserContext } from "../../context/UserProvider"
-import { verFechaActual } from "../../utils/helper"
+import { verFechaActual, verFechaActualConBarras } from "../../utils/helper"
 import { fechaActual } from "../../utils/GeneralUtils"
 
 function TasaEditar() {
@@ -118,7 +118,7 @@ function TasaEditar() {
       total_row: inputs.total_row ?? detalleInmueble.total_row,
       objAuditoria: {
         id_auditoria: 0,
-        fecha: verFechaActual(),
+        fecha: verFechaActualConBarras(),
         usuario: user?.userName,
         proceso: "Editar Tasa",
         identificacion: "string",
@@ -129,7 +129,7 @@ function TasaEditar() {
       },
     }
     axios
-      .post(urlApi, requestBody)
+      .put(urlApi, requestBody)
       .then(() => {
         Swal.fire({
           title: "Tasa Actualizada",

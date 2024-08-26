@@ -5,6 +5,7 @@ import menuIcon from "../assets/IconoMenu.svg"
 import { capitalizeFirstLetter } from "../utils/helper"
 import { setSecureItem } from "../modules/secureStorage"
 
+/**
 type UserType = {
   nombre: string
   apellido: string
@@ -18,6 +19,13 @@ type UserType = {
   img?: string
   token: string
 } | null
+ */
+
+type UserType = {
+  userName: string;
+  nombre: string;
+  apellido: string;
+} | null;
 
 type MenuItem = {
   texto: string
@@ -34,6 +42,7 @@ type UserContextType = {
   setUser: (user: UserType) => void
   handleLogin: (username: string, password: string) => void
   handleLogout: () => void
+  handleLoginCIDI: (codigoCIDI: String) => void
 }
 
 const userContext = createContext<UserContextType>({
@@ -41,9 +50,10 @@ const userContext = createContext<UserContextType>({
   error: null,
   menuItems: [],
   menuIcon: "",
-  setUser: () => {},
-  handleLogin: () => {},
-  handleLogout: () => {},
+  setUser: () => { },
+  handleLogin: () => { },
+  handleLogout: () => { },
+  handleLoginCIDI: () => { },
 })
 
 export function useUserContext() {
@@ -71,6 +81,33 @@ export function UserProvider({ children }: any) {
     { texto: "Cedulones", url: "/editar", icono: "FileText" },
     { texto: "ReLiquida", url: "/editar", icono: "Rewind" },
   ]
+
+  const handleLoginCIDI = async (codigoCIDI: String) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL_LOGINCIDI}UsuarioCIDI/ObtenerUsuarioCIDI2?Hash=${codigoCIDI}`
+      );
+      if (response.data) {
+        const user = response.data;
+        if (user.empleado == "N" || !user.empleado) {
+          console.log("NO EMPLEADO: ", user.empleado)
+        } else {
+          const username = JSON.parse(response.data.empleado).nombre
+          setUser({
+            userName: username,
+            nombre: user.nombre,
+            apellido: user.apellido
+          });
+        }
+      } else {
+        setError("Usuario o contraseña incorrectos");
+      }
+    }
+    catch (error) {
+      console.error("Error al validar el usuario:", error);
+      setError("Usuario o contraseña incorrectos");
+    }
+  }
 
   const handleLogin = async (username: any, password: any) => {
     setError(null)
@@ -125,7 +162,16 @@ export function UserProvider({ children }: any) {
 
   return (
     <userContext.Provider
-      value={{ user, error, menuItems, menuIcon, setUser, handleLogin, handleLogout }}
+      value={{
+        user,
+        error,
+        menuItems,
+        menuIcon,
+        setUser,
+        handleLogin,
+        handleLogout,
+        handleLoginCIDI
+      }}
     >
       {children}
     </userContext.Provider>
