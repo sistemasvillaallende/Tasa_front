@@ -218,12 +218,13 @@ const IniciarCtaCorriente = () => {
       })
       .catch((error) => {
         Swal.fire({
-          title: "Error 500",
-          text: "No se pudo iniciar la cuenta corriente por un error interno en el servidor",
+          title: `Error: ${error.response.status}`,
+          text: error.message,
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
         })
+        console.log(error)
       })
   }
 
