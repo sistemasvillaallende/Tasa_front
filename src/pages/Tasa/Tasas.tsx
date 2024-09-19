@@ -41,63 +41,9 @@ const Tasas = () => {
 
   return (
     <>
-      <div className="intro-y flex flex-col h-full">
-        {/* <section>
-            <div className="flex w-full justify-between col-span-12 intro-y lg:col-span-12">
-              <h2 className="text-lg font-medium">Buscar Persona</h2>
-            </div>
-            <div className="grid grid-cols-12 gap-6">
-              <div className="col-span-12 intro-y lg:col-span-4">
-                <FormLabel htmlFor="nombre">Nombre, Apellido o Razón Social</FormLabel>
-                <FormInput
-                  id="nombre"
-                  type="text"
-                  placeholder="Razón Social"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                />
-              </div>
-              <div className="col-span-12 intro-y lg:col-span-3">
-                <FormLabel className="ml-4" htmlFor="cuit">
-                  CUIT:
-                </FormLabel>
-                <FormInput
-                  id="cuit"
-                  type="text"
-                  placeholder="Ingrese el CUIT"
-                  value={cuit}
-                  onChange={(e) => setCuit(e.target.value)}
-                />
-              </div>
-              <div className="col-span-12 intro-y lg:col-span-1">
-                <Button onClick={handleSearch} className="ml-2 mt-7">
-                  Buscar
-                </Button>
-              </div>
-              <div className="col-span-12 intro-y lg:col-span-12">
-                {error && <p className="text-red-500 mt-2">{error}</p>}
-              </div>
-              <div className="col-span-12 intro-y lg:col-span-12">
-                {searchResult && (
-                  <div className="mt-4">
-                    <h3>Resultado de la búsqueda:</h3>
-                    <p>
-                      Nombre: {searchResult.nombre} {searchResult.apellido}
-                    </p>
-                    <p>CUIT: {searchResult.cuit}</p>
-                    <p>Dirección: {searchResult.direccion}</p>
-                    <p>Teléfono: {searchResult.telefono}</p>
-                    <p>Email: {searchResult.email}</p>
-                    <Button onClick={handleVerContribuyente} className="ml-2 mt-7">
-                      Ver Tasas
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section> */}
+      <div className="flex flex-col h-full bg-white pt-5">
         <SearchBar handleNuevaTasa={handleNuevaTasa} />
-        <div className="conScroll h-2/5">
+        <div className="conScroll h-full pb-24">
           {inmuebles && inmuebles.length > 0 && (
             <TableConstructor
               fields={fields}

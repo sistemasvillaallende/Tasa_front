@@ -117,7 +117,7 @@ const SearchBar = ({
 
               <FormInput
                 type="text"
-                className="mr-5 ml-5 border-transparent w-56 shadow-none rounded-5 pr-8"
+                className="mr-5 ml-5 border-transparent w-56 shadow-none rounded-5 pr-8 bg-gray-100"
                 placeholder="Buscar..."
                 value={searchForm.searchParametro}
                 onChange={(e) => handleChange(e)}

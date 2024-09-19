@@ -18,7 +18,7 @@ const Login = () => {
     document.title = "Industria y Comercio";
     const usuarioLogeado = sessionStorage.getItem("usuarioLogeado");
     if (usuarioLogeado) {
-      window.location.href = "/";
+      window.location.href = "/tasa";
     }
   }, []);
 

@@ -218,7 +218,7 @@ const IniciarCtaCorriente = () => {
       })
       .catch((error) => {
         Swal.fire({
-          title: `Error: ${error.response.status}`,
+          title: `Error ${error.response.status}: ${error.response.statusText}`,
           text: error.message,
           icon: "error",
           confirmButtonText: "Aceptar",
