@@ -13,6 +13,7 @@ const RenderPagination = () => {
   let startPage = Math.max(1, pagina - pageRange)
 
   let endPage = Math.min(cantPaginas, pagina + pageRange)
+
   const handlePageChange = (newPage: number) => {
     const paginaNum = newPage
     setSearch({ ...searchForm, pagina: paginaNum })

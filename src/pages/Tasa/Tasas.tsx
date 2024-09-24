@@ -53,7 +53,7 @@ const Tasas = () => {
           )}
         </div>
       </div>
-      <div className="absolute right-0 -bottom-16">
+      <div className="absolute right-0 mt-3">
         <RenderPagination />
       </div>
     </>

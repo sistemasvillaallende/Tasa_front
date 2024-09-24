@@ -153,7 +153,7 @@ function TasaEditar() {
       })
   }
   return (
-    <form onSubmit={handleSubmit} className="mb-10">
+    <form onSubmit={handleSubmit} className="mb-20">
       <div className="flex items-center mt-8 intro-y">
         <h1 className="mr-auto ml-5 mb-3 text-lg font-medium">Gestión de Tasa a la Propiedad</h1>
       </div>

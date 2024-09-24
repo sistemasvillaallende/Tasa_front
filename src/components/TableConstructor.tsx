@@ -60,16 +60,13 @@ const TableConstructor = ({ fields, data, handleClick }: TableProps) => {
                       <Table.Td key={idx}>
                         {field.fieldsArray.map((ele: { fieldName: string; frontName: string }) => {
                           return (
-                            <>
-                              <span
-                                key={ele.fieldName}
-                                className="font-medium"
-                              >{`${capitalizeFirstLetter(ele.frontName)}: `}</span>
-                              <span>{`${capitalizeFirstLetter(
-                                row[ele.fieldName].toString()
-                              )}`}</span>{" "}
+                            <React.Fragment key={ele.fieldName}>
+                              <span className="font-medium">
+                                {`${capitalizeFirstLetter(ele.frontName)}: `}
+                              </span>
+                              <span>{`${capitalizeFirstLetter(row[ele.fieldName].toString())}`}</span>
                               <br />
-                            </>
+                            </React.Fragment>
                           )
                         })}
                       </Table.Td>
