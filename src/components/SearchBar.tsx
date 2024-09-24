@@ -44,7 +44,7 @@ const SearchBar = ({
       let URL
       if (buscarPor === "denominacion") {
         URL = `${import.meta.env.VITE_URL_BASE
-          }GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
+        }Inmuebles/GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
       } else {
         URL = `${import.meta.env.VITE_URL_BASE
           }Inmuebles/GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
