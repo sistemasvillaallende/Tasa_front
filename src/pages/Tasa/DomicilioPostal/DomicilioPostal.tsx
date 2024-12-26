@@ -285,20 +285,34 @@ const DomicilioPostal = () => {
               <Grid item xs={12} md={6}>
                 <Autocomplete
                   fullWidth
+                  freeSolo
                   options={calles}
-                  getOptionLabel={(option) => option.text}
-                  value={calles.find(calle => calle.value === editData?.cod_calle_dom_esp.toString()) || null}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') {
+                      return option;
+                    }
+                    return option.text || '';
+                  }}
+                  value={editData?.nom_calle_dom_esp || ''}
+                  inputValue={searchCalle}
+                  onInputChange={(event, newInputValue) => {
+                    setSearchCalle(newInputValue);
+                    handleCalleSearch(newInputValue);
+                  }}
                   onChange={(event, newValue) => {
-                    if (newValue) {
+                    if (typeof newValue === 'string') {
+                      setEditData(prev => prev ? {
+                        ...prev,
+                        nom_calle_dom_esp: newValue,
+                        cod_calle_dom_esp: 0
+                      } : null);
+                    } else if (newValue && 'text' in newValue) {
                       setEditData(prev => prev ? {
                         ...prev,
                         nom_calle_dom_esp: newValue.text,
                         cod_calle_dom_esp: parseInt(newValue.value)
                       } : null);
                     }
-                  }}
-                  onInputChange={(event, newInputValue) => {
-                    handleCalleSearch(newInputValue);
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -308,9 +322,12 @@ const DomicilioPostal = () => {
                       fullWidth
                     />
                   )}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                  noOptionsText="No se encontraron calles"
-                  loadingText="Buscando..."
+                  isOptionEqualToValue={(option, value) => {
+                    if (typeof value === 'string') {
+                      return option.text === value;
+                    }
+                    return option.text === value.text;
+                  }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>

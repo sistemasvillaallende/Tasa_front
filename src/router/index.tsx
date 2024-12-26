@@ -22,6 +22,7 @@ import { CedulonesProvider } from "../context/CedulonesProviders"
 import Informes from "../pages/Informes"
 import Deudas from "../pages/Tasa/Deudas/Deudas"
 import DomicilioPostal from '../pages/Tasa/DomicilioPostal/DomicilioPostal'
+import ConexionAgua from '../pages/Tasa/ConexionAgua/ConexionAgua'
 
 import Header from "../components/Header";
 
@@ -55,6 +56,7 @@ const Router = () => {
                   <Route path="/informes/:id" element={<Informes />} />
                   <Route path="/deudas/:id" element={<Deudas />} />
                   <Route path="/domiciliopostal/:id" element={<DomicilioPostal />} />
+                  <Route path="/conexionagua/:id" element={<ConexionAgua />} />
                 </Route>
                 <Route path="/cedulonTasa/:nrocedulon" element={<CedulonTasa />} />
                 <Route path="/login" element={<Login />} />

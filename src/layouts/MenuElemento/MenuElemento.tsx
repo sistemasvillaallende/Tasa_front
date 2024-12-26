@@ -72,6 +72,11 @@ const MenuElemento = () => {
       pathname: `/domiciliopostal/${id ?? ""}`,
       icon: "FileText",
     },
+    {
+      icon: "Droplet",
+      pathname: `/conexionagua/${id ?? ""}`,
+      title: "Conexión de Agua",
+    },
   ]
 
   if (inmuebles) {
