@@ -18,6 +18,7 @@ import {
   TextField,
   IconButton,
   Tooltip,
+  TableSortLabel,
 } from '@mui/material';
 import axios from 'axios';
 import { useTasaContext } from '../../../context/TasaProvider';
@@ -44,12 +45,10 @@ interface CategoriaDeuda {
 }
 
 const Deudas = () => {
+  const { selectedInmueble, searchForm, setSearch } = useTasaContext();
   const [deudas, setDeudas] = useState<Deuda[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { searchForm } = useTasaContext()
-  const { denominacion } = searchForm
-  const { cir, sec, man, p_h, par } = denominacion
   const [openModal, setOpenModal] = useState(false);
   const [categorias, setCategorias] = useState<CategoriaDeuda[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<number>(0);
@@ -57,6 +56,31 @@ const Deudas = () => {
   const [periodo, setPeriodo] = useState<string>('');
   const [vencimiento, setVencimiento] = useState<string>('');
   const [editingDeuda, setEditingDeuda] = useState<Deuda | null>(null);
+  const [orderBy, setOrderBy] = useState<keyof Deuda>('nro_transaccion');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
+  useEffect(() => {
+    if (selectedInmueble) {
+      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
+      setSearch({
+        ...searchForm,
+        denominacion: {
+          cir: circunscripcion,
+          sec: seccion,
+          man: manzana,
+          par: parcela,
+          p_h: p_h || 0
+        }
+      });
+    }
+  }, [selectedInmueble]);
+
+  // Obtener los valores del searchForm.denominacion
+  const cir = searchForm?.denominacion?.cir;
+  const sec = searchForm?.denominacion?.sec;
+  const man = searchForm?.denominacion?.man;
+  const par = searchForm?.denominacion?.par;
+  const p_h = searchForm?.denominacion?.p_h;
 
   const fetchDeudas = async () => {
     try {
@@ -70,7 +94,9 @@ const Deudas = () => {
   };
 
   useEffect(() => {
-    fetchDeudas();
+    if (cir && sec && man && par) {
+      fetchDeudas();
+    }
   }, [cir, sec, man, par, p_h]);
 
   useEffect(() => {
@@ -309,8 +335,33 @@ const Deudas = () => {
     }
   };
 
+  const handleRequestSort = (property: keyof Deuda) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortData = (data: Deuda[]) => {
+    return [...data].sort((a, b) => {
+      if (orderBy === 'periodo') {
+        return order === 'asc'
+          ? a.periodo.localeCompare(b.periodo)
+          : b.periodo.localeCompare(a.periodo);
+      }
+      if (orderBy === 'fecha_transaccion') {
+        return order === 'asc'
+          ? new Date(a.fecha_transaccion).getTime() - new Date(b.fecha_transaccion).getTime()
+          : new Date(b.fecha_transaccion).getTime() - new Date(a.fecha_transaccion).getTime();
+      }
+      // Para nro_transaccion
+      return order === 'asc'
+        ? a.nro_transaccion - b.nro_transaccion
+        : b.nro_transaccion - a.nro_transaccion;
+    });
+  };
+
   return (
-    <div className="mt-16 ml-5 mr-5">
+    <div className="mt-16 ml-5 mr-5 mb-16">
       <Button
         variant="contained"
         onClick={() => setOpenModal(true)}
@@ -394,10 +445,34 @@ const Deudas = () => {
           <Table stickyHeader aria-label="tabla de deudas">
             <TableHead>
               <TableRow>
-                <TableCell>N° Trans.</TableCell>
-                <TableCell>Período</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={orderBy === 'nro_transaccion'}
+                    direction={orderBy === 'nro_transaccion' ? order : 'asc'}
+                    onClick={() => handleRequestSort('nro_transaccion')}
+                  >
+                    N° Trans.
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={orderBy === 'periodo'}
+                    direction={orderBy === 'periodo' ? order : 'asc'}
+                    onClick={() => handleRequestSort('periodo')}
+                  >
+                    Período
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Descripción</TableCell>
-                <TableCell>Fecha Transacción</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={orderBy === 'fecha_transaccion'}
+                    direction={orderBy === 'fecha_transaccion' ? order : 'asc'}
+                    onClick={() => handleRequestSort('fecha_transaccion')}
+                  >
+                    Fecha Transacción
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Monto Original</TableCell>
                 <TableCell>Debe</TableCell>
                 <TableCell>Recargo</TableCell>
@@ -407,7 +482,7 @@ const Deudas = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {deudas
+              {sortData(deudas)
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((deuda, index) => (
                   <TableRow key={index}>

@@ -21,7 +21,7 @@ import CedulonTasa from "../pages/Tasa/Cedulones/CedulonTasa"
 import { CedulonesProvider } from "../context/CedulonesProviders"
 import Informes from "../pages/Informes"
 import Deudas from "../pages/Tasa/Deudas/Deudas"
-
+import DomicilioPostal from '../pages/Tasa/DomicilioPostal/DomicilioPostal'
 
 import Header from "../components/Header";
 
@@ -54,6 +54,7 @@ const Router = () => {
                   <Route path="/reliquida/:id" element={<ReLiquida />} />
                   <Route path="/informes/:id" element={<Informes />} />
                   <Route path="/deudas/:id" element={<Deudas />} />
+                  <Route path="/domiciliopostal/:id" element={<DomicilioPostal />} />
                 </Route>
                 <Route path="/cedulonTasa/:nrocedulon" element={<CedulonTasa />} />
                 <Route path="/login" element={<Login />} />

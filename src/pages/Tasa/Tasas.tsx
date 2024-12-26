@@ -36,6 +36,7 @@ const Tasas = () => {
   }
 
   const handleVerContribuyente = (inmueble: any) => {
+    console.log(inmueble)
     navigate(`detalle/${inmueble.nro_bad}`)
   }
 

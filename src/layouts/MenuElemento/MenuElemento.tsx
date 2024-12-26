@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { useTasaContext } from "../../context/TasaProvider";
 import '../../assets/css/components/_Sidebar.css';
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { HomeIcon } from "@radix-ui/react-icons";
 
 const MenuElemento = () => {
-  const { inmuebles } = useTasaContext();
+  const { inmuebles, selectedInmueble } = useTasaContext();
   const navigate = useNavigate();
   const { id } = useParams()
 
@@ -65,6 +66,11 @@ const MenuElemento = () => {
       icon: "FileText",
       pathname: `/deudas/${id ?? ""}`,
       title: "Deudas",
+    },
+    {
+      title: 'Domicilio Postal',
+      pathname: `/domiciliopostal/${id ?? ""}`,
+      icon: "FileText",
     },
   ]
 

@@ -4,6 +4,8 @@ import Button from "../base-components/Button"
 import Lucide from "../base-components/Lucide"
 import { capitalizeFirstLetter, transformarDinero } from "../utils/helper"
 import { getSituacion } from "../utils/tasaUtils"
+import { useTasaContext } from '../context/TasaProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface TableProps {
   fields: any
@@ -12,6 +14,14 @@ interface TableProps {
 }
 
 const TableConstructor = ({ fields, data, handleClick }: TableProps) => {
+  const { setSelectedInmueble } = useTasaContext();
+  const navigate = useNavigate();
+
+  const handleRowClick = (row) => {
+    setSelectedInmueble(row);
+    navigate(`/detalle/${row.nro_bad}`);
+  };
+
   return (
     <Table striped>
       <Table.Thead>
@@ -78,7 +88,7 @@ const TableConstructor = ({ fields, data, handleClick }: TableProps) => {
                   variant="soft-primary"
                   className="mb-2 mr-1"
                   style={{ cursor: "pointer" }}
-                  onClick={() => handleClick(row)}
+                  onClick={() => handleRowClick(row)}
                 >
                   <Lucide icon="Eye" className="w-5 h-5" />
                 </Button>

@@ -3,7 +3,7 @@ import axios from "axios"
 import Swal from "sweetalert2"
 import { Inmueble } from "../interfaces/Inmueble"
 
-type TasaContextType = {
+interface TasaContextType {
   inmuebles: Inmueble[] | null
   getInmueble: Function
   traerInmuebles: any
@@ -12,18 +12,11 @@ type TasaContextType = {
   cantPaginas: number
   searchForm: any
   setSearch: Function
+  selectedInmueble: any | null
+  setSelectedInmueble: (inmueble: any) => void
 }
 
-const TasaContext = createContext<TasaContextType>({
-  inmuebles: null,
-  getInmueble: () => { },
-  traerInmuebles: () => { },
-  setInmuebles: () => { },
-  setCantPaginas: () => { },
-  cantPaginas: 0,
-  searchForm: {},
-  setSearch: () => { },
-})
+export const TasaContext = createContext<TasaContextType>({} as TasaContextType)
 
 export function useTasaContext() {
   return useContext(TasaContext)
@@ -46,6 +39,7 @@ export function TasaProvider({ children }: any) {
       p_h: 0,
     },
   })
+  const [selectedInmueble, setSelectedInmueble] = useState<any>(null)
 
   const getInmueble = (id: string) => {
     return inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
@@ -86,6 +80,8 @@ export function TasaProvider({ children }: any) {
         setCantPaginas,
         searchForm,
         setSearch,
+        selectedInmueble,
+        setSelectedInmueble,
       }}
     >
       {children}
