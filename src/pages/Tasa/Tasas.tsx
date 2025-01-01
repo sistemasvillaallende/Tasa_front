@@ -1,8 +1,9 @@
-import { useParams, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import TableConstructor from "../../components/TableConstructor"
 import RenderPagination from "../../components/RenderPagination"
 import SearchBar from "../../components/SearchBar"
 import { useTasaContext } from "../../context/TasaProvider"
+import PorConceptos from "../../pages/PorConceptos/PorConceptos"
 
 const fields = [
   {
@@ -30,7 +31,8 @@ const fields = [
 
 const Tasas = () => {
   const navigate = useNavigate()
-  const { inmuebles } = useTasaContext()
+  const { inmuebles, searchForm, showConceptos } = useTasaContext()
+
   const handleNuevaTasa = () => {
     navigate(`/nuevaTasa`)
   }
@@ -40,22 +42,33 @@ const Tasas = () => {
     navigate(`detalle/${inmueble.nro_bad}`)
   }
 
+  const hasSearchResults =
+    searchForm.searchParametro !== "" ||
+    (searchForm.buscarPor === "denominacion" &&
+      Object.values(searchForm.denominacion).some(value => value !== 0))
+
   return (
     <>
       <div className="flex flex-col h-full bg-white pt-5">
         <SearchBar handleNuevaTasa={handleNuevaTasa} />
         <div className="conScroll h-full pb-24">
-          {inmuebles && inmuebles.length > 0 && (
-            <TableConstructor
-              fields={fields}
-              data={inmuebles}
-              handleClick={handleVerContribuyente}
-            />
+          {showConceptos ? (
+            <PorConceptos />
+          ) : (
+            hasSearchResults && inmuebles && inmuebles.length > 0 && (
+              <>
+                <TableConstructor
+                  fields={fields}
+                  data={inmuebles}
+                  handleClick={handleVerContribuyente}
+                />
+                <div className="absolute right-0 mt-3">
+                  <RenderPagination />
+                </div>
+              </>
+            )
           )}
         </div>
-      </div>
-      <div className="absolute right-0 mt-3">
-        <RenderPagination />
       </div>
     </>
   )

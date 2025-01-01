@@ -14,6 +14,8 @@ interface TasaContextType {
   setSearch: Function
   selectedInmueble: any | null
   setSelectedInmueble: (inmueble: any) => void
+  showConceptos: boolean
+  setShowConceptos: (show: boolean) => void
 }
 
 export const TasaContext = createContext<TasaContextType>({} as TasaContextType)
@@ -40,6 +42,7 @@ export function TasaProvider({ children }: any) {
     },
   })
   const [selectedInmueble, setSelectedInmueble] = useState<any>(null)
+  const [showConceptos, setShowConceptos] = useState<boolean>(false)
 
   const getInmueble = (id: string) => {
     return inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
@@ -82,6 +85,8 @@ export function TasaProvider({ children }: any) {
         setSearch,
         selectedInmueble,
         setSelectedInmueble,
+        showConceptos,
+        setShowConceptos,
       }}
     >
       {children}

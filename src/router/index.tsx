@@ -24,6 +24,7 @@ import Deudas from "../pages/Tasa/Deudas/Deudas"
 import DomicilioPostal from '../pages/Tasa/DomicilioPostal/DomicilioPostal'
 import ConexionAgua from '../pages/Tasa/ConexionAgua/ConexionAgua'
 import NotaBaldio from '../pages/Tasa/NotaBaldio/NotaBaldio'
+import PorConceptos from "../pages/PorConceptos/PorConceptos"
 
 import Header from "../components/Header";
 
@@ -59,6 +60,7 @@ const Router = () => {
                   <Route path="/domiciliopostal/:id" element={<DomicilioPostal />} />
                   <Route path="/conexionagua/:id" element={<ConexionAgua />} />
                   <Route path="/baldio/:id" element={<NotaBaldio />} />
+                  <Route path="/por-conceptos" element={<PorConceptos />} />
                 </Route>
                 <Route path="/cedulonTasa/:nrocedulon" element={<CedulonTasa />} />
                 <Route path="/login" element={<Login />} />

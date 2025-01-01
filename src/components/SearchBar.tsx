@@ -4,15 +4,17 @@ import { FormInput, FormLabel, FormSelect } from "../base-components/Form"
 import Swal from "sweetalert2"
 import { useTasaContext } from "../context/TasaProvider"
 import axios from "axios"
+import { useNavigate } from 'react-router-dom';
 
 const SearchBar = ({
   handleNuevaTasa,
 }: {
   handleNuevaTasa: React.MouseEventHandler<HTMLButtonElement>
 }) => {
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null)
   const [paginaActual, setPaginaActual] = useState(1)
-  const { setInmuebles, setCantPaginas, searchForm, setSearch } = useTasaContext()
+  const { setInmuebles, setCantPaginas, searchForm, setSearch, showConceptos, setShowConceptos } = useTasaContext()
   const { buscarPor, searchParametro, denominacion, activos } = searchForm
   const { cir, sec, man, p_h, par } = denominacion
 
@@ -44,7 +46,7 @@ const SearchBar = ({
       let URL
       if (buscarPor === "denominacion") {
         URL = `${import.meta.env.VITE_URL_BASE
-        }Inmuebles/GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
+          }Inmuebles/GetInmueblesPaginadoDenominacion?circunscripcion=${cir}&seccion=${sec}&manzana=${man}&parcela=${par}&p_h=${p_h}`
       } else {
         URL = `${import.meta.env.VITE_URL_BASE
           }Inmuebles/GetInmueblesPaginado?buscarPor=${buscarPor}&strParametro=${searchParametro}&pagina=${paginaNum}&registros_por_pagina=${registrosPorPagina}`
@@ -78,6 +80,25 @@ const SearchBar = ({
   const handleLimpiar = () => {
     window.location.href = "/"
   }
+
+  const toggleConceptos = () => {
+    setShowConceptos(!showConceptos)
+    // Limpiar el formulario de búsqueda cuando cambiamos a vista de conceptos
+    if (!showConceptos) {
+      setSearch({
+        ...searchForm,
+        searchParametro: "",
+        denominacion: {
+          cir: 0,
+          sec: 0,
+          man: 0,
+          par: 0,
+          p_h: 0,
+        },
+      })
+    }
+  }
+
   return (
     <div className="mb-5">
       <div className="flex justify-start items-center">
@@ -131,6 +152,15 @@ const SearchBar = ({
 
             <Button variant="soft-primary" className="h-10 mx-3" onClick={handleLimpiar}>
               Limpiar
+            </Button>
+
+            <Button
+              variant={showConceptos ? "primary" : "soft-primary"}
+              className="h-10 mx-3"
+              onClick={toggleConceptos}
+              type="button"
+            >
+              {showConceptos ? "Ver Búsqueda" : "Ver Conceptos"}
             </Button>
           </div>
           {buscarPor === "denominacion" && (
