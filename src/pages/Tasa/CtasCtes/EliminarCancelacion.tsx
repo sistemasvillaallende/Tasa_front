@@ -123,6 +123,10 @@ const EliminarCancelacion = () => {
           icon: "success",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
         setReLiquidacionesSeleccionadas([])
         navigate(`/detalle/${detalleInmueble?.nro_bad}/`)
@@ -134,8 +138,11 @@ const EliminarCancelacion = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
-        console.error(error)
       })
   }
 
@@ -147,7 +154,7 @@ const EliminarCancelacion = () => {
       showCancelButton: true,
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#1976d2",
+      confirmButtonColor: "#27a3cf",
       position: 'top',
       customClass: {
         container: 'position-absolute'

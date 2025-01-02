@@ -11,6 +11,7 @@ import { currencyFormat } from "../../../utils/helper"
 import { CabeceraDeCedulon, DetalleCedulon } from "../../../interfaces/Inmueble"
 import Button from "../../../base-components/Button"
 import html2pdf from "html2pdf.js"
+import logoNotas from '../../../assets/logo-notas.png'
 // Crear un componente que representa el documento PDF
 
 const CedulonTasa = () => {
@@ -84,7 +85,7 @@ const CedulonTasa = () => {
 
     if (element !== null) {
       const opt = {
-        margin: 0,
+        margin: [10, 0, 10, 0],
         filename: `cedulon_${nrocedulon}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -93,24 +94,28 @@ const CedulonTasa = () => {
           logging: false,
           letterRendering: true,
           allowTaint: true,
-          scrollY: -window.scrollY,
-          windowHeight: element.scrollHeight
+          scrollY: 0,
+          windowHeight: document.documentElement.scrollHeight
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
           orientation: 'portrait',
-          compress: true
+          compress: true,
+          hotfixes: ["px_scaling"]
         },
         pagebreak: {
-          mode: ['avoid-all', 'css', 'legacy'],
+          mode: ['avoid-all'],
           before: '.page-break-before',
           after: '.page-break-after',
-          avoid: ['tr', '.cupon', '.tm_invoice_head', '.tm_table']
+          avoid: ['tr', '.cupon', '.tm_invoice_head']
         }
       }
 
-      html2pdf().set(opt).from(element).save()
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save()
     }
   }
 
@@ -143,9 +148,8 @@ const CedulonTasa = () => {
     .tm_invoice_head {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
-      padding-bottom: 20px;
     }
 
     .tm_invoice_left {
@@ -158,7 +162,9 @@ const CedulonTasa = () => {
     }
 
     .tm_logo img {
-      max-height: 80px;
+      max-height: 60px;
+      object-fit: contain;
+      margin: 0;
     }
 
     .tm_invoice_info {
@@ -292,6 +298,22 @@ const CedulonTasa = () => {
       text-align: center;
     }
 
+    .tm_logo {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .tm_logo img {
+      max-height: 60px;
+      object-fit: contain;
+      margin: 0;
+    }
+
+    .tm_logo .logo-secondary {
+      max-height: 60px;
+      margin-left: 10px;
+    }
+
     @media print {
       @page {
         size: A4;
@@ -393,18 +415,14 @@ const CedulonTasa = () => {
       <div ref={divRef}>
         <div className="tm_container">
           <div className="tm_invoice_wrap">
-            <div
-              className="tm_invoice tm_style2 tm_type1 tm_accent_border tm_radius_0 tm_small_border"
-              id="tm_download_section"
-            >
+            <div className="tm_invoice tm_style2 tm_type1 tm_accent_border tm_radius_0 tm_small_border">
               <div className="tm_invoice_in">
-                <div className="tm_invoice_head tm_mb20 tm_m0_md">
+                <div className="tm_invoice_head">
                   <div className="tm_invoice_left">
                     <div className="tm_logo">
                       <img
-                        style={{ maxHeight: "80px" }}
-                        src="https://vecino.villaallende.gov.ar/App_Themes/NuevaWeb/img/LogoVertical2.png"
-                        alt="Logo"
+                        src={logoNotas}
+                        alt="Logo Notas"
                       />
                     </div>
                   </div>
@@ -419,8 +437,8 @@ const CedulonTasa = () => {
                       format="CODE128"
                     />
                   </div>
-                  <div className="tm_shape_bg tm_accent_bg_10 tm_border tm_accent_border_20"></div>
                 </div>
+                <div className="tm_shape_bg tm_accent_bg_10 tm_border tm_accent_border_20"></div>
                 <div className="tm_invoice_info tm_mb30 tm_align_center">
                   <div className="tm_invoice_info_left tm_mb20_md">
                     <p className="tm_mb0">
@@ -585,11 +603,13 @@ const CedulonTasa = () => {
                     </div>
                     <div className="cupon_content">
                       <div className="cupon_data">
-                        <img
-                          src="https://vecino.villaallende.gov.ar/App_Themes/NuevaWeb/img/LogoVertical2.png"
-                          alt="Logo"
-                          className="cupon_logo"
-                        />
+                        <div className="tm_logo">
+                          <img
+                            src={logoNotas}
+                            alt="Logo Notas"
+                            className="cupon_logo"
+                          />
+                        </div>
                       </div>
                       <div className="cupon_data">
                         <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
@@ -617,11 +637,13 @@ const CedulonTasa = () => {
                     </div>
                     <div className="cupon_content">
                       <div className="cupon_data">
-                        <img
-                          src="https://vecino.villaallende.gov.ar/App_Themes/NuevaWeb/img/LogoVertical2.png"
-                          alt="Logo"
-                          className="cupon_logo"
-                        />
+                        <div className="tm_logo">
+                          <img
+                            src={logoNotas}
+                            alt="Logo Notas"
+                            className="cupon_logo"
+                          />
+                        </div>
                       </div>
                       <div className="cupon_data">
                         <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
