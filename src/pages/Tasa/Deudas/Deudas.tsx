@@ -189,13 +189,21 @@ const Deudas = () => {
         title: '¡Éxito!',
         text: 'La deuda ha sido creada correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
     } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'No se pudo crear la deuda',
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
       console.error('Error al crear deuda:', error);
     }
@@ -273,13 +281,21 @@ const Deudas = () => {
         title: '¡Éxito!',
         text: 'La deuda ha sido modificada correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
     } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'No se pudo modificar la deuda',
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
       console.error('Error al modificar deuda:', error);
     }
@@ -294,7 +310,11 @@ const Deudas = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      position: 'top',
+      customClass: {
+        container: 'position-absolute'
+      }
     });
 
     if (result.isConfirmed) {
@@ -322,13 +342,21 @@ const Deudas = () => {
           title: '¡Eliminado!',
           text: 'La deuda ha sido eliminada correctamente',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         });
       } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo eliminar la deuda',
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         });
         console.error('Error al eliminar deuda:', error);
       }
@@ -370,10 +398,20 @@ const Deudas = () => {
         Nueva Deuda
       </Button>
 
-      <Dialog open={openModal} onClose={() => {
-        setOpenModal(false);
-        setEditingDeuda(null);
-      }}>
+      <Dialog
+        open={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setEditingDeuda(null);
+        }}
+        PaperProps={{
+          style: {
+            position: 'fixed',
+            top: 50,
+            margin: 0
+          }
+        }}
+      >
         <DialogTitle>
           {editingDeuda ? 'Modificar Deuda' : 'Crear Nueva Deuda'}
         </DialogTitle>

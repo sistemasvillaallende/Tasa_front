@@ -179,9 +179,18 @@ const Frente = () => {
     }
   }
 
+  // Configuración común para todos los Swal
+  const swalConfig = {
+    position: 'top',
+    customClass: {
+      container: 'position-absolute'
+    }
+  }
+
   const handleDelete = async (frente: Frente) => {
     try {
       const result = await Swal.fire({
+        ...swalConfig,
         title: '¿Está seguro?',
         text: "Esta acción no se puede deshacer",
         icon: 'warning',
@@ -189,11 +198,7 @@ const Frente = () => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        position: 'top',
-        customClass: {
-          container: 'position-absolute'
-        }
+        cancelButtonText: 'Cancelar'
       })
 
       if (result.isConfirmed) {
@@ -210,32 +215,39 @@ const Frente = () => {
         }
 
         await axios.delete(
-          `${import.meta.env.VITE_URL_BASE}Inmuebles/EliminarFrente?cir=${frente.circunscripcion}&sec=${frente.seccion}&man=${frente.manzana}&par=${frente.parcela}&p_h=${frente.p_h}`,
+          `${import.meta.env.VITE_URL_BASE}Inmuebles/EliminarFrente?cir=${frente.circunscripcion}&sec=${frente.seccion}&man=${frente.manzana}&par=${frente.parcela}&p_h=${frente.p_h}&nro_frente=${frente.nro_frente}`,
           { data: body }
         )
 
         await fetchFrentes()
         Swal.fire({
+          ...swalConfig,
           title: 'Eliminado',
           text: 'El frente ha sido eliminado.',
-          icon: 'success',
-          position: 'top',
-          customClass: {
-            container: 'position-absolute'
-          }
+          icon: 'success'
         })
       }
     } catch (error) {
       console.error('Error al eliminar frente:', error)
       Swal.fire({
+        ...swalConfig,
         title: 'Error',
         text: 'No se pudo eliminar el frente',
-        icon: 'error',
-        position: 'top',
-        customClass: {
-          container: 'position-absolute'
-        }
+        icon: 'error'
       })
+    }
+  }
+
+  // Configuración común para los Dialogs
+  const dialogProps = {
+    maxWidth: "sm" as const,
+    fullWidth: true,
+    PaperProps: {
+      style: {
+        position: 'fixed',
+        top: 20,
+        margin: 0
+      }
     }
   }
 
@@ -307,15 +319,7 @@ const Frente = () => {
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          style: {
-            position: 'fixed',
-            top: 50,
-            margin: 0
-          }
-        }}
+        {...dialogProps}
       >
         <DialogTitle>Nuevo Frente</DialogTitle>
         <DialogContent>
@@ -391,15 +395,7 @@ const Frente = () => {
       <Dialog
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          style: {
-            position: 'fixed',
-            top: 50,
-            margin: 0
-          }
-        }}
+        {...dialogProps}
       >
         <DialogTitle>Editar Frente</DialogTitle>
         <DialogContent>
