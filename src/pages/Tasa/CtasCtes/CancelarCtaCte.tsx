@@ -1,15 +1,34 @@
 import { useEffect, useState } from "react"
 import { useTasaContext } from "../../../context/TasaProvider"
-import Table from "../../../base-components/Table"
 import axios from "axios"
-import Swal from "sweetalert2"
-import Button from "../../../base-components/Button"
-import Lucide from "../../../base-components/Lucide"
 import { useNavigate, useParams } from "react-router-dom"
 import { useUserContext } from "../../../context/UserProvider"
-import { formatNumberToARS, formatDateToDDMMYYYY } from "../../../utils/Operaciones"
-import { FormSelect, FormLabel, FormInline } from "../../../base-components/Form"
+import { formatNumberToARS } from "../../../utils/Operaciones"
 import { verFechaActual } from "../../../utils/helper"
+import {
+  Box,
+  Paper,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField
+} from '@mui/material'
+import Swal from 'sweetalert2'
 
 const CancelarCtaCte = () => {
   const [reLiquidaciones, setReLiquidaciones] = useState<any[]>([])
@@ -41,6 +60,10 @@ const CancelarCtaCte = () => {
           icon: "warning",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
       })
   }, [])
@@ -98,6 +121,10 @@ const CancelarCtaCte = () => {
           icon: "success",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
         setReLiquidacionesSeleccionadas([])
         navigate(`/detalle/${detalleInmueble?.nro_bad}`)
@@ -109,6 +136,10 @@ const CancelarCtaCte = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
       })
   }
@@ -121,12 +152,11 @@ const CancelarCtaCte = () => {
       showCancelButton: true,
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#27a3cf",
-      inputValidator: (value) => {
-        if (!value) {
-          return "Debes ingresar un texto para continuar"
-        }
-      },
+      confirmButtonColor: "#1976d2",
+      position: 'top',
+      customClass: {
+        container: 'position-absolute'
+      }
     })
 
     if (value) {
@@ -148,135 +178,129 @@ const CancelarCtaCte = () => {
   }
 
   return (
-    <>
-      <div className="conScroll grid grid-cols-12 gap-6 mt-5 ml-5 mr-4 sinAnimaciones">
-        <div className="col-span-12 intro-y lg:col-span-12">
-          <div className="flex w-full justify-between col-span-12 intro-y lg:col-span-12">
-            <h2> Cancelación especial de periodos de Cuenta Corriente </h2>
-          </div>
-          <div className="grid grid-cols-12 gap-6 mt-3">
-            {/** INICIO TABLA 1 */}
-            <div className="col-span-12 intro-y lg:col-span-4">
-              <div className="text-lg font-medium text-primary">Periodos disponibles</div>
-              <div className="cabeceraTable">
-                <Table>
-                  <Table.Thead variant="dark">
-                    <Table.Tr>
-                      <Table.Th>
-                        <Lucide
-                          icon="CheckSquare"
-                          className="w-5 h-5"
-                          onClick={() => handleSeleccionarTodo()}
-                          style={{ cursor: "pointer" }}
-                        />
-                      </Table.Th>
-                      <Table.Th>Periodo</Table.Th>
-                      <Table.Th className="text-center">Monto</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                </Table>
-              </div>
-              <div className="conScrollInicio cuadroDeudas">
-                <Table>
-                  <Table.Tbody>
-                    {reLiquidaciones.map((liquidacion, index) => (
-                      <Table.Tr key={index}>
-                        <Table.Td>
-                          <label>
-                            <input
-                              type="checkbox"
-                              onChange={() => handleSeleccionar(liquidacion)}
-                              checked={reLiquidacionesSeleccionadas.includes(liquidacion)}
-                            />
-                          </label>
-                        </Table.Td>
-                        <Table.Td>{liquidacion?.periodo}</Table.Td>
-                        <Table.Td className="text-right">
-                          {formatNumberToARS(liquidacion?.monto_original)}
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </div>
-            </div>
-            {/** FIN TABLA 1 */}
+    <div className="mt-16 ml-5 mr-5 mb-16">
+      <Box sx={{ p: 3 }}>
+        <Paper elevation={3} sx={{ p: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Cancelación especial de periodos de Cuenta Corriente
+          </Typography>
 
-            {/** INICIO TABLA 2 */}
-            <div className="col-span-12 intro-y lg:col-span-4 mr-2">
-              <div className="text-lg font-medium text-primary">Periodos a Cancelar</div>
-              <div className="cabeceraTable">
-                <Table>
-                  <Table.Thead variant="dark">
-                    <Table.Tr>
-                      <Table.Th></Table.Th>
-                      <Table.Th>Periodo</Table.Th>
-                      <Table.Th className="text-center">Monto</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                </Table>
-              </div>
-              <div className="conScrollInicio cuadroDeudas">
-                <Table>
-                  <Table.Tbody>
-                    {reLiquidacionesSeleccionadas.map((liquidacion, index) => (
-                      <Table.Tr key={index}>
-                        <Table.Td>
-                          <label>
-                            <input
-                              type="checkbox"
-                              onChange={() => handleSeleccionar(liquidacion)}
-                              checked={reLiquidacionesSeleccionadas.includes(liquidacion)}
-                            />
-                          </label>
-                        </Table.Td>
-                        <Table.Td>{liquidacion?.periodo}</Table.Td>
-                        <Table.Td className="text-right">
-                          {formatNumberToARS(liquidacion?.monto_original)}
-                        </Table.Td>
-                      </Table.Tr>
+          <Grid container spacing={3}>
+            {/* Primera tabla */}
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" color="primary" gutterBottom>
+                Periodos disponibles
+              </Typography>
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          onChange={handleSeleccionarTodo}
+                          checked={reLiquidacionesSeleccionadas.length === reLiquidaciones.length}
+                        />
+                      </TableCell>
+                      <TableCell>Periodo</TableCell>
+                      <TableCell align="right">Monto</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {reLiquidaciones.map((liquidacion, index) => (
+                      <TableRow key={index}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={reLiquidacionesSeleccionadas.includes(liquidacion)}
+                            onChange={() => handleSeleccionar(liquidacion)}
+                          />
+                        </TableCell>
+                        <TableCell>{liquidacion.periodo}</TableCell>
+                        <TableCell align="right">
+                          {formatNumberToARS(liquidacion.monto_original)}
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </Table.Tbody>
+                  </TableBody>
                 </Table>
-              </div>
-              <div className="mt-3 flex w-full justify-between text-lg font-medium text-primary text-right">
-                <span>Total:</span>
-                <span>{formatNumberToARS(sumarMontosSeleccionados())}</span>
-              </div>
-            </div>
-            {/** FIN TABLA 1 */}
-            <div className="col-span-12 intro-y lg:col-span-3"></div>
-            <div className="col-span-12 intro-y lg:col-span-4">
-              <FormInline>
-                <FormLabel htmlFor="horizontal-form-1">Motivo:</FormLabel>
-                <FormSelect
-                  className="sm:mt-2 sm:mr-2"
-                  aria-label=".form-select-lg example"
+              </TableContainer>
+            </Grid>
+
+            {/* Segunda tabla */}
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" color="primary" gutterBottom>
+                Periodos a Cancelar
+              </Typography>
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox"></TableCell>
+                      <TableCell>Periodo</TableCell>
+                      <TableCell align="right">Monto</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {reLiquidacionesSeleccionadas.map((liquidacion, index) => (
+                      <TableRow key={index}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={true}
+                            onChange={() => handleSeleccionar(liquidacion)}
+                          />
+                        </TableCell>
+                        <TableCell>{liquidacion.periodo}</TableCell>
+                        <TableCell align="right">
+                          {formatNumberToARS(liquidacion.monto_original)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="subtitle1" color="primary">Total:</Typography>
+                <Typography variant="subtitle1" color="primary">
+                  {formatNumberToARS(sumarMontosSeleccionados())}
+                </Typography>
+              </Box>
+            </Grid>
+
+            {/* Controles */}
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Motivo</InputLabel>
+                <Select
+                  value={motivo}
                   onChange={(e) => setMotivo(Number(e.target.value))}
+                  label="Motivo"
                 >
-                  <option value="">Seleccione un tipo de transacción</option>
-                  <option value={7}>Cancelación Operativa</option>
-                  <option value={8}>Decreto/Resolución</option>
-                </FormSelect>
-              </FormInline>
-            </div>
-            <div className="col-span-12 intro-y lg:col-span-6 mr-2 mt-2">
-              <Button
-                variant="primary"
-                className="ml-3"
-                onClick={handleAuditoria}
-                disabled={motivo === 0}
-              >
-                Confirmar
-              </Button>
-              <Button variant="outline-secondary" className="ml-3" onClick={handleCancelar}>
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+                  <MenuItem value={0}>Seleccione un tipo de transacción</MenuItem>
+                  <MenuItem value={7}>Cancelación Operativa</MenuItem>
+                  <MenuItem value={8}>Decreto/Resolución</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleAuditoria}
+                  disabled={motivo === 0}
+                  sx={{ mr: 2 }}
+                >
+                  Confirmar
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancelar}
+                >
+                  Cancelar
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Box>
+    </div>
   )
 }
 

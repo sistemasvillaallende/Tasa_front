@@ -103,19 +103,90 @@ const PorConceptos = () => {
     if (!element) return;
 
     const opt = {
-      margin: 1,
+      margin: 0.5,
       filename: `conceptos_${selectedConcepto?.descripcion || 'reporte'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'landscape' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(element).save();
   };
 
+  const styles = `
+    .pdf-content {
+      padding: 10px;
+    }
+
+    .pdf-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .pdf-logo {
+      height: 60px;
+    }
+
+    .pdf-titles {
+      flex-grow: 1;
+    }
+
+    .pdf-main-title {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .pdf-subtitle {
+      font-size: 16px;
+      margin: 5px 0 0 0;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8px;
+    }
+
+    .data-table th {
+      background-color: #f5f5f5;
+      padding: 4px;
+      border: 1px solid #ddd;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 3px;
+      border: 1px solid #ddd;
+      white-space: nowrap;
+    }
+
+    @media print {
+      .data-table {
+        font-size: 8px;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 3px;
+      }
+      
+      .pdf-main-title {
+        font-size: 16px;
+      }
+      
+      .pdf-subtitle {
+        font-size: 14px;
+      }
+    }
+  `;
+
   return (
     <div className="mt-16 ml-5 mr-5 mb-16">
+      <style>{styles}</style>
       <Box mb={4}>
         <Autocomplete
           options={conceptos}

@@ -94,15 +94,34 @@ const MenuElemento = () => {
     },
   ]
 
-  if (inmuebles) {
+  const formatearPropiedad = (inmueble: any) => {
+    if (!inmueble) return '';
+    const { circunscripcion, seccion, manzana, parcela, p_h } = inmueble;
+    return `C:${circunscripcion} S:${seccion} M:${manzana} P:${parcela} PH:${p_h}`;
+  }
+
+  const inmuebleActual = selectedInmueble || (inmuebles && inmuebles[0]);
+
+  if (inmuebleActual) {
     return (
       <>
         <nav className="sidebar">
-          <h2><Lucide icon="Home" className="w-4 h-4 mr-2" style={{
-            height: '40px', width: '40px',
-            color: 'hsla(0, 0%, 13%, 1)'
-          }} />
-            <span style={{ paddingTop: '10px', paddingLeft: '0px' }}>Tasa de la Propiedad</span> </h2>
+          <h2>
+            <Lucide icon="Home" className="w-4 h-4 mr-2" style={{
+              height: '40px', width: '40px',
+              color: 'hsla(0, 0%, 13%, 1)'
+            }} />
+            <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '0px' }}>
+              <span style={{ paddingTop: '5px' }}>Tasa de la Propiedad</span>
+              <span style={{
+                fontSize: '0.9em',
+                color: 'hsla(0, 0%, 40%, 1)',
+                paddingTop: '3px'
+              }}>
+                {formatearPropiedad(inmuebleActual)}
+              </span>
+            </div>
+          </h2>
           <ul>
             {updatedMenu.map((item: any, index: number) => (
               <li key={index}>

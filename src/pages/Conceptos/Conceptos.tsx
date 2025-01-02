@@ -337,7 +337,11 @@ const Conceptos = () => {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar"
+        cancelButtonText: "Cancelar",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
 
       if (result.isConfirmed) {
@@ -382,6 +386,10 @@ const Conceptos = () => {
           text: "El concepto ha sido eliminado correctamente",
           icon: "success",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         });
 
         await fetchConceptos();
@@ -394,6 +402,10 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
     }
   };
@@ -479,6 +491,13 @@ const Conceptos = () => {
           }}
           maxWidth="md"
           fullWidth
+          PaperProps={{
+            style: {
+              position: 'fixed',
+              top: 50,
+              margin: 0
+            }
+          }}
         >
           <DialogTitle>
             {editingConcepto ? 'Editar Concepto' : 'Agregar Nuevo Concepto'}

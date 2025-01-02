@@ -48,7 +48,7 @@ const Tasas = () => {
       Object.values(searchForm.denominacion).some(value => value !== 0))
 
   return (
-    <>
+    <div className="mb-16">
       <div className="flex flex-col h-full bg-white pt-5">
         <SearchBar handleNuevaTasa={handleNuevaTasa} />
         <div className="conScroll h-full pb-24">
@@ -62,7 +62,7 @@ const Tasas = () => {
                   data={inmuebles}
                   handleClick={handleVerContribuyente}
                 />
-                <div className="absolute right-0 mt-3">
+                <div className="absolute right-0 mt-3 mb-5">
                   <RenderPagination />
                 </div>
               </>
@@ -70,7 +70,7 @@ const Tasas = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

@@ -14,11 +14,12 @@ interface TableProps {
 }
 
 const TableConstructor = ({ fields, data, handleClick }: TableProps) => {
-  const { setSelectedInmueble } = useTasaContext();
+  const { setSelectedInmueble, setInmuebles } = useTasaContext();
   const navigate = useNavigate();
 
   const handleRowClick = (row) => {
     setSelectedInmueble(row);
+    setInmuebles([row]);
     navigate(`/detalle/${row.nro_bad}`);
   };
 
