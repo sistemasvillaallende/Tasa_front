@@ -82,6 +82,11 @@ const MenuElemento = () => {
       pathname: `/baldio/${id ?? ""}`,
       title: "Nota de Baldío",
     },
+    {
+      icon: "FileText",
+      pathname: `/conceptos/${id ?? ""}`,
+      title: "Conceptos",
+    },
   ]
 
   if (inmuebles) {
