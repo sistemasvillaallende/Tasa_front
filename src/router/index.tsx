@@ -26,7 +26,7 @@ import ConexionAgua from '../pages/Tasa/ConexionAgua/ConexionAgua'
 import NotaBaldio from '../pages/Tasa/NotaBaldio/NotaBaldio'
 import PorConceptos from "../pages/PorConceptos/PorConceptos"
 import Conceptos from "../pages/Conceptos/Conceptos"
-
+import Frente from "../pages/Frente/Frente"
 import Header from "../components/Header";
 
 const Router = () => {
@@ -63,6 +63,7 @@ const Router = () => {
                   <Route path="/baldio/:id" element={<NotaBaldio />} />
                   <Route path="/por-conceptos" element={<PorConceptos />} />
                   <Route path="/conceptos/:id" element={<Conceptos />} />
+                  <Route path="/frente/:id" element={<Frente />} />
                 </Route>
                 <Route path="/cedulonTasa/:nrocedulon" element={<CedulonTasa />} />
                 <Route path="/login" element={<Login />} />

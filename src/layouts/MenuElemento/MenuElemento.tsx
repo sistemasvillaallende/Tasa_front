@@ -87,6 +87,11 @@ const MenuElemento = () => {
       pathname: `/conceptos/${id ?? ""}`,
       title: "Conceptos",
     },
+    {
+      icon: "FileText",
+      pathname: `/frente/${id ?? ""}`,
+      title: "Frente",
+    },
   ]
 
   if (inmuebles) {

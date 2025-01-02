@@ -93,59 +93,38 @@ const Cedulones = () => {
     }
   }
   const handleCedulonClick = () => {
-    let lstDeuda: VCtasctes[] = []
-    let objDeuda: VCtasctes = {
-      categoria_deuda: 0,
-      deudaOriginal: 0,
-      intereses: 0,
-      nro_cedulon_paypertic: 0,
-      pago_parcial: false,
-      pago_a_cuenta: 0,
-      nro_transaccion: 0,
-      periodo: "",
-      importe: 0,
-      fecha_vencimiento: "",
-    }
-    let cedulon: CreateCedulones = {
-      cir: 0,
-      sec: 0,
-      man: 0,
-      par: 0,
-      p_h: 0,
-      vencimiento: "",
-      monto_cedulon: 0,
-      nroProc: 0,
-      listaDeuda: [],
-      nroCedulon: 0,
+    let lstDeuda: any[] = []
+
+    deudaSeleccionada.forEach(deu => {
+      const deudaItem = {
+        categoria_deuda: deu.categoriaDeuda,
+        deudaOriginal: deu.monto_original,
+        intereses: deu.recargo,
+        nro_cedulon_paypertic: deu.nro_cedulon_paypertic,
+        pago_parcial: deu.pago_parcial,
+        pago_a_cuenta: deu.pago_a_cuenta,
+        nro_transaccion: deu.nroTtransaccion,
+        periodo: deu.periodo,
+        importe: deu.debe,
+        fecha_vencimiento: deu.vencimiento
+      }
+      lstDeuda.push(deudaItem)
+    })
+
+    const cedulon = {
+      cir: circunscripcion,
+      sec: seccion,
+      man: manzana,
+      par: parcela,
+      p_h: p_h,
+      vencimiento: new Date().toLocaleDateString('es-AR'),
+      monto_cedulon: deudaSeleccionada.reduce((acc, curr) => acc + curr.debe, 0),
+      listaDeuda: lstDeuda,
+      nroCedulon: 0
     }
 
-    cedulon.cir = circunscripcion
-    cedulon.sec = seccion
-    cedulon.man = manzana
-    cedulon.par = parcela
-    cedulon.p_h = p_h
-    cedulon.nroProc = proc ? proc[0] : 0
-    let montocedulon: number = 0
-    deudaSeleccionada.map(
-      (deu, index) => (
-        (objDeuda.categoria_deuda = deu.categoriaDeuda),
-        (objDeuda.deudaOriginal = deu.monto_original),
-        (objDeuda.fecha_vencimiento = deu.vencimiento),
-        (objDeuda.importe = deu.debe),
-        (objDeuda.intereses = deu.recargo),
-        (objDeuda.nro_cedulon_paypertic = deu.nro_cedulon_paypertic),
-        (objDeuda.nro_transaccion = deu.nroTtransaccion),
-        (objDeuda.pago_a_cuenta = deu.pago_a_cuenta),
-        (objDeuda.pago_parcial = deu.pago_parcial),
-        (objDeuda.periodo = deu.periodo),
-        (montocedulon += deu.debe),
-        lstDeuda.push(objDeuda)
-      )
-    )
-    cedulon.monto_cedulon = montocedulon
-    cedulon.listaDeuda = lstDeuda
-    const fecha = new Date()
-    cedulon.vencimiento = fecha.toLocaleDateString()
+    console.log('Enviando cedulón:', cedulon)
+
     const urlApi = `${import.meta.env.VITE_URL_CEDULONES}EmitoCedulonTasa`
     axios
       .post(urlApi, cedulon)
@@ -159,14 +138,23 @@ const Cedulones = () => {
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             confirmButtonColor: "#27a3cf",
-          }).then((result: any) => {
+          }).then((result) => {
             if (result.isConfirmed) {
               navigate(`/cedulonTasa/${response.data}`)
             }
           })
         }
       })
-      .catch((error) => { })
+      .catch((error) => {
+        console.error('Error al generar cedulón:', error)
+        Swal.fire({
+          title: "Error",
+          text: "No se pudo generar el cedulón",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        })
+      })
   }
   useEffect(() => {
     const fetchData2 = async () => {
