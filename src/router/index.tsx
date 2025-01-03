@@ -49,6 +49,7 @@ const Router = () => {
                 <Route path="/" element={<TopMenu />}>
                   <Route path="/" element={<Tasas />} />
                   <Route path="/detalle/:id" element={<TasaDetalle />} />
+                  <Route path="/detalle/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<TasaDetalle />} />
                   <Route path="/editar/:id" element={<TasaEditar />} />
                   <Route path="/iniciarctacte/:id" element={<IniciarCtaCorriente />} />
                   <Route path="/cuenta-corriente/:id" element={<CuentaCorriente />} />
