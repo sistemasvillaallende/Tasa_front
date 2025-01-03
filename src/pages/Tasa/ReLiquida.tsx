@@ -12,38 +12,134 @@ import { useTasaContext } from "../../context/TasaProvider"
 
 const ReLiquida = () => {
   const [reLiquidaciones, setReLiquidaciones] = useState<ReLiquidacion[]>([])
-  const [reLiquidacionesSeleccionadas, setReLiquidacionesSeleccionadas] = useState<ReLiquidacion[]>(
-    []
-  )
+  const [reLiquidacionesSeleccionadas, setReLiquidacionesSeleccionadas] = useState<ReLiquidacion[]>([])
   const navigate = useNavigate()
   const { user } = useUserContext()
-  const { inmuebles } = useTasaContext()
-  const { id } = useParams()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: "",
-    parcela: "",
-    seccion: "",
-    manzana: "",
-    p_h: "",
-  }
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
-    const apiUrl = `${import.meta.env.VITE_URL_BASE
-      }Ctasctes_inmuebles/Listar_periodos_a_reliquidar?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
-    axios
-      .get(apiUrl)
-      .then((response) => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
+
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+
+        // Fetch períodos a reliquidar
+        const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Listar_periodos_a_reliquidar`
+        const response = await axios.get(apiUrl, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h
+          }
+        })
         setReLiquidaciones(response.data)
-      })
-      .catch((error) => {
+
+      } catch (error) {
+        console.error('Error:', error)
         Swal.fire({
-          title: `${error.response.data.message}`,
-          icon: "warning",
+          position: 'top',
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
         })
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+
+  const handleRecalcularDeuda = async (auditoria: string) => {
+    if (!detalleInmueble) return;
+
+    try {
+      const consulta = {
+        cir: detalleInmueble.circunscripcion,
+        sec: detalleInmueble.seccion,
+        man: detalleInmueble.manzana,
+        par: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
+        lstCtasTes: reLiquidacionesSeleccionadas,
+        auditoria: {
+          id_auditoria: 0,
+          fecha: verFechaActual(),
+          usuario: user?.userName,
+          proceso: "Reliquidación de deuda",
+          identificacion: "string",
+          autorizaciones: "string",
+          observaciones: auditoria,
+          detalle: "string",
+          ip: "string",
+        },
+      }
+
+      const apiUrl = `${import.meta.env.VITE_URL_CTACTE}Confirma_reliquidacion`
+      await axios.post(apiUrl, consulta)
+
+      Swal.fire({
+        position: 'top',
+        title: "Deuda Recalculada",
+        text: "Deuda Recalculada Correctamente.",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
       })
-  }, [])
+
+      setReLiquidacionesSeleccionadas([])
+      navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`)
+    } catch (error: any) {
+      Swal.fire({
+        position: 'top',
+        title: error.response?.status ? `${error.response.status}: ${error.response.statusText}` : "Error",
+        text: error.message,
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      })
+    }
+  }
 
   const handleSeleccionar = (e: ReLiquidacion) => {
     const reLiquidacionSeleccionada = reLiquidacionesSeleccionadas.find(
@@ -80,54 +176,9 @@ const ReLiquida = () => {
     return formattedDate
   }
 
-  const handleRecalcularDeuda = (auditoria: string) => {
-    const consulta = {
-      cir: circunscripcion,
-      sec: seccion,
-      man: manzana,
-      par: parcela,
-      p_h: p_h,
-      lstCtasTes: reLiquidacionesSeleccionadas,
-      auditoria: {
-        id_auditoria: 0,
-        fecha: verFechaActual(),
-        usuario: user?.userName,
-        proceso: "Reliquidación de deuda",
-        identificacion: "string",
-        autorizaciones: "string",
-        observaciones: auditoria,
-        detalle: "string",
-        ip: "string",
-      },
-    }
-    // TODO: Validar este endpoint, no está en postman
-    const apiUrl = `${import.meta.env.VITE_URL_CTACTE}Confirma_reliquidacion`
-    axios
-      .post(apiUrl, consulta)
-      .then((response) => {
-        Swal.fire({
-          title: "Deuda Recalculada",
-          text: "Deuda Recalculada Correctamente.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
-        })
-        setReLiquidacionesSeleccionadas([])
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: `${error.response.status}: ${error.response.statusText}`,
-          text: error.message,
-          icon: "error",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
-        })
-        console.error(error)
-      })
-  }
-
   const handleAuditoria = async () => {
     const { value } = await Swal.fire({
+      position: 'top',
       title: "Autorización",
       input: "textarea",
       inputPlaceholder: "Observaciones",
@@ -135,11 +186,6 @@ const ReLiquida = () => {
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#27a3cf",
-      inputValidator: (value) => {
-        if (!value) {
-          return "Debes ingresar un texto para continuar"
-        }
-      },
     })
 
     if (value) {

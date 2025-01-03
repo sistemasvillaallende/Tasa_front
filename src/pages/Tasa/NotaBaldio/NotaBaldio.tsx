@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTasaContext } from '../../../context/TasaProvider';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
@@ -9,6 +10,7 @@ import {
   Button
 } from '@mui/material';
 import { PictureAsPdf as PdfIcon } from '@mui/icons-material';
+import Swal from 'sweetalert2';
 import logoMunicipalidad from '../../../assets/logo-notas.png';
 
 interface BaldioData {
@@ -30,28 +32,89 @@ interface BaldioData {
 }
 
 const NotaBaldio = () => {
-  const { selectedInmueble } = useTasaContext();
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams();
+  const { inmuebles, setInmuebles } = useTasaContext();
   const [baldioData, setBaldioData] = useState<BaldioData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const contentRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBaldioData = async () => {
-      if (!selectedInmueble) return;
-
-      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
+    const fetchData = async () => {
+      if (!isLoading) return;
 
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_URL_BASE}Inmuebles/GetDatosBaldio?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h || 0}`
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          );
+          inmuebleData = response.data;
+          setInmuebles([inmuebleData]);
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id);
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          });
+          navigate('/');
+          return;
+        }
+
+        // Obtener datos del baldío
+        const baldioResponse = await axios.get(
+          `${import.meta.env.VITE_URL_BASE}Inmuebles/GetDatosBaldio`, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h || 0
+          }
+        }
         );
-        setBaldioData(response.data);
+        setBaldioData(baldioResponse.data);
+
       } catch (error) {
-        console.error('Error al obtener datos del baldío:', error);
+        console.error('Error:', error);
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        });
+        navigate('/');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchBaldioData();
-  }, [selectedInmueble]);
+    fetchData();
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id]);
 
   const exportToPDF = () => {
     const element = contentRef.current;
@@ -66,8 +129,12 @@ const NotaBaldio = () => {
     html2pdf().set(opt).from(element).save();
   };
 
+  if (isLoading) {
+    return <Typography>Cargando datos...</Typography>;
+  }
+
   if (!baldioData) {
-    return <Typography>Cargando datos del baldío...</Typography>;
+    return <Typography>No se encontraron datos del baldío</Typography>;
   }
 
   const fechaActual = new Date();

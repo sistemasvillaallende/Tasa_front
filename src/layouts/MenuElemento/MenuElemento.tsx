@@ -9,7 +9,20 @@ import { HomeIcon } from "@radix-ui/react-icons";
 const MenuElemento = () => {
   const { inmuebles, selectedInmueble } = useTasaContext();
   const navigate = useNavigate();
-  const { id } = useParams()
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams();
+
+  const getUrlWithNomenclatura = (baseUrl: string) => {
+    if (id) {
+      const inmueble = selectedInmueble || (inmuebles && inmuebles[0]);
+      if (inmueble) {
+        return `${baseUrl}/${inmueble.circunscripcion}/${inmueble.seccion}/${inmueble.manzana}/${inmueble.parcela}/${inmueble.p_h}`;
+      }
+    }
+    if (circunscripcion) {
+      return `${baseUrl}/${circunscripcion}/${seccion}/${manzana}/${parcela}/${p_h}`;
+    }
+    return "/";
+  };
 
   const updatedMenu: any = [
     {
@@ -19,77 +32,77 @@ const MenuElemento = () => {
     },
     {
       icon: "Eye",
-      pathname: `/detalle/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/detalle"),
       title: "Detalle",
     },
     {
       icon: "Edit",
-      pathname: `/editar/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/editar"),
       title: "Editar",
     },
     {
       icon: "FilePlus",
-      pathname: `/iniciarctacte/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/iniciarctacte"),
       title: "Inicia Cta. Corriente",
     },
     {
       icon: "DollarSign",
-      pathname: `/cuenta-corriente/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/cuenta-corriente"),
       title: "Cta. Corriente",
     },
     {
       icon: "ThumbsUp",
-      pathname: `/cancelar-cuenta/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/cancelar-cuenta"),
       title: "Cancelar Cta.Cte.",
     },
     {
       icon: "Slash",
-      pathname: `/eliminar-cancelacion/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/eliminar-cancelacion"),
       title: "Eliminar Cancelación",
     },
     {
       icon: "FileText",
-      pathname: `/cedulones/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/cedulones"),
       title: "Cedulones",
     },
     {
       icon: "Rewind",
-      pathname: `/reliquida/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/reliquida"),
       title: "ReLiquida",
     },
     {
       icon: "Save",
-      pathname: `/informes/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/informes"),
       title: "Informes",
     },
     {
       icon: "FileText",
-      pathname: `/deudas/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/deudas"),
       title: "Deudas",
     },
     {
       title: 'Domicilio Postal',
-      pathname: `/domiciliopostal/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/domiciliopostal"),
       icon: "FileText",
     },
     {
       icon: "Droplet",
-      pathname: `/conexionagua/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/conexionagua"),
       title: "Conexión de Agua",
     },
     {
       icon: "FileText",
-      pathname: `/baldio/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/baldio"),
       title: "Nota de Baldío",
     },
     {
       icon: "FileText",
-      pathname: `/conceptos/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/conceptos"),
       title: "Conceptos",
     },
     {
       icon: "FileText",
-      pathname: `/frente/${id ?? ""}`,
+      pathname: getUrlWithNomenclatura("/frente"),
       title: "Frente",
     },
   ]

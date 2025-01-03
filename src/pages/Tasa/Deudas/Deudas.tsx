@@ -24,6 +24,7 @@ import axios from 'axios';
 import { useTasaContext } from '../../../context/TasaProvider';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import Swal from 'sweetalert2';
+import { useNavigate, useParams } from "react-router-dom"
 
 interface Deuda {
   periodo: string;
@@ -45,93 +46,156 @@ interface CategoriaDeuda {
 }
 
 const Deudas = () => {
-  const { selectedInmueble, searchForm, setSearch } = useTasaContext();
-  const [deudas, setDeudas] = useState<Deuda[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [openModal, setOpenModal] = useState(false);
-  const [categorias, setCategorias] = useState<CategoriaDeuda[]>([]);
-  const [selectedCategoria, setSelectedCategoria] = useState<number>(0);
-  const [montoOriginal, setMontoOriginal] = useState<number>(0);
-  const [periodo, setPeriodo] = useState<string>('');
-  const [vencimiento, setVencimiento] = useState<string>('');
-  const [editingDeuda, setEditingDeuda] = useState<Deuda | null>(null);
-  const [orderBy, setOrderBy] = useState<keyof Deuda>('nro_transaccion');
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [deudas, setDeudas] = useState<Deuda[]>([])
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [openModal, setOpenModal] = useState(false)
+  const [categorias, setCategorias] = useState<CategoriaDeuda[]>([])
+  const [selectedCategoria, setSelectedCategoria] = useState<number>(0)
+  const [montoOriginal, setMontoOriginal] = useState<number>(0)
+  const [periodo, setPeriodo] = useState<string>('')
+  const [vencimiento, setVencimiento] = useState<string>('')
+  const [editingDeuda, setEditingDeuda] = useState<Deuda | null>(null)
+  const [orderBy, setOrderBy] = useState<keyof Deuda>('nro_transaccion')
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (selectedInmueble) {
-      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
-      setSearch({
-        ...searchForm,
-        denominacion: {
-          cir: circunscripcion,
-          sec: seccion,
-          man: manzana,
-          par: parcela,
-          p_h: p_h || 0
+  const fetchCategorias = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_URL_CTACTE}ListarCategoriaDeuda`);
+      setCategorias(response.data);
+    } catch (error) {
+      console.error('Error al obtener categorías:', error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al obtener las categorías",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
         }
       });
     }
-  }, [selectedInmueble]);
+  };
 
-  // Obtener los valores del searchForm.denominacion
-  const cir = searchForm?.denominacion?.cir;
-  const sec = searchForm?.denominacion?.sec;
-  const man = searchForm?.denominacion?.man;
-  const par = searchForm?.denominacion?.par;
-  const p_h = searchForm?.denominacion?.p_h;
+  useEffect(() => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
 
-  const fetchDeudas = async () => {
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+        await fetchDeudas(inmuebleData)
+        await fetchCategorias()
+
+      } catch (error) {
+        console.error('Error:', error)
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        })
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+
+  const fetchDeudas = async (inmueble: any) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_CTACTE}ListarDeudasXTasa?cir=${cir}&sec=${sec}&man=${man}&par=${par}&p_h=${p_h}`
-      );
-      setDeudas(response.data);
-    } catch (error) {
-      console.error('Error al obtener deudas:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (cir && sec && man && par) {
-      fetchDeudas();
-    }
-  }, [cir, sec, man, par, p_h]);
-
-  useEffect(() => {
-    const fetchCategorias = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_URL_CTACTE}ListarCategoriaDeuda`);
-        setCategorias(response.data);
-      } catch (error) {
-        console.error('Error al obtener categorías:', error);
+        `${import.meta.env.VITE_URL_CTACTE}ListarDeudasXTasa`, {
+        params: {
+          cir: inmueble.circunscripcion,
+          sec: inmueble.seccion,
+          man: inmueble.manzana,
+          par: inmueble.parcela,
+          p_h: inmueble.p_h
+        }
       }
-    };
-    fetchCategorias();
-  }, []);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+      )
+      setDeudas(response.data)
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Error al obtener las deudas",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      })
+    }
+  }
 
   const handleCreateDeuda = async () => {
     const categoriaSeleccionada = categorias.find(cat => cat.cod_categoria === selectedCategoria);
 
     const nuevaDeuda = {
-      cir, sec, man, par, p_h,
+      cir: detalleInmueble.circunscripcion,
+      sec: detalleInmueble.seccion,
+      man: detalleInmueble.manzana,
+      par: detalleInmueble.parcela,
+      p_h: detalleInmueble.p_h,
       lstCtastes: [{
         tipo_transaccion: 1,
-        circunscripcion: cir,
-        seccion: sec,
-        manzana: man,
-        parcela: par,
-        p_h: p_h,
+        circunscripcion: detalleInmueble.circunscripcion,
+        seccion: detalleInmueble.seccion,
+        manzana: detalleInmueble.manzana,
+        parcela: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
         fecha_transaccion: new Date().toISOString(),
         periodo: periodo,
         cedulon_impreso: true,
@@ -178,16 +242,16 @@ const Deudas = () => {
     try {
       await axios.post(`${import.meta.env.VITE_URL_CTACTE}NuevaDeuda`, nuevaDeuda);
       setOpenModal(false);
-      await fetchDeudas();
+      await fetchDeudas(detalleInmueble);
       setPeriodo('');
       setVencimiento('');
       setMontoOriginal(0);
       setSelectedCategoria(0);
 
       Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: 'La deuda ha sido creada correctamente',
+        title: "¡Éxito!",
+        text: "La deuda ha sido creada correctamente",
+        icon: "success",
         timer: 2000,
         showConfirmButton: false,
         position: 'top',
@@ -197,9 +261,11 @@ const Deudas = () => {
       });
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo crear la deuda',
+        title: "Error",
+        text: "No se pudo crear la deuda",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
         position: 'top',
         customClass: {
           container: 'position-absolute'
@@ -213,15 +279,19 @@ const Deudas = () => {
     const categoriaSeleccionada = categorias.find(cat => cat.cod_categoria === selectedCategoria);
 
     const deudaModificada = {
-      cir, sec, man, par, p_h,
+      cir: detalleInmueble.circunscripcion,
+      sec: detalleInmueble.seccion,
+      man: detalleInmueble.manzana,
+      par: detalleInmueble.parcela,
+      p_h: detalleInmueble.p_h,
       lstCtastes: [{
         tipo_transaccion: 1,
         nro_transaccion: deuda.nro_transaccion,
-        circunscripcion: cir,
-        seccion: sec,
-        manzana: man,
-        parcela: par,
-        p_h: p_h,
+        circunscripcion: detalleInmueble.circunscripcion,
+        seccion: detalleInmueble.seccion,
+        manzana: detalleInmueble.manzana,
+        parcela: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
         fecha_transaccion: deuda.fecha_transaccion,
         periodo: periodo || deuda.periodo,
         cedulon_impreso: true,
@@ -269,7 +339,7 @@ const Deudas = () => {
       await axios.put(`${import.meta.env.VITE_URL_CTACTE}ModificarDeuda`, deudaModificada);
       setOpenModal(false);
       setEditingDeuda(null);
-      await fetchDeudas();
+      await fetchDeudas(detalleInmueble);
       // Limpiar campos
       setPeriodo('');
       setVencimiento('');
@@ -277,9 +347,9 @@ const Deudas = () => {
       setSelectedCategoria(0);
 
       Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: 'La deuda ha sido modificada correctamente',
+        title: "¡Éxito!",
+        text: "La deuda ha sido modificada correctamente",
+        icon: "success",
         timer: 2000,
         showConfirmButton: false,
         position: 'top',
@@ -289,9 +359,11 @@ const Deudas = () => {
       });
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo modificar la deuda',
+        title: "Error",
+        text: "No se pudo modificar la deuda",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
         position: 'top',
         customClass: {
           container: 'position-absolute'
@@ -320,7 +392,7 @@ const Deudas = () => {
     if (result.isConfirmed) {
       try {
         await axios.delete(
-          `${import.meta.env.VITE_URL_CTACTE}EliminarDeuda?cir=${cir}&sec=${sec}&man=${man}&par=${par}&p_h=${p_h}&nro_transaccion=${deuda.nro_transaccion}`,
+          `${import.meta.env.VITE_URL_CTACTE}EliminarDeuda?cir=${detalleInmueble.circunscripcion}&sec=${detalleInmueble.seccion}&man=${detalleInmueble.manzana}&par=${detalleInmueble.parcela}&p_h=${detalleInmueble.p_h}&nro_transaccion=${deuda.nro_transaccion}`,
           {
             data: {
               id_auditoria: 0,
@@ -335,12 +407,12 @@ const Deudas = () => {
             }
           }
         );
-        await fetchDeudas();
+        await fetchDeudas(detalleInmueble);
 
         Swal.fire({
-          icon: 'success',
-          title: '¡Eliminado!',
-          text: 'La deuda ha sido eliminada correctamente',
+          title: "¡Eliminado!",
+          text: "La deuda ha sido eliminada correctamente",
+          icon: "success",
           timer: 2000,
           showConfirmButton: false,
           position: 'top',
@@ -350,9 +422,11 @@ const Deudas = () => {
         });
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar la deuda',
+          title: "Error",
+          text: "No se pudo eliminar la deuda",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
           position: 'top',
           customClass: {
             container: 'position-absolute'
@@ -386,6 +460,15 @@ const Deudas = () => {
         ? a.nro_transaccion - b.nro_transaccion
         : b.nro_transaccion - a.nro_transaccion;
     });
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (

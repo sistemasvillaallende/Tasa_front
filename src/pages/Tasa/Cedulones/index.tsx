@@ -4,17 +4,15 @@ import Table from "../../../base-components/Table"
 import { FormSelect, FormSwitch } from "../../../base-components/Form"
 import { useTasaContext } from "../../../context/TasaProvider"
 import { currencyFormat, selectCalculaMontos } from "../../../utils/helper"
+import { useNavigate, useParams } from "react-router-dom"
+import Swal from "sweetalert2"
+import Button from "../../../base-components/Button"
+import LoadingIcon from "../../../base-components/LoadingIcon"
 
 import { LstDeuda } from "../../../interfaces/LstDeuda"
 import { Tarjetas } from "../../../interfaces/Tarjetas"
 import { Planes_Cobro } from "../../../interfaces/Planes_Cobro"
 import { CheckOut } from "../../../interfaces/CheckOut"
-import Button from "../../../base-components/Button"
-import LoadingIcon from "../../../base-components/LoadingIcon"
-import { VCtasctes } from "../../../interfaces/VCtasctes"
-import { CreateCedulones } from "../../../interfaces/CreateCedulones"
-import { useNavigate, useParams } from "react-router-dom"
-import Swal from "sweetalert2"
 
 interface LstProcuraciones {
   nroProc: number
@@ -27,21 +25,106 @@ const Cedulones = () => {
   const [PlanesCobro, setPlanesCobro] = useState<Planes_Cobro[] | null>(null)
   const [spinner] = useState<boolean>()
   const [PlanCobro, setPlanCobro] = useState<Planes_Cobro>()
-  const { id } = useParams()
-  const { inmuebles } = useTasaContext()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: 0,
-    parcela: 0,
-    seccion: 0,
-    manzana: 0,
-    p_h: 0,
-  }
-
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [deuda, setDeuda] = useState<LstDeuda[]>([])
   const [deudaSeleccionada, setDeudaSeleccionada] = useState<LstDeuda[]>([])
   const [checkout, setCheckout] = useState<CheckOut>()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
+
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+
+        // Fetch deuda inicial
+        const responseDeuda = await axios.get(
+          `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/getListDeudaTasa`, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h
+          }
+        }
+        )
+        setDeuda(responseDeuda.data)
+
+        // Fetch tarjetas
+        const urlTarjetas = `${import.meta.env.VITE_URL_TARJETAS}getTarjetasDesktop`
+        const responseTarjetas = await fetch(urlTarjetas)
+        const dataTarjetas = await responseTarjetas.json()
+        setTarjetas(dataTarjetas)
+
+        // Fetch planes iniciales
+        const urlPlanes = `${import.meta.env.VITE_URL_TARJETAS}getPlanBySubsistema?subsistema=1&deuda=0&cod_tarjeta=${dataTarjetas[0].cod_tarjeta}`
+        const responsePlanes = await fetch(urlPlanes)
+        const dataPlanes = await responsePlanes.json()
+        setDescripcionPlanes(dataPlanes)
+
+      } catch (error) {
+        console.error('Error:', error)
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        })
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+
   function setDescripcionPlanes(planes_con_descripcion: Planes_Cobro[]) {
     planes_con_descripcion?.forEach((element) => {
       if (element.con_dto_interes == 1) {
@@ -138,6 +221,10 @@ const Cedulones = () => {
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
           }).then((result) => {
             if (result.isConfirmed) {
               navigate(`/cedulonTasa/${response.data}`)
@@ -153,38 +240,13 @@ const Cedulones = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
       })
   }
-  useEffect(() => {
-    const fetchData2 = async () => {
-      const response = await axios.get(
-        `${import.meta.env.VITE_URL_BASE
-        }Ctasctes_inmuebles/getListDeudaTasa?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
-      )
-      setDeuda(response.data)
-    }
-    fetchData2()
-
-    let url = `${import.meta.env.VITE_URL_TARJETAS}getTarjetasDesktop`
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setTarjetas(data)
-        let url2 =
-          `${import.meta.env.VITE_URL_TARJETAS}getPlanBySubsistema?subsistema=` +
-          1 +
-          `&deuda=0&cod_tarjeta=` +
-          data[0].cod_tarjeta
-        fetch(url2)
-          .then((response2) => response2.json())
-          .then((data2) => {
-            setDescripcionPlanes(data2)
-          })
-          .catch((error) => console.error(error))
-      })
-      .catch((error) => console.error(error))
-  }, [])
   function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value
     if (value == "1") {

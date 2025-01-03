@@ -20,7 +20,7 @@ const TableConstructor = ({ fields, data, handleClick }: TableProps) => {
   const handleRowClick = (row) => {
     setSelectedInmueble(row);
     setInmuebles([row]);
-    navigate(`/detalle/${row.nro_bad}`);
+    navigate(`/detalle/${row.circunscripcion}/${row.seccion}/${row.manzana}/${row.parcela}/${row.p_h}`);
   };
 
   return (

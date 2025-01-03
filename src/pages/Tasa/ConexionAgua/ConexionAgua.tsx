@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTasaContext } from '../../../context/TasaProvider';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
@@ -10,6 +11,7 @@ import {
   Button
 } from '@mui/material';
 import { PictureAsPdf as PdfIcon } from '@mui/icons-material';
+import Swal from 'sweetalert2';
 import logoMunicipalidad from '../../../assets/logo-notas.png';
 
 interface ConexionAguaData {
@@ -32,44 +34,89 @@ interface ConexionAguaData {
 }
 
 const ConexionAgua = () => {
-  const { selectedInmueble, searchForm, setSearch } = useTasaContext();
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams();
+  const { inmuebles, setInmuebles } = useTasaContext();
   const [conexionData, setConexionData] = useState<ConexionAguaData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const contentRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (selectedInmueble) {
-      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
-      setSearch({
-        ...searchForm,
-        denominacion: {
-          cir: circunscripcion,
-          sec: seccion,
-          man: manzana,
-          par: parcela,
-          p_h: p_h || 0
-        }
-      });
-    }
-  }, [selectedInmueble]);
-
-  useEffect(() => {
-    const fetchConexionAgua = async () => {
-      if (!selectedInmueble) return;
-
-      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
+    const fetchData = async () => {
+      if (!isLoading) return;
 
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_URL_BASE}Inmuebles/GetDatosConexionAgua?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h || 0}`
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          );
+          inmuebleData = response.data;
+          setInmuebles([inmuebleData]);
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id);
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          });
+          navigate('/');
+          return;
+        }
+
+        // Obtener datos de conexión de agua
+        const conexionResponse = await axios.get(
+          `${import.meta.env.VITE_URL_BASE}Inmuebles/GetDatosConexionAgua`, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h || 0
+          }
+        }
         );
-        setConexionData(response.data);
+        setConexionData(conexionResponse.data);
+
       } catch (error) {
-        console.error('Error al obtener datos de conexión:', error);
+        console.error('Error:', error);
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        });
+        navigate('/');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchConexionAgua();
-  }, [selectedInmueble]);
+    fetchData();
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id]);
 
   const exportToPDF = () => {
     const element = contentRef.current;
@@ -84,8 +131,12 @@ const ConexionAgua = () => {
     html2pdf().set(opt).from(element).save();
   };
 
+  if (isLoading) {
+    return <Typography>Cargando datos...</Typography>;
+  }
+
   if (!conexionData) {
-    return <Typography>Cargando datos de conexión...</Typography>;
+    return <Typography>No se encontraron datos de conexión</Typography>;
   }
 
   return (

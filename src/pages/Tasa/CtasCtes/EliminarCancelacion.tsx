@@ -23,31 +23,77 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete'
 
 const EliminarCancelacion = () => {
-  const { inmuebles } = useTasaContext()
-  const { id } = useParams()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: "",
-    parcela: "",
-    seccion: "",
-    manzana: "",
-    p_h: "",
-  }
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [reLiquidaciones, setReLiquidaciones] = useState<ReLiquidacion[]>([])
   const [reLiquidacionesSeleccionadas, setReLiquidacionesSeleccionadas] = useState<ReLiquidacion[]>([])
   const navigate = useNavigate()
   const { user } = useUserContext()
 
   useEffect(() => {
-    const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Listar_Periodos_cancelados?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
-    axios.get(apiUrl)
-      .then((response) => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
+
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+
+        // Fetch períodos cancelados
+        const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Listar_Periodos_cancelados`
+        const response = await axios.get(apiUrl, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h
+          }
+        })
         setReLiquidaciones(response.data)
-      })
-      .catch((error) => {
+
+      } catch (error) {
+        console.error('Error:', error)
         Swal.fire({
-          title: `${error.response.data.message}`,
-          icon: "warning",
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
           position: 'top',
@@ -55,8 +101,14 @@ const EliminarCancelacion = () => {
             container: 'position-absolute'
           }
         })
-      })
-  }, [])
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
 
   const handleSeleccionar = (e: ReLiquidacion) => {
     const reLiquidacionSeleccionada = reLiquidacionesSeleccionadas.find(
@@ -93,57 +145,59 @@ const EliminarCancelacion = () => {
     return formattedDate
   }
 
-  const handleCancelarCtaCte = (auditoria: string) => {
-    const consulta = {
-      cir: circunscripcion,
-      sec: seccion,
-      man: manzana,
-      par: parcela,
-      p_h: p_h,
-      lstCtasTes: reLiquidacionesSeleccionadas,
-      auditoria: {
-        id_auditoria: 0,
-        fecha: verFechaActual(),
-        usuario: user?.userName,
-        proceso: "Eliminar cancelación",
-        identificacion: "string",
-        autorizaciones: "string",
-        observaciones: auditoria,
-        detalle: "string",
-        ip: "string",
-      },
+  const handleCancelarCtaCte = async (auditoria: string) => {
+    if (!detalleInmueble) return;
+
+    try {
+      const consulta = {
+        cir: detalleInmueble.circunscripcion,
+        sec: detalleInmueble.seccion,
+        man: detalleInmueble.manzana,
+        par: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
+        lstCtasTes: reLiquidacionesSeleccionadas,
+        auditoria: {
+          id_auditoria: 0,
+          fecha: verFechaActual(),
+          usuario: user?.userName,
+          proceso: "Eliminar cancelación",
+          identificacion: "string",
+          autorizaciones: "string",
+          observaciones: auditoria,
+          detalle: "string",
+          ip: "string",
+        },
+      }
+
+      await axios.post(`${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Confirma_elimina_cancelacion`, consulta)
+
+      Swal.fire({
+        title: "Eliminación de Cancelación",
+        text: "Se ha eliminado las cancelaciones de los periodos seleccionados.",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      })
+
+      setReLiquidacionesSeleccionadas([])
+      navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`)
+    } catch (error: any) {
+      Swal.fire({
+        title: error.response?.status ? `${error.response.status}: ${error.response.statusText}` : "Error",
+        text: error.message,
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      })
     }
-    const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Confirma_elimina_cancelacion`
-    axios
-      .post(apiUrl, consulta)
-      .then((response) => {
-        Swal.fire({
-          title: "Eliminación de Cancelación",
-          text: "Se ha eliminado las cancelaciones de los periodos seleccionados.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
-          position: 'top',
-          customClass: {
-            container: 'position-absolute'
-          }
-        })
-        setReLiquidacionesSeleccionadas([])
-        navigate(`/detalle/${detalleInmueble?.nro_bad}/`)
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: `${error.response.status}: ${error.response.statusText}`,
-          text: error.message,
-          icon: "error",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
-          position: 'top',
-          customClass: {
-            container: 'position-absolute'
-          }
-        })
-      })
   }
 
   const handleAuditoria = async () => {

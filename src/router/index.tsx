@@ -50,23 +50,54 @@ const Router = () => {
                   <Route path="/" element={<Tasas />} />
                   <Route path="/detalle/:id" element={<TasaDetalle />} />
                   <Route path="/detalle/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<TasaDetalle />} />
+
                   <Route path="/editar/:id" element={<TasaEditar />} />
+                  <Route path="/editar/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<TasaEditar />} />
+
                   <Route path="/iniciarctacte/:id" element={<IniciarCtaCorriente />} />
+                  <Route path="/iniciarctacte/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<IniciarCtaCorriente />} />
+
                   <Route path="/cuenta-corriente/:id" element={<CuentaCorriente />} />
-                  <Route path="/cedulones/:id" element={<Cedulones />} />
+                  <Route path="/cuenta-corriente/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<CuentaCorriente />} />
+
                   <Route path="/cancelar-cuenta/:id" element={<CancelarCtaCte />} />
+                  <Route path="/cancelar-cuenta/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<CancelarCtaCte />} />
+
                   <Route path="/eliminar-cancelacion/:id" element={<EliminarCancelacion />} />
+                  <Route path="/eliminar-cancelacion/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<EliminarCancelacion />} />
+
+                  <Route path="/cedulones/:id" element={<Cedulones />} />
+                  <Route path="/cedulones/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<Cedulones />} />
+
                   <Route path="/reliquida/:id" element={<ReLiquida />} />
+                  <Route path="/reliquida/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<ReLiquida />} />
+
                   <Route path="/informes/:id" element={<Informes />} />
+                  <Route path="/informes/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<Informes />} />
+
                   <Route path="/deudas/:id" element={<Deudas />} />
+                  <Route path="/deudas/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<Deudas />} />
+
                   <Route path="/domiciliopostal/:id" element={<DomicilioPostal />} />
+                  <Route path="/domiciliopostal/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<DomicilioPostal />} />
+
                   <Route path="/conexionagua/:id" element={<ConexionAgua />} />
+                  <Route path="/conexionagua/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<ConexionAgua />} />
+
                   <Route path="/baldio/:id" element={<NotaBaldio />} />
-                  <Route path="/por-conceptos" element={<PorConceptos />} />
+                  <Route path="/baldio/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<NotaBaldio />} />
+
                   <Route path="/conceptos/:id" element={<Conceptos />} />
+                  <Route path="/conceptos/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<Conceptos />} />
+
                   <Route path="/frente/:id" element={<Frente />} />
+                  <Route path="/frente/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<Frente />} />
+
                 </Route>
+
                 <Route path="/cedulonTasa/:nrocedulon" element={<CedulonTasa />} />
+                <Route path="/por-conceptos" element={<PorConceptos />} />
+
                 <Route path="/login" element={<Login />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>

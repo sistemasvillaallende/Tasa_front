@@ -9,20 +9,59 @@ import axios from "axios"
 import Swal from "sweetalert2"
 
 function TasaDetalle() {
-  const { id } = useParams()
-  const { inmuebles } = useTasaContext()
+  const params = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
   const [detalleInmueble, setDetalleInmueble] = useState<Inmueble | undefined>()
   const [openDialog, setOpenDialog] = useState(false)
   const [observaciones, setObservaciones] = useState("")
 
   useEffect(() => {
-    if (!inmuebles) window.location.href = "/"
-  }, [])
-  useEffect(() => {
-    if (!detalleInmueble) {
-      setDetalleInmueble(inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id))
+    const fetchInmueble = async () => {
+      try {
+        // Si tenemos id, buscamos en inmuebles
+        if (params.id) {
+          const inmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === params.id)
+          if (inmueble) {
+            setDetalleInmueble(inmueble)
+            return
+          }
+        }
+        // Si tenemos los parámetros de nomenclatura, hacemos la petición a la API
+        else if (params.circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion: params.circunscripcion,
+              seccion: params.seccion,
+              manzana: params.manzana,
+              parcela: params.parcela,
+              p_h: params.p_h
+            }
+          }
+          )
+          setDetalleInmueble(response.data)
+          // Actualizamos el contexto con el nuevo inmueble
+          setInmuebles([response.data])
+          return
+        }
+
+        // Si no encontramos el inmueble, redirigimos al inicio
+        window.location.href = "/"
+      } catch (error) {
+        console.error('Error al obtener el inmueble:', error)
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos del inmueble",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        })
+        window.location.href = "/"
+      }
     }
-  }, [inmuebles])
+
+    fetchInmueble()
+  }, [params])
 
   const getUserFromCookie = () => {
     const cookie = document.cookie

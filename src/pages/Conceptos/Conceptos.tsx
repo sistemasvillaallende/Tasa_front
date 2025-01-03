@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTasaContext } from '../../context/TasaProvider'
 import Table from '../../base-components/Table'
 import axios from 'axios'
@@ -16,9 +17,9 @@ import {
   Select,
   MenuItem
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit'
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 interface Concepto {
   circunscripcion: number
@@ -58,24 +59,116 @@ interface ObjAuditoria {
 }
 
 const Conceptos = () => {
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const navigate = useNavigate()
+  const { inmuebles, setInmuebles } = useTasaContext()
   const [conceptos, setConceptos] = useState<Concepto[]>([])
-  const { selectedInmueble } = useTasaContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [conceptosSelect, setConceptosSelect] = useState<ConceptoSelect[]>([])
   const [selectedConcepto, setSelectedConcepto] = useState<ConceptoSelect | null>(null)
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [editingConcepto, setEditingConcepto] = useState<Concepto | null>(null)
   const [newConcepto, setNewConcepto] = useState({
     cod_concepto_inmueble: 0,
-    des_concepto_inmueble: "",
+    des_concepto_inmueble: '',
     porcentaje: 0,
     monto: 0,
-    vencimiento: new Date().toISOString().split('T')[0],
+    vencimiento: '',
     nro_decreto: 0,
     anio_desde: new Date().getFullYear(),
     anio_hasta: new Date().getFullYear(),
     activo: 1,
-    observaciones: ""
+    observaciones: ''
   })
-  const [editingConcepto, setEditingConcepto] = useState<Concepto | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!isLoading) return;
+
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          );
+          inmuebleData = response.data;
+          setInmuebles([inmuebleData]);
+          setDetalleInmueble(inmuebleData);
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id);
+          if (inmuebleData) {
+            setDetalleInmueble(inmuebleData);
+          }
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          });
+          navigate('/');
+          return;
+        }
+
+        await fetchConceptos(inmuebleData);
+        await fetchConceptosSelect();
+
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id]);
+
+  const fetchConceptos = async (inmueble: any) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL_BASE}Conceptos_inmueble/listConceptosXinmueble`, {
+        params: {
+          cir: inmueble.circunscripcion,
+          sec: inmueble.seccion,
+          man: inmueble.manzana,
+          par: inmueble.parcela,
+          p_h: inmueble.p_h
+        }
+      }
+      );
+      setConceptos(response.data);
+    } catch (error) {
+      console.error('Error al cargar conceptos:', error);
+    }
+  };
 
   const getUserFromCookie = () => {
     try {
@@ -111,29 +204,30 @@ const Conceptos = () => {
   }
 
   const handleAgregarConcepto = async () => {
-    const usuario = getUserFromCookie()
-    console.log('Usuario:', usuario)
-    console.log('Inmueble seleccionado:', selectedInmueble)
-
-    if (!usuario || !selectedInmueble) {
+    const usuario = getUserFromCookie();
+    if (!usuario || !detalleInmueble) {
       Swal.fire({
         title: "Error",
-        text: `Usuario: ${usuario ? 'Sí' : 'No'}, Inmueble: ${selectedInmueble ? 'Sí' : 'No'}`,
+        text: "Faltan datos necesarios para agregar el concepto",
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-      })
-      return
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
+      return;
     }
 
     try {
-      const now = new Date().toISOString()
+      const now = new Date().toISOString();
       const conceptoData = {
-        circunscripcion: selectedInmueble.circunscripcion,
-        seccion: selectedInmueble.seccion,
-        manzana: selectedInmueble.manzana,
-        parcela: selectedInmueble.parcela,
-        p_h: selectedInmueble.p_h,
+        circunscripcion: detalleInmueble.circunscripcion,
+        seccion: detalleInmueble.seccion,
+        manzana: detalleInmueble.manzana,
+        parcela: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
         cod_concepto_inmueble: Number(newConcepto.cod_concepto_inmueble),
         des_concepto_inmueble: newConcepto.des_concepto_inmueble,
         porcentaje: Number(newConcepto.porcentaje),
@@ -156,71 +250,52 @@ const Conceptos = () => {
           detalle: "",
           ip: ""
         }
-      }
+      };
 
-      console.log('Enviando datos:', conceptoData)
-
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_URL_BASE}Conceptos_inmueble/AddConcepto?usuario=${usuario}`,
         conceptoData
-      )
+      );
 
-      console.log('Respuesta:', response)
+      Swal.fire({
+        title: "Éxito",
+        text: "Concepto agregado correctamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
 
-      if (response.data) {
-        Swal.fire({
-          title: "Éxito",
-          text: "Concepto agregado correctamente",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
-        })
-
-        setIsModalOpen(false)
-        await fetchConceptos()
-      }
+      setIsModalOpen(false);
+      await fetchConceptos(detalleInmueble);
 
     } catch (error) {
-      console.error('Error al agregar concepto:', error)
+      console.error('Error al agregar concepto:', error);
       Swal.fire({
         title: "Error",
         text: "Error al agregar el concepto",
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-      })
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
+    }
+  };
+
+  const fetchConceptosSelect = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_URL_BASE}Conceptos_inmueble/GetAllConceptos`)
+      setConceptosSelect(response.data)
+    } catch (error) {
+      console.error('Error al cargar conceptos:', error)
     }
   }
-
-  const fetchConceptos = async () => {
-    if (selectedInmueble) {
-      try {
-        const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble
-        const response = await axios.get(
-          `${import.meta.env.VITE_URL_BASE}Conceptos_inmueble/listConceptosXinmueble?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
-        )
-        setConceptos(response.data)
-      } catch (error) {
-        console.error('Error al cargar conceptos:', error)
-      }
-    }
-  }
-
-  useEffect(() => {
-    fetchConceptos()
-  }, [selectedInmueble])
-
-  useEffect(() => {
-    const fetchConceptosSelect = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_URL_BASE}Conceptos_inmueble/GetAllConceptos`)
-        setConceptosSelect(response.data)
-      } catch (error) {
-        console.error('Error al cargar conceptos:', error)
-      }
-    }
-    fetchConceptosSelect()
-  }, [])
 
   const handleConceptoChange = (event: any, value: ConceptoSelect | null) => {
     setSelectedConcepto(value)
@@ -259,18 +334,48 @@ const Conceptos = () => {
     setIsModalOpen(true);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingConcepto(null);
+    setNewConcepto({
+      cod_concepto_inmueble: 0,
+      des_concepto_inmueble: '',
+      porcentaje: 0,
+      monto: 0,
+      vencimiento: '',
+      nro_decreto: 0,
+      anio_desde: new Date().getFullYear(),
+      anio_hasta: new Date().getFullYear(),
+      activo: 1,
+      observaciones: ''
+    });
+  };
+
   const handleUpdateConcepto = async () => {
     const usuario = getUserFromCookie();
-    if (!usuario || !selectedInmueble || !editingConcepto) return;
+    if (!usuario || !detalleInmueble || !editingConcepto) {
+      Swal.fire({
+        title: "Error",
+        text: "Faltan datos necesarios para la actualización",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
+      return;
+    }
 
     try {
       const now = new Date().toISOString();
       const conceptoData = {
-        circunscripcion: selectedInmueble.circunscripcion,
-        seccion: selectedInmueble.seccion,
-        manzana: selectedInmueble.manzana,
-        parcela: selectedInmueble.parcela,
-        p_h: selectedInmueble.p_h,
+        circunscripcion: detalleInmueble.circunscripcion,
+        seccion: detalleInmueble.seccion,
+        manzana: detalleInmueble.manzana,
+        parcela: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
         cod_concepto_inmueble: Number(newConcepto.cod_concepto_inmueble),
         des_concepto_inmueble: newConcepto.des_concepto_inmueble,
         porcentaje: Number(newConcepto.porcentaje),
@@ -306,11 +411,15 @@ const Conceptos = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
 
       setIsModalOpen(false);
       setEditingConcepto(null);
-      await fetchConceptos();
+      await fetchConceptos(detalleInmueble);
 
     } catch (error) {
       console.error('Error al actualizar concepto:', error);
@@ -320,6 +429,10 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
     }
   };
@@ -417,7 +530,10 @@ const Conceptos = () => {
           <h2 className="text-lg font-medium">Conceptos del Inmueble</h2>
           <Button
             variant="contained"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingConcepto(null);
+              setIsModalOpen(true);
+            }}
           >
             Agregar Concepto
           </Button>
@@ -485,10 +601,7 @@ const Conceptos = () => {
 
         <Dialog
           open={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingConcepto(null);
-          }}
+          onClose={handleCloseModal}
           maxWidth="md"
           fullWidth
           PaperProps={{
@@ -500,7 +613,7 @@ const Conceptos = () => {
           }}
         >
           <DialogTitle>
-            {editingConcepto ? 'Editar Concepto' : 'Agregar Nuevo Concepto'}
+            {editingConcepto ? 'Editar Concepto' : 'Agregar Concepto'}
           </DialogTitle>
           <DialogContent>
             <div className="grid grid-cols-2 gap-4 mt-4">
@@ -574,10 +687,7 @@ const Conceptos = () => {
             </div>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => {
-              setIsModalOpen(false);
-              setEditingConcepto(null);
-            }}>
+            <Button onClick={handleCloseModal}>
               Cancelar
             </Button>
             <Button

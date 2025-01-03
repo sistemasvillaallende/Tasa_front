@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTasaContext } from '../../../context/TasaProvider';
 import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -27,6 +28,23 @@ import {
   Edit as EditIcon
 } from '@mui/icons-material';
 import Swal from 'sweetalert2';
+
+// Función para formatear la fecha
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  } catch (error) {
+    console.error('Error al formatear la fecha:', error);
+    return dateString;
+  }
+};
 
 interface DomicilioPostalData {
   nom_calle_dom_esp: string;
@@ -72,89 +90,195 @@ interface Barrio {
 }
 
 const DomicilioPostal = () => {
-  const { selectedInmueble, searchForm, setSearch } = useTasaContext();
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams();
+  const { inmuebles, setInmuebles } = useTasaContext();
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [domicilioData, setDomicilioData] = useState<DomicilioPostalData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [editData, setEditData] = useState<DomicilioPostalData | null>(null);
   const [calles, setCalles] = useState<Calle[]>([]);
-  const [searchCalle, setSearchCalle] = useState('');
   const [barrios, setBarrios] = useState<Barrio[]>([]);
-  const [searchBarrio, setSearchBarrio] = useState('');
+  const [searchCalle, setSearchCalle] = useState('');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (selectedInmueble) {
-      const { circunscripcion, seccion, manzana, parcela, p_h } = selectedInmueble;
-      setSearch({
-        ...searchForm,
-        denominacion: {
-          cir: circunscripcion,
-          sec: seccion,
-          man: manzana,
-          par: parcela,
-          p_h: p_h || 0
+  const handleCalleSearch = async (searchTerm: string) => {
+    if (searchTerm.length < 3) return;
+
+    try {
+      const response = await axios.get<Calle[]>(
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/GetCalle`, {
+        params: { nom_calle: searchTerm }
+      }
+      );
+      setCalles(response.data);
+    } catch (error) {
+      console.error('Error al buscar calles:', error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al buscar calles",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
         }
       });
     }
-  }, [selectedInmueble]);
-
-  const cir = searchForm?.denominacion?.cir;
-  const sec = searchForm?.denominacion?.sec;
-  const man = searchForm?.denominacion?.man;
-  const par = searchForm?.denominacion?.par;
-  const p_h = searchForm?.denominacion?.p_h;
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
   };
 
-  useEffect(() => {
-    const fetchDomicilioPostal = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_URL_BASE}Inmuebles/DatosDomicilioPostal?cir=${cir}&sec=${sec}&man=${man}&par=${par}&p_h=${p_h}`
-        );
-        setDomicilioData(response.data);
-      } catch (error) {
-        console.error('Error al obtener datos del domicilio:', error);
+  const handleBarrioSearch = async (searchTerm: string) => {
+    if (searchTerm.length < 1) return;
+
+    try {
+      const response = await axios.get<Barrio[]>(
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/GetBarrios`, {
+        params: { barrio: searchTerm }
       }
-    };
-
-    if (cir && sec && man && par) {
-      fetchDomicilioPostal();
+      );
+      setBarrios(response.data);
+    } catch (error) {
+      console.error('Error al buscar barrios:', error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al buscar barrios",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
     }
-  }, [cir, sec, man, par, p_h]);
+  };
 
-  const handleEdit = () => {
+  const handleEditClick = () => {
     setEditData(domicilioData);
     setOpenDialog(true);
   };
 
-  const handleUpdate = async () => {
+  const fetchDomicilioPostal = async (params: { cir: string, sec: string, man: string, par: string, p_h: string }) => {
     try {
-      const auditoria: Auditoria = {
-        id_auditoria: 0,
-        fecha: new Date().toISOString(),
-        usuario: "sistema",
-        proceso: "actualizar_domicilio",
-        identificacion: "",
-        autorizaciones: "",
-        observaciones: "",
-        detalle: "",
-        ip: ""
-      };
+      const response = await axios.get<DomicilioPostalData>(
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/DatosDomicilioPostal`, {
+        params: params
+      }
+      );
+      setDomicilioData(response.data);
+      setEditData(response.data);
+    } catch (error) {
+      console.error('Error al obtener datos del domicilio:', error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al obtener datos del domicilio",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!isLoading) return;
+
+      try {
+        if (circunscripcion && seccion && manzana && parcela && p_h) {
+          await fetchDomicilioPostal({
+            cir: circunscripcion,
+            sec: seccion,
+            man: manzana,
+            par: parcela,
+            p_h: p_h
+          });
+        } else if (id) {
+          const inmueble = inmuebles?.find((i) => i.nro_bad.toString() === id);
+          if (inmueble) {
+            await fetchDomicilioPostal({
+              cir: inmueble.circunscripcion.toString(),
+              sec: inmueble.seccion.toString(),
+              man: inmueble.manzana.toString(),
+              par: inmueble.parcela.toString(),
+              p_h: inmueble.p_h.toString()
+            });
+          } else {
+            throw new Error("No se encontró el inmueble");
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        });
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id]);
+
+  const handleUpdate = async () => {
+    if (!editData) {
+      console.error('No hay datos para actualizar');
+      return;
+    }
+
+    if (!circunscripcion || !seccion || !manzana || !parcela || !p_h) {
+      console.error('Faltan parámetros de nomenclatura');
+      return;
+    }
+
+    try {
+      console.log('Enviando actualización...', {
+        params: { circunscripcion, seccion, manzana, parcela, p_h },
+        data: editData
+      });
 
       const response = await axios.put(
-        `${import.meta.env.VITE_URL_BASE}Inmuebles/ActualizarDomicilioPostal?cir=${cir}&sec=${sec}&man=${man}&par=${par}&p_h=${p_h}`,
-        {
-          datosDomicilio: editData,
-          auditoria
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/ActualizarDomicilioPostal`, {
+        datosDomicilio: {
+          ...editData,
+          fecha_cambio_domicilio: new Date().toISOString()
+        },
+        auditoria: {
+          id_auditoria: 0,
+          fecha: new Date().toISOString(),
+          usuario: "sistema",
+          proceso: "actualizar_domicilio",
+          identificacion: "",
+          autorizaciones: "",
+          observaciones: "",
+          detalle: "",
+          ip: ""
         }
+      }, {
+        params: {
+          cir: circunscripcion,
+          sec: seccion,
+          man: manzana,
+          par: parcela,
+          p_h: p_h
+        }
+      }
       );
+
+      console.log('Respuesta:', response);
 
       if (response.status === 200) {
         setDomicilioData(editData);
@@ -164,7 +288,11 @@ const DomicilioPostal = () => {
           title: 'Éxito',
           text: 'Domicilio actualizado correctamente',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         });
       }
     } catch (error) {
@@ -172,52 +300,14 @@ const DomicilioPostal = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo actualizar el domicilio'
+        text: error.response?.data?.message || 'No se pudo actualizar el domicilio',
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       });
     }
   };
-
-  const fetchCalles = async (search: string) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_URL_BASE}Inmuebles/GetCalle?nom_calle=${search}`
-      );
-      setCalles(response.data);
-    } catch (error) {
-      console.error('Error al obtener calles:', error);
-    }
-  };
-
-  const handleCalleSearch = (value: string) => {
-    setSearchCalle(value);
-    if (value.length > 0) {
-      fetchCalles(value);
-    }
-  };
-
-  const fetchBarrios = async (search: string) => {
-    try {
-      console.log('Buscando barrio:', search);
-      const response = await axios.get(
-        `${import.meta.env.VITE_URL_BASE}Inmuebles/GetBarrios?barrio=${search}`
-      );
-      console.log('Barrios encontrados:', response.data);
-      setBarrios(response.data);
-    } catch (error) {
-      console.error('Error al obtener barrios:', error);
-    }
-  };
-
-  const handleBarrioSearch = (value: string) => {
-    setSearchBarrio(value);
-    if (value.length > 0) {
-      fetchBarrios(value);
-    }
-  };
-
-  if (!domicilioData) {
-    return <Typography>Cargando datos del domicilio...</Typography>;
-  }
 
   return (
     <div className="mt-16 ml-5 mr-5 mb-16">
@@ -226,7 +316,7 @@ const DomicilioPostal = () => {
           <Button
             variant="contained"
             startIcon={<EditIcon />}
-            onClick={handleEdit}
+            onClick={handleEditClick}
           >
             Editar Domicilio
           </Button>
@@ -243,16 +333,16 @@ const DomicilioPostal = () => {
                 </Box>
                 <Divider sx={{ mb: 2 }} />
                 <Typography>
-                  <strong>Calle:</strong> {domicilioData.nom_calle_dom_esp}
+                  <strong>Calle:</strong> {domicilioData?.nom_calle_dom_esp}
                 </Typography>
                 <Typography>
-                  <strong>Número:</strong> {domicilioData.nro_dom_esp}
+                  <strong>Número:</strong> {domicilioData?.nro_dom_esp}
                 </Typography>
-                <Typography><strong>Barrio:</strong> {domicilioData.nom_barrio_dom_esp}</Typography>
-                <Typography><strong>Ciudad:</strong> {domicilioData.ciudad_dom_esp}</Typography>
-                <Typography><strong>Provincia:</strong> {domicilioData.provincia_dom_esp}</Typography>
-                <Typography><strong>País:</strong> {domicilioData.pais_dom_esp}</Typography>
-                <Typography><strong>Código Postal:</strong> {domicilioData.cod_postal}</Typography>
+                <Typography><strong>Barrio:</strong> {domicilioData?.nom_barrio_dom_esp}</Typography>
+                <Typography><strong>Ciudad:</strong> {domicilioData?.ciudad_dom_esp}</Typography>
+                <Typography><strong>Provincia:</strong> {domicilioData?.provincia_dom_esp}</Typography>
+                <Typography><strong>País:</strong> {domicilioData?.pais_dom_esp}</Typography>
+                <Typography><strong>Código Postal:</strong> {domicilioData?.cod_postal}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -266,19 +356,31 @@ const DomicilioPostal = () => {
                   <Typography variant="h6">Información de Contacto</Typography>
                 </Box>
                 <Divider sx={{ mb: 2 }} />
-                <Typography><strong>Teléfono:</strong> {domicilioData.telefono || 'No especificado'}</Typography>
-                <Typography><strong>Celular:</strong> {domicilioData.celular || 'No especificado'}</Typography>
-                <Typography><strong>Email:</strong> {domicilioData.email_envio_cedulon || 'No especificado'}</Typography>
-                <Typography><strong>CUIT Ocupante:</strong> {domicilioData.cuit_ocupante || 'No especificado'}</Typography>
+                <Typography><strong>Teléfono:</strong> {domicilioData?.telefono || 'No especificado'}</Typography>
+                <Typography><strong>Celular:</strong> {domicilioData?.celular || 'No especificado'}</Typography>
+                <Typography><strong>Email:</strong> {domicilioData?.email_envio_cedulon || 'No especificado'}</Typography>
+                <Typography><strong>CUIT Ocupante:</strong> {domicilioData?.cuit_ocupante || 'No especificado'}</Typography>
                 <Typography>
-                  <strong>Última actualización:</strong> {formatDate(domicilioData.fecha_cambio_domicilio)}
+                  <strong>Última actualización:</strong> {formatDate(domicilioData?.fecha_cambio_domicilio || '')}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
 
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            style: {
+              position: 'fixed',
+              top: 50,
+              margin: 0
+            }
+          }}
+        >
           <DialogTitle>Editar Domicilio Postal</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -430,8 +532,15 @@ const DomicilioPostal = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-            <Button onClick={handleUpdate} variant="contained" color="primary">
+            <Button onClick={() => setOpenDialog(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleUpdate}
+              variant="contained"
+              color="primary"
+              disabled={!editData}
+            >
               Guardar
             </Button>
           </DialogActions>

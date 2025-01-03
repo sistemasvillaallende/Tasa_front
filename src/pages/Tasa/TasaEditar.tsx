@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import defaultInputs, { fieldsState } from "../../utils/defaultInputs"
 import RenderInputs from "../../components/RenderInputs"
 import Button from "../../base-components/Button"
@@ -8,150 +8,131 @@ import Swal from "sweetalert2"
 import axios from "axios"
 import { useUserContext } from "../../context/UserProvider"
 import { verFechaActual, verFechaActualConBarras } from "../../utils/helper"
-import { fechaActual } from "../../utils/GeneralUtils"
 
 function TasaEditar() {
-  const { getInmueble, traerInmuebles } = useTasaContext()
+  const { getInmueble, setInmuebles } = useTasaContext()
   const { user } = useUserContext()
-  const { id } = useParams()
-  const detalleInmueble = getInmueble(id)
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: 0,
-    parcela: 0,
-    seccion: 0,
-    manzana: 0,
-    p_h: 0,
-  }
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
   const navigate = useNavigate()
-  const handleCancelar = (e: any) => {
-    e.preventDefalut()
-    navigate(`/`)
-  }
-
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
   const [inputs, setInputs] = useState<any>({})
-  useEffect(() => {
-    // if (!detalleInmueble) window.location.href = "/"
-    const newState: any = {}
-    fieldsState.map((fieldName: string) => {
-      newState[fieldName] = detalleInmueble && detalleInmueble[fieldName]
-    })
-    setInputs(newState)
-  }, [detalleInmueble])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const urlApi = `${import.meta.env.VITE_URL_BASE}Inmuebles/Updateinmueble`
-    const requestBody = {
-      circunscripcion: circunscripcion,
-      seccion: seccion,
-      manzana: manzana,
-      parcela: parcela,
-      p_h: p_h,
-      cod_barrio: inputs.cod_barrio ?? detalleInmueble.cod_barrio,
-      nro_bad: inputs.nro_bad ?? detalleInmueble.nro_bad,
-      nombre: inputs.nombre ?? detalleInmueble.nombre,
-      exhimido: inputs.exhimido ?? detalleInmueble.exhimido,
-      jubilado: inputs.jubilado ?? detalleInmueble.jubilado,
-      cod_barrio_dom_esp: inputs.cod_barrio_dom_esp ?? detalleInmueble.cod_barrio_dom_esp,
-      nom_barrio_dom_esp: inputs.nom_barrio_dom_esp ?? detalleInmueble.nom_barrio_dom_esp,
-      cod_calle_dom_esp: inputs.cod_calle_dom_esp ?? detalleInmueble.cod_calle_dom_esp,
-      nom_calle_dom_esp: inputs.nom_calle_dom_esp ?? detalleInmueble.nom_calle_dom_esp,
-      nro_dom_esp: inputs.nro_dom_esp ?? detalleInmueble.nro_dom_esp,
-      piso_dpto_esp: inputs.piso_dpto_esp ?? detalleInmueble.piso_dpto_esp,
-      ciudad_dom_esp: inputs.ciudad_dom_esp ?? detalleInmueble.ciudad_dom_esp,
-      provincia_dom_esp: inputs.provincia_dom_esp ?? detalleInmueble.provincia_dom_esp,
-      pais_dom_esp: inputs.pais_dom_esp ?? detalleInmueble.pais_dom_esp,
-      union_tributaria: inputs.union_tributaria ?? detalleInmueble.union_tributaria,
-      edificado: inputs.edificado ?? detalleInmueble.edificado,
-      parquizado: inputs.parquizado ?? detalleInmueble.parquizado,
-      baldio_sucio: inputs.baldio_sucio ?? detalleInmueble.baldio_sucio,
-      construccion: inputs.construccion ?? detalleInmueble.construccion,
-      cod_uso: inputs.cod_uso ?? detalleInmueble.cod_uso,
-      superficie: inputs.superficie ?? detalleInmueble.superficie,
-      piso_dpto: inputs.piso_dpto ?? detalleInmueble.piso_dpto,
-      cod_calle_pf: inputs.cod_calle_pf ?? detalleInmueble.cod_calle_pf,
-      nro_dom_pf: inputs.nro_dom_pf ?? detalleInmueble.nro_dom_pf,
-      cod_postal: inputs.cod_postal ?? detalleInmueble.cod_postal,
-      ultimo_periodo: inputs.ultimo_periodo ?? detalleInmueble.ultimo_periodo,
-      fecha_cambio_domicilio:
-        inputs.fecha_cambio_domicilio ?? detalleInmueble.fecha_cambio_domicilio,
-      ocupante: inputs.ocupante ?? detalleInmueble.ocupante,
-      emite_cedulon: inputs.emite_cedulon ?? detalleInmueble.emite_cedulon,
-      baldio_country: inputs.baldio_country ?? detalleInmueble.baldio_country,
-      debito_automatico: inputs.debito_automatico ?? detalleInmueble.debito_automatico,
-      nro_secuencia: inputs.nro_secuencia ?? detalleInmueble.nro_secuencia,
-      cod_situacion_judicial:
-        inputs.cod_situacion_judicial ?? detalleInmueble.cod_situacion_judicial,
-      fecha_alta: inputs.fecha_alta ?? detalleInmueble.fecha_alta,
-      clave_pago: inputs.clave_pago ?? detalleInmueble.clave_pago,
-      municipal: inputs.municipal ?? detalleInmueble.municipal,
-      email_envio_cedulon: inputs.email_envio_cedulon ?? detalleInmueble.email_envio_cedulon,
-      telefono: inputs.telefono ?? detalleInmueble.telefono,
-      celular: inputs.celular ?? detalleInmueble.celular,
-      cod_tipo_per_elegido: inputs.cod_tipo_per_elegido ?? detalleInmueble.cod_tipo_per_elegido,
-      con_deuda: inputs.con_deuda ?? detalleInmueble.con_deuda,
-      saldo_adeudado: inputs.saldo_adeudado ?? detalleInmueble.saldo_adeudado,
-      superficie_edificada: inputs.superficie_edificada ?? detalleInmueble.superficie_edificada,
-      cod_estado: inputs.cod_estado ?? detalleInmueble.cod_estado,
-      cedulon_digital: inputs.cedulon_digital ?? detalleInmueble.cedulon_digital,
-      oculto: inputs.oculto ?? detalleInmueble.oculto,
-      nro_doc_ocupante: inputs.nro_doc_ocupante ?? detalleInmueble.nro_doc_ocupante,
-      cuit_ocupante: inputs.cuit_ocupante ?? detalleInmueble.cuit_ocupante,
-      nro_bad_ocupante: inputs.nro_bad_ocupante ?? detalleInmueble.nro_bad_ocupante,
-      cod_categoria_zona_liq:
-        inputs.cod_categoria_zona_liq ?? detalleInmueble.cod_categoria_zona_liq,
-      tipo_ph: inputs.tipo_ph ?? detalleInmueble.tipo_ph,
-      fecha_tipo_ph:
-        (inputs.fecha_tipo_ph && inputs.fecha_tipo_ph) ?? detalleInmueble.fecha_tipo_ph
-          ? detalleInmueble.fecha_tipo_ph
-          : new Date(),
-      cuil: inputs.cuil ?? detalleInmueble.cuil,
-      fecha_vecino_digital:
-        (inputs.fecha_vecino_digital != "" && inputs.fecha_vecino_digital) ??
-          detalleInmueble.fecha_vecino_digital
-          ? detalleInmueble.fecha_vecino_digital
-          : new Date(),
-      cuit_vecino_digital: inputs.cuit_vecino_digital ?? detalleInmueble.cuit_vecino_digital,
-      lat: inputs.lat ?? detalleInmueble.lat,
-      long: inputs.long ?? detalleInmueble.long,
-      diR_GOOGLE: inputs.diR_GOOGLE ?? detalleInmueble.diR_GOOGLE,
-      total_row: inputs.total_row ?? detalleInmueble.total_row,
-      objAuditoria: {
-        id_auditoria: 0,
-        fecha: verFechaActualConBarras(),
-        usuario: user?.userName,
-        proceso: "Editar Tasa",
-        identificacion: "string",
-        autorizaciones: "string",
-        observaciones: "string",
-        detalle: "string",
-        ip: "string",
-      },
-    }
-    axios
-      .put(urlApi, requestBody)
-      .then(() => {
-        Swal.fire({
-          title: "Tasa Actualizada",
-          text: "La actualización se ha realizado correctamente.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#27a3cf",
+  useEffect(() => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return; // Evitar múltiples llamadas si ya se cargaron los datos
+
+      try {
+        let inmuebleData;
+
+        // Si tenemos parámetros de nomenclatura, hacemos la petición a la API
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+        }
+        // Si tenemos id, usamos getInmueble
+        else if (id && getInmueble) {
+          inmuebleData = getInmueble(id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+        setInmuebles([inmuebleData])
+
+        // Inicializar inputs con los datos del inmueble
+        const newState: any = {}
+        fieldsState.forEach((fieldName: string) => {
+          newState[fieldName] = inmuebleData[fieldName]
         })
-        traerInmuebles()
-        navigate(`/detalle/${detalleInmueble?.nro_bad}`)
-      })
-      .catch((error) => {
+        setInputs(newState)
+      } catch (error) {
+        console.error('Error al obtener el inmueble:', error)
         Swal.fire({
-          title: `${error.response.status}: ${error.response.statusText}`,
-          text: error.message,
+          title: "Error",
+          text: "Error al obtener los datos del inmueble",
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
         })
-        console.error(error)
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id, getInmueble])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!detalleInmueble) return
+
+    try {
+      const requestBody = {
+        ...detalleInmueble,
+        ...inputs,
+        objAuditoria: {
+          id_auditoria: 0,
+          fecha: verFechaActualConBarras(),
+          usuario: user?.userName,
+          proceso: "Editar Tasa",
+          identificacion: "string",
+          autorizaciones: "string",
+          observaciones: "string",
+          detalle: "string",
+          ip: "string",
+        },
+      }
+
+      await axios.put(`${import.meta.env.VITE_URL_BASE}Inmuebles/Updateinmueble`, requestBody)
+
+      Swal.fire({
+        title: "Tasa Actualizada",
+        text: "La actualización se ha realizado correctamente.",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
       })
+
+      navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`)
+    } catch (error: any) {
+      Swal.fire({
+        title: error.response?.status ? `${error.response.status}: ${error.response.statusText}` : "Error",
+        text: error.message || "Error al actualizar el inmueble",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      })
+      console.error(error)
+    }
   }
+
+  const handleCancelar = (e: any) => {
+    e.preventDefault()
+    navigate('/')
+  }
+
   return (
     <form onSubmit={handleSubmit} className="mb-20">
       <div className="flex items-center mt-8 intro-y">
@@ -159,26 +140,25 @@ function TasaEditar() {
       </div>
       <div className="box py-2">
         <RenderInputs
-          list={defaultInputs.casaCentral ?? detalleInmueble.list}
+          list={defaultInputs.casaCentral}
           title="Casa Central"
           formInputs={inputs}
           setInputs={setInputs}
           bgSlate
         />
         <RenderInputs
-          list={defaultInputs.datosDomicilio ?? detalleInmueble.list}
+          list={defaultInputs.datosDomicilio}
           title="Datos del Domicilio"
           formInputs={inputs}
           setInputs={setInputs}
         />
         <RenderInputs
-          list={defaultInputs.datosLiquidacion ?? detalleInmueble.list}
+          list={defaultInputs.datosLiquidacion}
           title="Datos de Liquidación"
           formInputs={inputs}
           setInputs={setInputs}
           bgSlate
-        />{" "}
-        {/* END: Page Layout */}
+        />
       </div>
       <div className="flex justify-end mr-5 mt-5">
         <Button variant="outline-secondary" className="text-xl" onClick={handleCancelar}>

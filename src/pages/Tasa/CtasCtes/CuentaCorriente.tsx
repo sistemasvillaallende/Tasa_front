@@ -27,12 +27,12 @@ import {
 
 const CuentaCorriente = () => {
   const divRef = useRef(null)
-  const { id } = useParams()
-  const { inmuebles } = useTasaContext()
-  const detalleInmueble = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { inmuebles, setInmuebles } = useTasaContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [autos, setAutos] = useState<Ctasctes[]>([])
   const [cate_deuda, setCate_deuda] = useState<Combo[]>([])
-  const { dominio } = useParams()
   const [filtro, setFiltro] = useState(1)
   const [cateDeuda, setcateDeuda] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -48,13 +48,6 @@ const CuentaCorriente = () => {
 
   const [detallePlan, setDetallePlan] = useState<DetPlanPago | null>()
   const [showModalPlan, setShowModalPlan] = useState(false)
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: "",
-    parcela: "",
-    seccion: "",
-    manzana: "",
-    p_h: "",
-  }
 
   const navigate = useNavigate()
 
@@ -63,21 +56,110 @@ const CuentaCorriente = () => {
   }
 
   useEffect(() => {
-    setShowModal(false)
-    const fetchData = async () => {
-      const response = await axios.get(
-        `${import.meta.env.VITE_URL_BASE
-        }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}&tipo_consulta=1&cate_deuda_desde=1&cate_deuda_hasta=1000`
-      )
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
 
-      setAutos(response.data)
+      try {
+        let inmuebleData;
 
-      const response2 = await axios.get(`${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCategoriasTasa`)
-      setCate_deuda(response2.data)
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id) {
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+        }
+
+        if (!inmuebleData) {
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+
+        // Fetch cuenta corriente data
+        const responseCtaCte = await axios.get(
+          `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCtacte`, {
+          params: {
+            cir: inmuebleData.circunscripcion,
+            sec: inmuebleData.seccion,
+            man: inmuebleData.manzana,
+            par: inmuebleData.parcela,
+            p_h: inmuebleData.p_h,
+            tipo_consulta: 1,
+            cate_deuda_desde: 1,
+            cate_deuda_hasta: 1000
+          }
+        }
+        )
+        setAutos(responseCtaCte.data)
+
+        // Fetch categorías
+        const responseCategorias = await axios.get(
+          `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCategoriasTasa`
+        )
+        setCate_deuda(responseCategorias.data)
+
+      } catch (error) {
+        console.error('Error:', error)
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    fetchData()
-  }, [dominio])
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+
+  function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const value = event.target.value
+    setFiltro(Number.parseInt(value))
+    let hasta = cateDeuda === 0 ? 20 : cateDeuda
+
+    fetchCtaCte(Number.parseInt(value), cateDeuda, hasta)
+  }
+
+  function handleSelectChangeTipo(event: React.ChangeEvent<HTMLSelectElement>) {
+    const value = Number.parseInt(event.target.value)
+    setcateDeuda(value)
+    let hasta = value === 0 ? 20 : value
+
+    fetchCtaCte(filtro, value, hasta)
+  }
+
+  const fetchCtaCte = async (tipoConsulta: number, cateDeudaDesde: number, cateDeudaHasta: number) => {
+    if (!detalleInmueble) return;
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/ListarCtacte`, {
+        params: {
+          cir: detalleInmueble.circunscripcion,
+          sec: detalleInmueble.seccion,
+          man: detalleInmueble.manzana,
+          par: detalleInmueble.parcela,
+          p_h: detalleInmueble.p_h,
+          tipo_consulta: tipoConsulta,
+          cate_deuda_desde: cateDeudaDesde,
+          cate_deuda_hasta: cateDeudaHasta
+        }
+      }
+      )
+      setAutos(response.data)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
 
   let saldo_actualizado = 0
   if (autos.length > 0) {
@@ -90,32 +172,6 @@ const CuentaCorriente = () => {
   const saldo_original = deudas.reduce((a, b) => a + b.monto_original, 0)
   function currencyFormat(num: number) {
     return "$" + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
-  }
-  function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const value = event.target.value
-    setFiltro(Number.parseInt(value))
-    let hasta = 0
-    if (cateDeuda == 0) {
-      hasta = 20
-    } else {
-      hasta = cateDeuda
-    }
-    let url =
-      `${import.meta.env.VITE_URL_BASE
-      }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
-      `&tipo_consulta=` +
-      value +
-      `&cate_deuda_desde=` +
-      cateDeuda +
-      `&cate_deuda_hasta=` +
-      hasta +
-      ``
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setAutos(data)
-      })
-      .catch((error) => console.error(error))
   }
   function handledet(tipo_transaccion: number, nro_transaccion: number) {
     const fetchData = async () => {
@@ -178,32 +234,6 @@ const CuentaCorriente = () => {
       .then((data) => {
         setDetallePlan(data)
         setShowModalPlan(true)
-      })
-      .catch((error) => console.error(error))
-  }
-  function handleSelectChangeTipo(event: React.ChangeEvent<HTMLSelectElement>) {
-    const value = event.target.value
-    setcateDeuda(Number.parseInt(value))
-    let hasta = 0
-    if (Number.parseInt(value) == 0) {
-      hasta = 20
-    } else {
-      hasta = Number.parseInt(value)
-    }
-    let url =
-      `${import.meta.env.VITE_URL_BASE
-      }Ctasctes_inmuebles/ListarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}` +
-      `&tipo_consulta=` +
-      filtro +
-      `&cate_deuda_desde=` +
-      value +
-      `&cate_deuda_hasta=` +
-      hasta +
-      ``
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setAutos(data)
       })
       .catch((error) => console.error(error))
   }

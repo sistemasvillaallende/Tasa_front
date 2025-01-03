@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { FormLabel } from "../../../base-components/Form"
@@ -16,25 +16,91 @@ interface Periodo {
 const IniciarCtaCorriente = () => {
   const navigate = useNavigate()
   const [cargando, setCargando] = useState<boolean>(false)
-  const { id } = useParams()
-  const { getInmueble } = useTasaContext()
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const { getInmueble, setInmuebles } = useTasaContext()
   const { user } = useUserContext()
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const detalleInmueble = getInmueble(id)
-
-  const { circunscripcion, seccion, manzana, p_h, parcela } = detalleInmueble ?? {
-    circunscripcion: "",
-    parcela: "",
-    seccion: "",
-    manzana: "",
-    p_h: "",
-  }
   const [periodosExistentes, setPeriodosExistentes] = useState<Periodo[]>([])
   const [periodosIncluidos, setPeriodosIncluidos] = useState<Periodo[]>([])
-  const [periodosSeleccionadosExistentes, setPeriodosSeleccionadosExistentes] = useState<string[]>(
-    []
-  )
+  const [periodosSeleccionadosExistentes, setPeriodosSeleccionadosExistentes] = useState<string[]>([])
   const [periodosSeleccionadosIncluidos, setPeriodosSeleccionadosIncluidos] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchInmueble = async () => {
+      if (!isLoading) return;
+
+      try {
+        let inmuebleData;
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+        } else if (id && getInmueble) {
+          inmuebleData = getInmueble(id)
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+          })
+          navigate('/')
+          return
+        }
+
+        setDetalleInmueble(inmuebleData)
+        traerPeriodos(inmuebleData)
+      } catch (error) {
+        console.error('Error al obtener el inmueble:', error)
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos del inmueble",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        })
+        navigate('/')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInmueble()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id, getInmueble])
+
+  const traerPeriodos = async (inmueble: any) => {
+    try {
+      const { circunscripcion, seccion, manzana, parcela, p_h } = inmueble
+      const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/IniciarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+      const response = await axios.get(apiUrl)
+      setPeriodosExistentes(response.data)
+      setCargando(true)
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron traer los periodos",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      })
+    }
+  }
 
   const moverPeriodoExistentesAIncluidos = () => {
     const nuevosPeriodosIncluidos = periodosExistentes.filter((periodo) =>
@@ -70,28 +136,6 @@ const IniciarCtaCorriente = () => {
     setPeriodosIncluidos([])
   }
 
-  const traerPeriodos = async () => {
-    try {
-      const apiUrl = `${import.meta.env.VITE_URL_BASE
-        }Ctasctes_inmuebles/IniciarCtacte?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
-      const response = await axios.get(apiUrl)
-      setPeriodosExistentes(response.data)
-      setCargando(true)
-    } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "No se pudieron traer los periodos",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#27a3cf",
-      })
-    }
-  }
-
-  useEffect(() => {
-    traerPeriodos()
-  }, [])
-
   const cancelar = () => {
     navigate(-1)
   }
@@ -109,10 +153,10 @@ const IniciarCtaCorriente = () => {
 
   const devolverVencimiento = (fecha: string) => {
     const fechaFormateada = formatearFecha(fecha)
-    const dia = fechaFormateada.split("/")[0]
-    const mes = fechaFormateada.split("/")[1]
-    const anio = fechaFormateada.split("/")[2]
-    return `${anio}-${mes}-${dia}T00:00:00.000Z`
+    const [dia, mes, anio] = fechaFormateada.split("/")
+    const mesFormateado = mes.padStart(2, '0')
+    const diaFormateado = dia.padStart(2, '0')
+    return `${anio}-${mesFormateado}-${diaFormateado}T00:00:00.000Z`
   }
 
   const getCurrentFormattedDate = () => {

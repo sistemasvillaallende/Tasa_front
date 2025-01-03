@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTasaContext } from '../../context/TasaProvider'
 import axios from 'axios'
 import {
@@ -54,6 +55,9 @@ interface Calle {
 }
 
 const Frente = () => {
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
+  const navigate = useNavigate()
+  const { setInmuebles } = useTasaContext()
   const [frentes, setFrentes] = useState<Frente[]>([])
   const [openDialog, setOpenDialog] = useState(false)
   const [zonas, setZonas] = useState<Zona[]>([])
@@ -67,25 +71,97 @@ const Frente = () => {
   })
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [frenteEditar, setFrenteEditar] = useState<Frente | null>(null)
-
-  const { inmuebles } = useTasaContext()
-  const detalleInmueble = inmuebles?.[0]
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetchFrentes()
-    fetchZonas()
-  }, [detalleInmueble])
+    const fetchData = async () => {
+      if (!isLoading) return
 
-  const fetchFrentes = async () => {
-    if (!detalleInmueble) return
+      try {
+        let inmuebleData
+
+        if (circunscripcion) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
+            params: {
+              circunscripcion,
+              seccion,
+              manzana,
+              parcela,
+              p_h
+            }
+          }
+          )
+          inmuebleData = response.data
+          setInmuebles([inmuebleData])
+          setDetalleInmueble(inmuebleData)
+        } else if (id) {
+          const inmuebleResponse = await axios.get(
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/GetInmuebleByNroBad?nro_bad=${id}`
+          )
+          inmuebleData = inmuebleResponse.data
+          if (inmuebleData) {
+            setDetalleInmueble(inmuebleData)
+          }
+        }
+
+        if (!inmuebleData) {
+          Swal.fire({
+            title: "Error",
+            text: "No se encontró el inmueble",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#27a3cf",
+            position: 'top',
+            customClass: {
+              container: 'position-absolute'
+            }
+          })
+          navigate('/')
+          return
+        }
+
+        await fetchFrentes(inmuebleData)
+        await fetchZonas()
+
+      } catch (error) {
+        console.error('Error:', error)
+        Swal.fire({
+          title: "Error",
+          text: "Error al obtener los datos",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+
+  const fetchFrentes = async (inmueble: any) => {
     try {
-      const { circunscripcion, seccion, manzana, parcela, p_h } = detalleInmueble
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_BASE}Inmuebles/FrentesXInmueble?cir=${circunscripcion}&sec=${seccion}&man=${manzana}&par=${parcela}&p_h=${p_h}`
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/FrentesXInmueble`, {
+        params: {
+          cir: inmueble.circunscripcion,
+          sec: inmueble.seccion,
+          man: inmueble.manzana,
+          par: inmueble.parcela,
+          p_h: inmueble.p_h
+        }
+      }
       )
       setFrentes(response.data)
     } catch (error) {
-      console.error('Error al obtener los frentes:', error)
+      console.error('Error al obtener frentes:', error)
     }
   }
 
@@ -108,7 +184,7 @@ const Frente = () => {
   }
 
   const handleSubmit = async () => {
-    if (!detalleInmueble) return
+    if (!detalleInmueble) return;
 
     try {
       const body = {
@@ -134,16 +210,52 @@ const Frente = () => {
           detalle: "",
           ip: ""
         }
-      }
+      };
 
-      await axios.post(`${import.meta.env.VITE_URL_BASE}Inmuebles/NuevoFrente`, body)
-      setOpenDialog(false)
-      fetchFrentes()
-      setNuevoFrente({ cod_calle: '', nro_domicilio: '', metros_frente: '', cod_zona: '' })
+      await axios.post(`${import.meta.env.VITE_URL_BASE}Inmuebles/NuevoFrente`, body);
+
+      // Cerrar el diálogo
+      setOpenDialog(false);
+
+      // Limpiar el formulario
+      setNuevoFrente({
+        cod_calle: '',
+        nro_domicilio: '',
+        metros_frente: '',
+        cod_zona: ''
+      });
+
+      // Actualizar la tabla
+      await fetchFrentes(detalleInmueble);
+
+      // Mostrar mensaje de éxito
+      Swal.fire({
+        title: "Éxito",
+        text: "Frente agregado correctamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
+
     } catch (error) {
-      console.error('Error al crear nuevo frente:', error)
+      console.error('Error al crear nuevo frente:', error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo crear el frente",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
+      });
     }
-  }
+  };
 
   const handleEditSubmit = async () => {
     if (!frenteEditar || !detalleInmueble) return
@@ -319,7 +431,15 @@ const Frente = () => {
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        {...dialogProps}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            position: 'fixed',
+            top: 20,
+            margin: 0
+          }
+        }}
       >
         <DialogTitle>Nuevo Frente</DialogTitle>
         <DialogContent>
@@ -395,7 +515,15 @@ const Frente = () => {
       <Dialog
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
-        {...dialogProps}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            position: 'fixed',
+            top: 20,
+            margin: 0
+          }
+        }}
       >
         <DialogTitle>Editar Frente</DialogTitle>
         <DialogContent>

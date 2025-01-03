@@ -54,6 +54,10 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       })
       return
     }
@@ -64,6 +68,10 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       })
       return
     }
@@ -75,6 +83,10 @@ const InformeDeDeuda = () => {
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#27a3cf",
+      position: 'top',
+      customClass: {
+        container: 'position-absolute'
+      },
       inputValidator: (value) => {
         if (!value) {
           return "Debes ingresar un texto para continuar"
@@ -158,6 +170,10 @@ const InformeDeDeuda = () => {
           icon: "warning",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
+          position: 'top',
+          customClass: {
+            container: 'position-absolute'
+          }
         })
       }
       setMostrarTabla(true)
@@ -169,6 +185,10 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
+        position: 'top',
+        customClass: {
+          container: 'position-absolute'
+        }
       })
       setCargando(false)
     }
