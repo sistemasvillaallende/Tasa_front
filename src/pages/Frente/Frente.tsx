@@ -113,7 +113,7 @@ const Frente = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-            position: 'top',
+
             customClass: {
               container: 'position-absolute'
             }
@@ -133,7 +133,7 @@ const Frente = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -235,7 +235,7 @@ const Frente = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -249,7 +249,7 @@ const Frente = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -293,7 +293,7 @@ const Frente = () => {
 
   // Configuración común para todos los Swal
   const swalConfig = {
-    position: 'top',
+
     customClass: {
       container: 'position-absolute'
     }

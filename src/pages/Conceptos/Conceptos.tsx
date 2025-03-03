@@ -118,7 +118,7 @@ const Conceptos = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-            position: 'top',
+
             customClass: {
               container: 'position-absolute'
             }
@@ -138,7 +138,7 @@ const Conceptos = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -212,7 +212,7 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -263,7 +263,7 @@ const Conceptos = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -280,7 +280,7 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -360,7 +360,7 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -411,7 +411,7 @@ const Conceptos = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -429,7 +429,7 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -451,7 +451,7 @@ const Conceptos = () => {
         cancelButtonColor: "#3085d6",
         confirmButtonText: "Sí, eliminar",
         cancelButtonText: "Cancelar",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -499,7 +499,7 @@ const Conceptos = () => {
           text: "El concepto ha sido eliminado correctamente",
           icon: "success",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -515,7 +515,7 @@ const Conceptos = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }

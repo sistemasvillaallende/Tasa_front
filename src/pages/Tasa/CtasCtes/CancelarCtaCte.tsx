@@ -68,7 +68,7 @@ const CancelarCtaCte = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-            position: 'top',
+
             customClass: {
               container: 'position-absolute'
             }
@@ -100,7 +100,7 @@ const CancelarCtaCte = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -147,7 +147,7 @@ const CancelarCtaCte = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -162,7 +162,7 @@ const CancelarCtaCte = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -201,7 +201,7 @@ const CancelarCtaCte = () => {
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#1976d2",
-      position: 'top',
+
       customClass: {
         container: 'position-absolute'
       }

@@ -64,7 +64,7 @@ const EliminarCancelacion = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-            position: 'top',
+
             customClass: {
               container: 'position-absolute'
             }
@@ -96,7 +96,7 @@ const EliminarCancelacion = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -177,7 +177,7 @@ const EliminarCancelacion = () => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -192,7 +192,7 @@ const EliminarCancelacion = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -209,7 +209,7 @@ const EliminarCancelacion = () => {
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#27a3cf",
-      position: 'top',
+
       customClass: {
         container: 'position-absolute'
       }

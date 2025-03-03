@@ -76,7 +76,7 @@ const Deudas = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -116,7 +116,7 @@ const Deudas = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-            position: 'top',
+
             customClass: {
               container: 'position-absolute'
             }
@@ -137,7 +137,7 @@ const Deudas = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -172,7 +172,7 @@ const Deudas = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -254,7 +254,7 @@ const Deudas = () => {
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -266,7 +266,7 @@ const Deudas = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -352,7 +352,7 @@ const Deudas = () => {
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -364,7 +364,7 @@ const Deudas = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -383,7 +383,7 @@ const Deudas = () => {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
-      position: 'top',
+
       customClass: {
         container: 'position-absolute'
       }
@@ -415,7 +415,7 @@ const Deudas = () => {
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -427,7 +427,7 @@ const Deudas = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }

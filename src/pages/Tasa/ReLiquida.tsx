@@ -75,7 +75,7 @@ const ReLiquida = () => {
       } catch (error) {
         console.error('Error:', error)
         Swal.fire({
-          position: 'top',
+
           title: "Error",
           text: "Error al obtener los datos",
           icon: "error",
@@ -119,7 +119,7 @@ const ReLiquida = () => {
       await axios.post(apiUrl, consulta)
 
       Swal.fire({
-        position: 'top',
+
         title: "Deuda Recalculada",
         text: "Deuda Recalculada Correctamente.",
         icon: "success",
@@ -131,7 +131,7 @@ const ReLiquida = () => {
       navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`)
     } catch (error: any) {
       Swal.fire({
-        position: 'top',
+
         title: error.response?.status ? `${error.response.status}: ${error.response.statusText}` : "Error",
         text: error.message,
         icon: "error",
@@ -178,7 +178,7 @@ const ReLiquida = () => {
 
   const handleAuditoria = async () => {
     const { value } = await Swal.fire({
-      position: 'top',
+
       title: "Autorización",
       input: "textarea",
       inputPlaceholder: "Observaciones",

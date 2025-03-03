@@ -120,7 +120,7 @@ const DomicilioPostal = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -146,7 +146,7 @@ const DomicilioPostal = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -176,7 +176,7 @@ const DomicilioPostal = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -219,7 +219,7 @@ const DomicilioPostal = () => {
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -289,7 +289,7 @@ const DomicilioPostal = () => {
           text: 'Domicilio actualizado correctamente',
           timer: 2000,
           showConfirmButton: false,
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -301,7 +301,7 @@ const DomicilioPostal = () => {
         icon: 'error',
         title: 'Error',
         text: error.response?.data?.message || 'No se pudo actualizar el domicilio',
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }

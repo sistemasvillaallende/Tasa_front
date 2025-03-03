@@ -54,7 +54,7 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -68,7 +68,7 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
@@ -83,7 +83,7 @@ const InformeDeDeuda = () => {
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#27a3cf",
-      position: 'top',
+
       customClass: {
         container: 'position-absolute'
       },
@@ -170,7 +170,7 @@ const InformeDeDeuda = () => {
           icon: "warning",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-          position: 'top',
+
           customClass: {
             container: 'position-absolute'
           }
@@ -185,7 +185,7 @@ const InformeDeDeuda = () => {
         icon: "error",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "#27a3cf",
-        position: 'top',
+
         customClass: {
           container: 'position-absolute'
         }
