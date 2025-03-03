@@ -12,6 +12,7 @@ import { capitalizeFirstLetter } from "../../utils/helper"
 import placeholderProfile from "../../assets/images/placeholders/Usuario.png"
 import { getSecureItem } from "../../modules/secureStorage"
 import logoHeader from "../../assets/images/logoHeader.svg"
+import { parseCIDICookie } from "../../utils/cookieParser"
 
 function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
   const [searchDropdown, setSearchDropdown] = useState(false)
@@ -38,14 +39,11 @@ function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
   }
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("usuarioLogeado")
-    if (isLoggedIn) {
-      const parsedUser = getSecureItem("usuarioLogeado")
-      if (parsedUser) {
-        setUser(parsedUser)
-      }
+    const cidiUser = parseCIDICookie();
+    if (cidiUser) {
+      setUser(cidiUser)
     }
-  }, [])
+  }, []);
 
   return (
     <div className="menu-institucional">
