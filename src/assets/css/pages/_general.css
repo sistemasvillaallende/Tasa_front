@@ -5,6 +5,7 @@
 .principal {
     height: calc(100vh - 0px);
     overflow-y: clip;
+    margin-top: 85px;
 }
 
 .grilla {
