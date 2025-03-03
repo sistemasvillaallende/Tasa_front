@@ -77,9 +77,7 @@ const SearchBar = ({
     setSearch({ ...searchForm, denominacion: { ...searchForm.denominacion, [name]: value } })
   }
 
-  const handleLimpiar = () => {
-    window.location.href = "/"
-  }
+
 
   const toggleConceptos = () => {
     setShowConceptos(!showConceptos)
@@ -150,9 +148,7 @@ const SearchBar = ({
               Buscar
             </Button>
 
-            <Button variant="soft-primary" className="h-10 mx-3" onClick={handleLimpiar}>
-              Limpiar
-            </Button>
+
 
             <Button
               variant={showConceptos ? "primary" : "soft-primary"}
