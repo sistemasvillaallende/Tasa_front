@@ -57,7 +57,7 @@ const defaultInputs = {
       label: "Piso",
       type: "number",
       placeholder: "",
-      field: "nro_dom_esp",
+      field: "piso_dpto_esp",
     },
     {
       name: "manzana",
