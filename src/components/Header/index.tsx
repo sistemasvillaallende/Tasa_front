@@ -12,7 +12,7 @@ import { capitalizeFirstLetter } from "../../utils/helper"
 import placeholderProfile from "../../assets/images/placeholders/Usuario.png"
 import { getSecureItem } from "../../modules/secureStorage"
 import logoHeader from "../../assets/images/logoHeader.svg"
-import { parseCIDICookie } from "../../utils/cookieParser"
+import { parseCIDICookie, deleteCookie } from "../../utils/cookieParser"
 
 function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
   const [searchDropdown, setSearchDropdown] = useState(false)
@@ -27,7 +27,7 @@ function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
   if (location?.hash?.includes("id=")) path = location.hash.split("id=")?.[1]
   if (path === "") path = "inicio"
   if (path === undefined) path = "pagina-no-encontrada"
-  const { handleLogout, user, setUser } = useUserContext()
+  const { user, setUser } = useUserContext()
   const navigate = useNavigate()
 
   const headerTitle: any = {
@@ -37,6 +37,8 @@ function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
     nuevasemisiones: { title: "", icon: "" },
     "pagina-no-encontrada": { title: "Página no encontrada", icon: "Warning" },
   }
+
+
 
   useEffect(() => {
     const cidiUser = parseCIDICookie();
@@ -118,7 +120,7 @@ function Main(props: { layout?: "side-menu" | "simple-menu" | "top-menu" }) {
                   </div>
                 </Menu.Header>
                 <Menu.Divider className="bg-white/[0.08]" />
-                <Menu.Item className="hover:bg-white/5" onClick={handleLogout}>
+                <Menu.Item className="hover:bg-white/5" onClick={deleteCookie}>
                   <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Cerrar Sesión
                 </Menu.Item>
               </Menu.Items>
