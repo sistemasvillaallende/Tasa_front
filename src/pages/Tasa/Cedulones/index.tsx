@@ -221,7 +221,7 @@ const Cedulones = () => {
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             confirmButtonColor: "#27a3cf",
-
+            cancelButtonColor: "#ff0000", // Cambiado a rojo
             customClass: {
               container: 'position-absolute'
             }
