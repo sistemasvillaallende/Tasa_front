@@ -7,6 +7,7 @@ import { Inmueble } from "../../interfaces/Inmueble"
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material"
 import axios from "axios"
 import Swal from "sweetalert2"
+import { format } from "date-fns";
 
 function TasaDetalle() {
   const params = useParams()
@@ -145,6 +146,11 @@ function TasaDetalle() {
     setOpenDialog(false)
   }
 
+  const formatDateToDDMMYYYY = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, "dd/MM/yyyy");
+  };
+
   return (
     <form className="mb-10">
       <div className="flex items-center justify-between mt-8 intro-y">
@@ -164,7 +170,12 @@ function TasaDetalle() {
       <div className="box py-2">
         {/* Datos del propietadio */}
         <RenderTexts
-          data={detalleInmueble}
+          data={{
+            ...detalleInmueble,
+            fecha_cambio_domicilio: detalleInmueble?.fecha_cambio_domicilio
+              ? formatDateToDDMMYYYY(detalleInmueble.fecha_cambio_domicilio)
+              : "",
+          }}
           list={defaultInputs.casaCentral}
           title="Datos del propietario"
           bgSlate
