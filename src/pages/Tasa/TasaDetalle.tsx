@@ -146,6 +146,56 @@ function TasaDetalle() {
     setOpenDialog(false)
   }
 
+  const handleUpdatePropietario = async (updatedData: Partial<Inmueble>) => {
+    if (!detalleInmueble) return;
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_URL_BASE}Inmuebles/UpdatePropietario`,
+        { ...detalleInmueble, ...updatedData },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Éxito",
+          text: "Datos del propietario actualizados correctamente.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        });
+
+        // Update the state with the new data
+        setDetalleInmueble((prev) => ({
+          ...prev,
+          ...updatedData,
+        }));
+
+        // Optionally update the context if needed
+        setInmuebles((prev) =>
+          prev.map((inmueble) =>
+            inmueble.nro_bad === detalleInmueble.nro_bad
+              ? { ...inmueble, ...updatedData }
+              : inmueble
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error al actualizar los datos del propietario:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron actualizar los datos del propietario.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      });
+    }
+  };
+
   const formatDateToDDMMYYYY = (dateString: string) => {
     const date = new Date(dateString);
     return format(date, "dd/MM/yyyy");
@@ -179,6 +229,7 @@ function TasaDetalle() {
           list={defaultInputs.casaCentral}
           title="Datos del propietario"
           bgSlate
+          onUpdate={handleUpdatePropietario} // Pass the update handler
         />
         {/* Datos de domicilio */}
         <RenderTexts
