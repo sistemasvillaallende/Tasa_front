@@ -532,6 +532,9 @@ const Deudas = () => {
             onChange={(e) => setSelectedCategoria(Number(e.target.value))}
             sx={{ mt: 2 }}
           >
+            <MenuItem value={0} disabled>
+              Seleccionar Categoría
+            </MenuItem>
             {categorias.map((cat) => (
               <MenuItem key={cat.cod_categoria} value={cat.cod_categoria}>
                 {cat.des_categoria}
