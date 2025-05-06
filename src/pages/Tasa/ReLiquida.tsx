@@ -1,49 +1,50 @@
-import { useEffect, useState } from "react"
-import Table from "../../base-components/Table"
-import { ReLiquidacion } from "../../interfaces/Inmueble"
-import axios from "axios"
-import Swal from "sweetalert2"
-import Button from "../../base-components/Button"
-import Lucide from "../../base-components/Lucide"
-import { useNavigate, useParams } from "react-router-dom"
-import { useUserContext } from "../../context/UserProvider"
-import { formatNumberToARS, formatDateToDDMMYYYY } from "../../utils/Operaciones"
-import { useTasaContext } from "../../context/TasaProvider"
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  Button,
+  Box,
+} from "@mui/material";
+import { ReLiquidacion } from "../../interfaces/Inmueble";
+import { useUserContext } from "../../context/UserProvider";
+import { useTasaContext } from "../../context/TasaProvider";
+import { formatNumberToARS, formatDateToDDMMYYYY } from "../../utils/Operaciones";
 
 const ReLiquida = () => {
-  const [reLiquidaciones, setReLiquidaciones] = useState<ReLiquidacion[]>([])
-  const [reLiquidacionesSeleccionadas, setReLiquidacionesSeleccionadas] = useState<ReLiquidacion[]>([])
-  const navigate = useNavigate()
-  const { user } = useUserContext()
-  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams()
-  const { inmuebles, setInmuebles } = useTasaContext()
-  const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [reLiquidaciones, setReLiquidaciones] = useState<ReLiquidacion[]>([]);
+  const [reLiquidacionesSeleccionadas, setReLiquidacionesSeleccionadas] = useState<Set<number>>(new Set());
   const [isReliquidado, setIsReliquidado] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useUserContext();
+  const { id, circunscripcion, seccion, manzana, parcela, p_h } = useParams();
+  const { inmuebles, setInmuebles } = useTasaContext();
+  const [detalleInmueble, setDetalleInmueble] = useState<any>(null);
 
   useEffect(() => {
     const fetchInmueble = async () => {
-      if (!isLoading) return;
-
       try {
         let inmuebleData;
 
         if (circunscripcion) {
           const response = await axios.get(
-            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`, {
-            params: {
-              circunscripcion,
-              seccion,
-              manzana,
-              parcela,
-              p_h
+            `${import.meta.env.VITE_URL_BASE}Inmuebles/getByPk`,
+            {
+              params: { circunscripcion, seccion, manzana, parcela, p_h },
             }
-          }
-          )
-          inmuebleData = response.data
-          setInmuebles([inmuebleData])
+          );
+          inmuebleData = response.data;
+          setInmuebles([inmuebleData]);
         } else if (id) {
-          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id)
+          inmuebleData = inmuebles?.find((inmueble) => inmueble.nro_bad.toString() === id);
         }
 
         if (!inmuebleData) {
@@ -53,154 +54,62 @@ const ReLiquida = () => {
             icon: "error",
             confirmButtonText: "Aceptar",
             confirmButtonColor: "#27a3cf",
-          })
-          navigate('/')
-          return
+          });
+          navigate("/");
+          return;
         }
 
-        setDetalleInmueble(inmuebleData)
+        setDetalleInmueble(inmuebleData);
 
-        // Fetch períodos a reliquidar
-        const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Listar_periodos_a_reliquidar`
+        const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Listar_periodos_a_reliquidar`;
         const response = await axios.get(apiUrl, {
           params: {
             cir: inmuebleData.circunscripcion,
             sec: inmuebleData.seccion,
             man: inmuebleData.manzana,
             par: inmuebleData.parcela,
-            p_h: inmuebleData.p_h
-          }
-        })
-        setReLiquidaciones(response.data)
-
+            p_h: inmuebleData.p_h,
+          },
+        });
+        setReLiquidaciones(response.data);
       } catch (error) {
-        console.error('Error:', error)
         Swal.fire({
-
           title: "Error",
           text: "Error al obtener los datos",
           icon: "error",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#27a3cf",
-        })
-        navigate('/')
-      } finally {
-        setIsLoading(false)
+        });
+        navigate("/");
       }
-    }
+    };
 
-    fetchInmueble()
-  }, [circunscripcion, seccion, manzana, parcela, p_h, id])
+    fetchInmueble();
+  }, [circunscripcion, seccion, manzana, parcela, p_h, id]);
 
-  const handleRecalcularDeuda = async (auditoria: string) => {
-    if (!detalleInmueble) return;
-
-    try {
-      const consulta = {
-        cir: detalleInmueble.circunscripcion,
-        sec: detalleInmueble.seccion,
-        man: detalleInmueble.manzana,
-        par: detalleInmueble.parcela,
-        p_h: detalleInmueble.p_h,
-        lstCtasTes: reLiquidacionesSeleccionadas,
-        auditoria: {
-          id_auditoria: 0,
-          fecha: verFechaActual(),
-          usuario: user?.userName,
-          proceso: "Reliquidación de deuda",
-          identificacion: "string",
-          autorizaciones: "string",
-          observaciones: auditoria,
-          detalle: "string",
-          ip: "string",
-        },
+  const handleCheckboxChange = (index: number) => {
+    setReLiquidacionesSeleccionadas((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
       }
+      return newSet;
+    });
+  };
 
-      const apiUrl = `${import.meta.env.VITE_URL_CTACTE}Confirma_reliquidacion`
-      await axios.post(apiUrl, consulta)
-
-      Swal.fire({
-
-        title: "Deuda Recalculada",
-        text: "Deuda Recalculada Correctamente.",
-        icon: "success",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#27a3cf",
-      })
-
-      setReLiquidacionesSeleccionadas([])
-      navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`)
-    } catch (error: any) {
-      Swal.fire({
-
-        title: error.response?.status ? `${error.response.status}: ${error.response.statusText}` : "Error",
-        text: error.message,
-        icon: "error",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#27a3cf",
-      })
-    }
-  }
-
-  const handleSeleccionar = (e: ReLiquidacion) => {
-    const reLiquidacionSeleccionada = reLiquidacionesSeleccionadas.find(
-      (reLiquidacion) => reLiquidacion.periodo === e.periodo
-    )
-    if (reLiquidacionSeleccionada) {
-      const reLiquidacionesFiltradas = reLiquidacionesSeleccionadas.filter(
-        (reLiquidacion) => reLiquidacion.periodo !== e.periodo
-      )
-      setReLiquidacionesSeleccionadas(reLiquidacionesFiltradas)
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const allIndexes = reLiquidaciones.map((_, index) => index);
+      setReLiquidacionesSeleccionadas(new Set(allIndexes));
     } else {
-      setReLiquidacionesSeleccionadas([...reLiquidacionesSeleccionadas, e])
+      setReLiquidacionesSeleccionadas(new Set());
     }
-  }
-
-  const handleSeleccionarTodo = () => {
-    if (reLiquidacionesSeleccionadas.length === reLiquidaciones.length) {
-      setReLiquidacionesSeleccionadas([])
-    } else {
-      setReLiquidacionesSeleccionadas([...reLiquidaciones])
-    }
-  }
-
-  const verFechaActual = () => {
-    const currentDate = new Date()
-    const year = currentDate.getFullYear()
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0") // Sumamos 1 ya que en JavaScript los meses comienzan en 0
-    const day = String(currentDate.getDate()).padStart(2, "0")
-    const hours = String(currentDate.getHours()).padStart(2, "0")
-    const minutes = String(currentDate.getMinutes()).padStart(2, "0")
-    const seconds = String(currentDate.getSeconds()).padStart(2, "0")
-    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, "0")
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
-    return formattedDate
-  }
-
-  const handleAuditoria = async () => {
-    const { value } = await Swal.fire({
-
-      title: "Autorización",
-      input: "textarea",
-      inputPlaceholder: "Observaciones",
-      showCancelButton: true,
-      confirmButtonText: "Aceptar",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#27a3cf",
-    })
-
-    if (value) {
-      handleRecalcularDeuda(value)
-    }
-  }
-
-  const handleCancelar = () => {
-    setReLiquidacionesSeleccionadas([])
-    navigate(`/detalle/${detalleInmueble?.nro_bad}`)
-  }
+  };
 
   const handleReliquidar = async () => {
-    if (!detalleInmueble || reLiquidacionesSeleccionadas.length === 0) {
+    if (!detalleInmueble || reLiquidacionesSeleccionadas.size === 0) {
       Swal.fire({
         title: "Error",
         text: "Debe seleccionar al menos un período para reliquidar.",
@@ -212,46 +121,22 @@ const ReLiquida = () => {
     }
 
     try {
-      const periodosAReliquidar = reLiquidacionesSeleccionadas.map((periodo) => ({
-        tipo_transaccion: periodo.tipo_transaccion,
-        nro_transaccion: periodo.nro_transaccion || 0,
-        circunscripcion: detalleInmueble.circunscripcion,
-        seccion: detalleInmueble.seccion,
-        manzana: detalleInmueble.manzana,
-        parcela: detalleInmueble.parcela,
-        p_h: detalleInmueble.p_h,
-        fecha_transaccion: null,
-        periodo: periodo.periodo,
-        cedulon_impreso: false,
-        nro_pago_parcial: 0,
-        monto_original: periodo.monto_original || 0,
-        nro_plan: null,
-        pagado: false,
-        debe: periodo.debe || 0,
-        haber: 0,
-        deuda_activa: false,
-        pago_parcial: false,
-        categoria_deuda: 0,
-        nro_procuracion: null,
-        vencimiento: periodo.vencimiento,
-        nro_cedulon: 0,
-        monto_pagado: 0,
-        recargo: 0,
-        honorarios: 0,
-        iva_hons: 0,
-        tipo_deuda: periodo.tipo_deuda || 0,
-        decreto: "",
-        observaciones: "",
-        nro_cedulon_paypertic: 0,
-        des_movimiento: "",
-        des_categoria: "",
-        deuda: 0,
-        sel: 0,
-        costo_financiero: 0,
-        des_rubro: "",
-        cod_tipo_per: 1,
-        sub_total: 0,
-      }));
+      const periodosAReliquidar = Array.from(reLiquidacionesSeleccionadas).map((index) => {
+        const periodo = reLiquidaciones[index];
+        return {
+          tipo_transaccion: periodo.tipo_transaccion,
+          nro_transaccion: periodo.nro_transaccion || 0,
+          circunscripcion: detalleInmueble.circunscripcion,
+          seccion: detalleInmueble.seccion,
+          manzana: detalleInmueble.manzana,
+          parcela: detalleInmueble.parcela,
+          p_h: detalleInmueble.p_h,
+          periodo: periodo.periodo,
+          debe: periodo.debe || 0,
+          monto_original: periodo.monto_original || 0,
+          vencimiento: periodo.vencimiento,
+        };
+      });
 
       const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Reliquidar_periodos`;
       await axios.post(apiUrl, periodosAReliquidar, {
@@ -262,9 +147,7 @@ const ReLiquida = () => {
           par: detalleInmueble.parcela,
           p_h: detalleInmueble.p_h,
         },
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       Swal.fire({
@@ -276,13 +159,7 @@ const ReLiquida = () => {
       });
 
       setIsReliquidado(true);
-    } catch (error: any) {
-      console.error("Error detallado:", {
-        mensaje: error.message,
-        respuesta: error.response?.data,
-        status: error.response?.status,
-      });
-
+    } catch (error) {
       Swal.fire({
         title: "Error",
         text: "Error al reliquidar los períodos.",
@@ -293,137 +170,165 @@ const ReLiquida = () => {
     }
   };
 
-  return (
-    <>
-      <div className="conScroll grid grid-cols-12 gap-6 mt-5 ml-5 mr-4 sinAnimaciones">
-        <div className="col-span-12 intro-y lg:col-span-12">
-          <div className="flex w-full justify-between col-span-12 intro-y lg:col-span-12">
-            <h2> Reliquidación de Deuda </h2>
-          </div>
-          <div className="grid grid-cols-12 gap-6 mt-3">
-            {/** INICIO TABLA 1 */}
-            <div className="col-span-12 intro-y lg:col-span-6">
-              <div className="text-lg font-medium text-primary">Deudas del Inmueble</div>
-              <div className="cabeceraTable">
-                <Table>
-                  <Table.Thead variant="dark">
-                    <Table.Tr>
-                      <Table.Th>
-                        <Lucide
-                          icon="CheckSquare"
-                          className="w-5 h-5"
-                          onClick={() => handleSeleccionarTodo()}
-                          style={{ cursor: "pointer" }}
-                        />
-                      </Table.Th>
-                      <Table.Th>Periodo</Table.Th>
-                      <Table.Th>Monto</Table.Th>
-                      <Table.Th>Debe</Table.Th>
-                      <Table.Th>Vto.</Table.Th>
-                      <Table.Th>Tipo</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                </Table>
-              </div>
-              <div className="conScrollInicio cuadroDeudas">
-                <Table>
-                  <Table.Tbody>
-                    {reLiquidaciones.map((liquidacion, index) => (
-                      <Table.Tr key={index}>
-                        <Table.Td>
-                          <label>
-                            <input
-                              type="checkbox"
-                              onChange={() => handleSeleccionar(liquidacion)}
-                              checked={reLiquidacionesSeleccionadas.includes(liquidacion)}
-                            />
-                          </label>
-                        </Table.Td>
-                        <Table.Td>{liquidacion?.periodo}</Table.Td>
-                        <Table.Td>{formatNumberToARS(liquidacion?.monto_original)}</Table.Td>
-                        <Table.Td>{formatNumberToARS(liquidacion?.debe)}</Table.Td>
-                        <Table.Td>{formatDateToDDMMYYYY(liquidacion?.vencimiento)}</Table.Td>
-                        <Table.Td>{liquidacion?.tipo_deuda}</Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </div>
-            </div>
-            {/** FIN TABLA 1 */}
+  const handleConfirmar = async () => {
+    const totalMonto = Array.from(reLiquidacionesSeleccionadas).reduce(
+      (acc, index) => acc + (reLiquidaciones[index]?.monto_original || 0),
+      0
+    );
+    const totalDebe = Array.from(reLiquidacionesSeleccionadas).reduce(
+      (acc, index) => acc + (reLiquidaciones[index]?.debe || 0),
+      0
+    );
 
-            {/** INICIO TABLA 2 */}
-            <div className="col-span-12 intro-y lg:col-span-6 mr-2">
-              <div className="text-lg font-medium text-primary">Deudas que se recalculan</div>
-              <div className="cabeceraTable">
-                <Table>
-                  <Table.Thead variant="dark">
-                    <Table.Tr>
-                      <Table.Th></Table.Th>
-                      <Table.Th>Periodo</Table.Th>
-                      <Table.Th>Monto</Table.Th>
-                      <Table.Th>Debe</Table.Th>
-                      <Table.Th>Vto.</Table.Th>
-                      <Table.Th>Tipo</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                </Table>
-              </div>
-              <div className="conScrollInicio cuadroDeudas">
-                <Table>
-                  <Table.Tbody>
-                    {reLiquidacionesSeleccionadas.map((liquidacion, index) => (
-                      <Table.Tr key={index}>
-                        <Table.Td>
-                          <label>
-                            <input
-                              type="checkbox"
-                              onChange={() => handleSeleccionar(liquidacion)}
-                              checked={reLiquidacionesSeleccionadas.includes(liquidacion)}
-                            />
-                          </label>
-                        </Table.Td>
-                        <Table.Td>{liquidacion?.periodo}</Table.Td>
-                        <Table.Td>{formatNumberToARS(liquidacion?.monto_original)}</Table.Td>
-                        <Table.Td>{formatNumberToARS(liquidacion?.debe)}</Table.Td>
-                        <Table.Td>{formatDateToDDMMYYYY(liquidacion?.vencimiento)}</Table.Td>
-                        <Table.Td>{liquidacion?.tipo_deuda}</Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </div>
-            </div>
-            {/** FIN TABLA 1 */}
-            <div className="col-span-12 intro-y lg:col-span-6 mr-2">
-              <Button
-                variant="primary"
-                className="ml-3 mt-3"
-                onClick={handleReliquidar}
-              >
-                Reliquidar
-              </Button>
-              <Button
-                variant="primary"
-                className="ml-3 mt-3"
-                onClick={handleAuditoria}
-                disabled={!isReliquidado}
-              >
-                Confirmar
-              </Button>
-              <Button
-                variant="outline-secondary"
-                className="ml-3 mt-3"
-                onClick={handleCancelar}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
+    const { value: observaciones } = await Swal.fire({
+      title: "Autorización",
+      html: `
+        <div class="text-left">
+          <p class="font-bold">Totales:</p>
+          <p>Monto: $ ${totalMonto.toFixed(2)}</p>
+          <p>Debe: $ ${totalDebe.toFixed(2)}</p>
         </div>
-      </div>
-    </>
-  )
-}
+      `,
+      input: "textarea",
+      inputPlaceholder: "Ingrese observaciones",
+      showCancelButton: true,
+      confirmButtonText: "Aceptar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#27a3cf",
+      cancelButtonColor: "#d33",
+    });
 
-export default ReLiquida
+    if (observaciones) {
+      try {
+        const consulta = {
+          cir: detalleInmueble.circunscripcion,
+          sec: detalleInmueble.seccion,
+          man: detalleInmueble.manzana,
+          par: detalleInmueble.parcela,
+          p_h: detalleInmueble.p_h,
+          lstCtasTes: Array.from(reLiquidacionesSeleccionadas).map((index) => reLiquidaciones[index]),
+          auditoria: {
+            id_auditoria: 0,
+            fecha: new Date().toISOString(),
+            usuario: user?.userName,
+            proceso: "Reliquidación de deuda",
+            identificacion: "string",
+            autorizaciones: "string",
+            observaciones,
+            detalle: "string",
+            ip: "string",
+          },
+        };
+
+        const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Confirma_reliquidacion`;
+        await axios.post(apiUrl, consulta, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        Swal.fire({
+          title: "Confirmación Exitosa",
+          text: "La reliquidación ha sido confirmada correctamente.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        });
+
+        setReLiquidacionesSeleccionadas(new Set());
+        setIsReliquidado(false);
+        navigate(`/detalle/${detalleInmueble.circunscripcion}/${detalleInmueble.seccion}/${detalleInmueble.manzana}/${detalleInmueble.parcela}/${detalleInmueble.p_h}`);
+      } catch (error) {
+        Swal.fire({
+          title: "Error",
+          text: "Error al confirmar la reliquidación.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#27a3cf",
+        });
+      }
+    }
+  };
+
+  return (
+    <div className="paginas">
+      <Box sx={{ display: "flex", gap: 2, p: 2 }}>
+        {/* Tabla Izquierda */}
+        <Box sx={{ flex: 1, minWidth: "45%" }}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Box>Períodos a Reliquidar</Box>
+            </Box>
+            <TableContainer sx={{ maxHeight: 500 }}>
+              <Table stickyHeader size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        indeterminate={
+                          reLiquidacionesSeleccionadas.size > 0 &&
+                          reLiquidacionesSeleccionadas.size < reLiquidaciones.length
+                        }
+                        checked={
+                          reLiquidacionesSeleccionadas.size === reLiquidaciones.length &&
+                          reLiquidaciones.length > 0
+                        }
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
+                    <TableCell>Período</TableCell>
+                    <TableCell align="right">Monto</TableCell>
+                    <TableCell align="right">Debe</TableCell>
+                    <TableCell>Vto.</TableCell>
+                    <TableCell>Tipo</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {reLiquidaciones.map((liquidacion, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      selected={reLiquidacionesSeleccionadas.has(index)}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={reLiquidacionesSeleccionadas.has(index)}
+                          onChange={() => handleCheckboxChange(index)}
+                        />
+                      </TableCell>
+                      <TableCell>{liquidacion.periodo}</TableCell>
+                      <TableCell align="right">{formatNumberToARS(liquidacion.monto_original)}</TableCell>
+                      <TableCell align="right">{formatNumberToARS(liquidacion.debe)}</TableCell>
+                      <TableCell>{formatDateToDDMMYYYY(liquidacion.vencimiento)}</TableCell>
+                      <TableCell>{liquidacion.tipo_deuda}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Box>
+
+        {/* Botones */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-end" }}>
+          <Button
+            variant="contained"
+            onClick={handleReliquidar}
+            disabled={reLiquidacionesSeleccionadas.size === 0}
+          >
+            Reliquidar
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleConfirmar}
+            disabled={!isReliquidado}
+          >
+            Confirmar
+          </Button>
+        </Box>
+      </Box>
+    </div>
+  );
+};
+
+export default ReLiquida;
