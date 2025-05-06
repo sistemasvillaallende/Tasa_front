@@ -19,6 +19,7 @@ const ReLiquida = () => {
   const { inmuebles, setInmuebles } = useTasaContext()
   const [detalleInmueble, setDetalleInmueble] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isReliquidado, setIsReliquidado] = useState(false);
 
   useEffect(() => {
     const fetchInmueble = async () => {
@@ -198,6 +199,100 @@ const ReLiquida = () => {
     navigate(`/detalle/${detalleInmueble?.nro_bad}`)
   }
 
+  const handleReliquidar = async () => {
+    if (!detalleInmueble || reLiquidacionesSeleccionadas.length === 0) {
+      Swal.fire({
+        title: "Error",
+        text: "Debe seleccionar al menos un período para reliquidar.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      });
+      return;
+    }
+
+    try {
+      const periodosAReliquidar = reLiquidacionesSeleccionadas.map((periodo) => ({
+        tipo_transaccion: periodo.tipo_transaccion,
+        nro_transaccion: periodo.nro_transaccion || 0,
+        circunscripcion: detalleInmueble.circunscripcion,
+        seccion: detalleInmueble.seccion,
+        manzana: detalleInmueble.manzana,
+        parcela: detalleInmueble.parcela,
+        p_h: detalleInmueble.p_h,
+        fecha_transaccion: null,
+        periodo: periodo.periodo,
+        cedulon_impreso: false,
+        nro_pago_parcial: 0,
+        monto_original: periodo.monto_original || 0,
+        nro_plan: null,
+        pagado: false,
+        debe: periodo.debe || 0,
+        haber: 0,
+        deuda_activa: false,
+        pago_parcial: false,
+        categoria_deuda: 0,
+        nro_procuracion: null,
+        vencimiento: periodo.vencimiento,
+        nro_cedulon: 0,
+        monto_pagado: 0,
+        recargo: 0,
+        honorarios: 0,
+        iva_hons: 0,
+        tipo_deuda: periodo.tipo_deuda || 0,
+        decreto: "",
+        observaciones: "",
+        nro_cedulon_paypertic: 0,
+        des_movimiento: "",
+        des_categoria: "",
+        deuda: 0,
+        sel: 0,
+        costo_financiero: 0,
+        des_rubro: "",
+        cod_tipo_per: 1,
+        sub_total: 0,
+      }));
+
+      const apiUrl = `${import.meta.env.VITE_URL_BASE}Ctasctes_inmuebles/Reliquidar_periodos`;
+      await axios.post(apiUrl, periodosAReliquidar, {
+        params: {
+          cir: detalleInmueble.circunscripcion,
+          sec: detalleInmueble.seccion,
+          man: detalleInmueble.manzana,
+          par: detalleInmueble.parcela,
+          p_h: detalleInmueble.p_h,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      Swal.fire({
+        title: "Reliquidación Exitosa",
+        text: "Los períodos seleccionados han sido reliquidados correctamente.",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      });
+
+      setIsReliquidado(true);
+    } catch (error: any) {
+      console.error("Error detallado:", {
+        mensaje: error.message,
+        respuesta: error.response?.data,
+        status: error.response?.status,
+      });
+
+      Swal.fire({
+        title: "Error",
+        text: "Error al reliquidar los períodos.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#27a3cf",
+      });
+    }
+  };
+
   return (
     <>
       <div className="conScroll grid grid-cols-12 gap-6 mt-5 ml-5 mr-4 sinAnimaciones">
@@ -301,10 +396,26 @@ const ReLiquida = () => {
             </div>
             {/** FIN TABLA 1 */}
             <div className="col-span-12 intro-y lg:col-span-6 mr-2">
-              <Button variant="primary" className="ml-3 mt-3" onClick={handleAuditoria}>
+              <Button
+                variant="primary"
+                className="ml-3 mt-3"
+                onClick={handleReliquidar}
+              >
+                Reliquidar
+              </Button>
+              <Button
+                variant="primary"
+                className="ml-3 mt-3"
+                onClick={handleAuditoria}
+                disabled={!isReliquidado}
+              >
                 Confirmar
               </Button>
-              <Button variant="outline-secondary" className="ml-3 mt-3" onClick={handleCancelar}>
+              <Button
+                variant="outline-secondary"
+                className="ml-3 mt-3"
+                onClick={handleCancelar}
+              >
                 Cancelar
               </Button>
             </div>
