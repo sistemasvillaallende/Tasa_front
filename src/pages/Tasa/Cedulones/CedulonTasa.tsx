@@ -121,284 +121,128 @@ const CedulonTasa = () => {
 
   // Estilos CSS adicionales para mejorar la apariencia del cedulón
   const styles = `
+  .tm_container {
+    width: 210mm; /* A4 width */
+    height: auto;
+    min-height: 297mm; /* A4 height */
+    padding: 20mm; /* Add padding for better spacing */
+    margin: 0 auto; /* Center the content */
+    background: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    font-size: 13px; /* Reduce font size globally */
+  }
+
+  .tm_invoice_wrap {
+    width: 100%;
+    background: #fff;
+    padding: 0;
+    margin: 0;
+    page-break-inside: avoid;
+  }
+
+  .tm_invoice {
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+    page-break-inside: avoid;
+  }
+
+  .tm_invoice_head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px; /* Add spacing below the header */
+  }
+
+  .tm_logo img {
+    max-height: 80px; /* Larger logo */
+    object-fit: contain;
+    margin: 0;
+  }
+
+  .tm_barcode {
+    text-align: right;
+  }
+
+  .tm_barcode_number {
+    margin-top: 5px;
+    font-size: 10px; /* Reduce font size */
+    text-align: center;
+    color: #333;
+  }
+
+  .tm_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0; /* Add spacing between tables */
+  }
+
+  .tm_table th,
+  .tm_table td {
+    padding: 8px; /* Reduce padding */
+    border: 1px solid #e5e5e5;
+    text-align: left;
+    font-size: 10px; /* Reduce font size */
+  }
+
+  .tm_invoice_footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px; /* Add spacing above footer */
+    font-size: 10px; /* Reduce font size */
+  }
+
+  .tm_left_footer {
+    flex: 1;
+  }
+
+  .tm_right_footer {
+    flex: 1;
+    text-align: right;
+  }
+
+  .tm_primary_color {
+    color: #27a3cf;
+  }
+
+  .tm_accent_color {
+    color: #333;
+  }
+
+  .tm_section_heading {
+    margin: 30px 0; /* Add spacing above and below section headings */
+    padding: 10px;
+    background: #f8f9fa;
+    border-left: 4px solid #27a3cf;
+    font-size: 12px; /* Reduce font size */
+  }
+
+  @media print {
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
     .tm_container {
-      width: 100%;
+      width: 210mm;
       height: auto;
       min-height: 297mm;
-      padding: 0;
-      margin: 0;
-      background: #fff;
+      padding: 20mm;
+      margin: 0 auto;
     }
 
-    .tm_invoice_wrap {
-      width: 100%;
-      background: #fff;
-      padding: 0;
-      margin: 0;
-      page-break-inside: avoid;
+    .no-print {
+      display: none;
     }
-
-    .tm_invoice {
-      width: 100%;
-      padding: 10px;
-      margin: 0;
-      page-break-inside: avoid;
-    }
-
-    .tm_invoice_head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      width: 100%;
-    }
-
-    .tm_invoice_left {
-      flex: 1;
-    }
-
-    .tm_invoice_right {
-      flex: 1;
-      text-align: right;
-    }
-
-    .tm_logo img {
-      max-height: 60px;
-      object-fit: contain;
-      margin: 0;
-    }
-
-    .tm_invoice_info {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0;
-    }
-
-    .tm_invoice_info_left {
-      flex: 1;
-    }
-
-    .tm_invoice_info_right {
-      flex: 1;
-      text-align: right;
-    }
-
-    .tm_table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-    }
-
-    .tm_table th,
-    .tm_table td {
-      padding: 10px;
-      border: 1px solid #e5e5e5;
-    }
-
-    .tm_table_responsive {
-      width: 100%;
-      overflow-x: auto;
-      margin: 0;
-    }
-
-    .tm_invoice_footer {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-
-    .tm_left_footer {
-      flex: 1;
-    }
-
-    .tm_right_footer {
-      flex: 1;
-    }
-
-    .tm_primary_color {
-      color: #27a3cf;
-    }
-
-    .tm_accent_color {
-      color: #333;
-    }
-
-    .tm_section_heading {
-      margin: 20px 0;
-      padding: 10px;
-      background: #f8f9fa;
-      border-left: 4px solid #27a3cf;
-    }
-
-    .cupones_container {
-      margin-top: 30px;
-      page-break-inside: avoid;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      gap: 0;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    .linea_puntos_horizontal {
-      border: none;
-      border-top: 1px dashed #000;
-      margin: 10px 0;
-      width: 100%;
-    }
-
-    .linea_puntos_vertical {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      border-left: 1px dashed #000;
-      height: 100%;
-    }
-
-    .cupon {
-      width: 50%;
-      padding: 10px;
-      border: 1px solid #000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 0;
-    }
-
-    .cupon_header {
-      font-weight: bold;
-      text-align: center;
-      background: #f8f9fa;
-      padding: 5px;
-      border-bottom: 1px solid #000;
-    }
-
-    .cupon_content {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .cupon_data {
-      font-size: 12px;
-      line-height: 1.2;
-    }
-
-    .cupon_logo {
-      max-height: 50px;
-      object-fit: contain;
-    }
-
-    .barcode_container {
-      grid-column: span 2;
-      text-align: center;
-    }
-
-    .tm_logo {
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .tm_logo img {
-      max-height: 60px;
-      object-fit: contain;
-      margin: 0;
-    }
-
-    .tm_logo .logo-secondary {
-      max-height: 60px;
-      margin-left: 10px;
-    }
-
-    @media print {
-      @page {
-        size: A4;
-        margin: 0;
-        padding: 0;
-      }
-      
-      body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-      }
-
-      .tm_container {
-        width: 100%;
-        height: auto;
-        min-height: 297mm;
-        padding: 0;
-        margin: 0;
-        box-shadow: none;
-      }
-
-      .tm_invoice_wrap {
-        padding: 5mm;
-        width: 100%;
-        page-break-inside: avoid;
-      }
-
-      .tm_invoice {
-        width: 100%;
-        padding: 0;
-        page-break-inside: avoid;
-      }
-
-      .tm_table {
-        width: 100%;
-        margin: 0;
-        page-break-inside: avoid;
-      }
-
-      .tm_table_responsive {
-        width: 100%;
-        margin: 0;
-        page-break-inside: avoid;
-      }
-
-      table {
-        width: 100% !important;
-        margin: 0 !important;
-        page-break-inside: avoid;
-      }
-
-      tr {
-        page-break-inside: avoid;
-      }
-
-      .cupones_container {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        page-break-before: always;
-        page-break-inside: avoid;
-      }
-
-      .cupon {
-        width: 50%;
-        margin: 0;
-        padding: 10px;
-        page-break-inside: avoid;
-      }
-
-      .linea_puntos_horizontal {
-        width: 100%;
-        margin: 10px 0;
-      }
-
-      .linea_puntos_vertical {
-        height: 100%;
-      }
-
-      .no-print {
-        display: none;
-      }
-    }
-  `
+  }
+`
 
   // Agregar los estilos al documento
   useEffect(() => {
@@ -418,27 +262,25 @@ const CedulonTasa = () => {
             <div className="tm_invoice tm_style2 tm_type1 tm_accent_border tm_radius_0 tm_small_border">
               <div className="tm_invoice_in">
                 <div className="tm_invoice_head">
-                  <div className="tm_invoice_left">
-                    <div className="tm_logo">
-                      <img
-                        src={logoNotas}
-                        alt="Logo Notas"
-                      />
-                    </div>
-                  </div>
-                  <div className="tm_invoice_right">
-                    <Barcode
-                      fontSize={14}
-                      width={1.4}
-                      height={50}
-                      textAlign={"center"}
-                      marginLeft={80}
-                      value={barcodeData}
-                      format="CODE128"
+                  {/* Municipality Logo */}
+                  <div className="tm_logo">
+                    <img
+                      src={logoNotas}
+                      alt="Logo Municipalidad"
                     />
                   </div>
+                  {/* Barcode and Cedulon Number */}
+                  <div className="tm_barcode">
+                    <Barcode
+                      value={nrocedulon || ""}
+                      format="CODE39"
+                      width={1.5}
+                      height={50}
+                      displayValue={false}
+                    />
+                    <div className="tm_barcode_number">C0{nrocedulon}</div>
+                  </div>
                 </div>
-                <div className="tm_shape_bg tm_accent_bg_10 tm_border tm_accent_border_20"></div>
                 <div className="tm_invoice_info tm_mb30 tm_align_center">
                   <div className="tm_invoice_info_left tm_mb20_md">
                     <p className="tm_mb0">
@@ -517,7 +359,7 @@ const CedulonTasa = () => {
                         <tbody>
                           {detalle.map((item, index) => {
                             return (
-                              <tr key={index}>
+                              <tr key={index} style={{ lineHeight: "1", padding: "2px 0" }}>
                                 <td className="tm_width_1 tm_accent_border_20">{item.periodo}</td>
                                 <td className="tm_width_3 tm_accent_border_20">{item.concepto}</td>
                                 <td className="tm_width_1 tm_accent_border_20 tm_text_right">
@@ -593,83 +435,89 @@ const CedulonTasa = () => {
                     </div>
                   </div>
                 </div>
+
                 <div className="linea_puntos_horizontal"></div>
                 <div className="cupones_container">
                   <div className="linea_puntos_vertical"></div>
 
-                  <div className="cupon">
-                    <div className="cupon_header">
-                      CUPON MUNICIPALIDAD - TASA AL INMUEBLE
-                    </div>
-                    <div className="cupon_content">
-                      <div className="cupon_data">
-                        <div className="tm_logo">
-                          <img
-                            src={logoNotas}
-                            alt="Logo Notas"
-                            className="cupon_logo"
+                  <div className="talon" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                    <div className="cupon" style={{ flex: "1", margin: "0 10px", lineHeight: "1.2" }}>
+                      <div className="cupon_header" style={{ marginTop: "20px", marginBottom: "20px" }}>
+                        CUPON MUNICIPALIDAD TASA AL INMUEBLE
+                      </div>
+                      <div className="cupon_content">
+                        <div className="cupon_data">
+                          <div className="tm_logo">
+                            <img
+                              src={logoNotas}
+                              alt="Logo Notas"
+                              className="cupon_logo"
+                              width={180}
+                            />
+                          </div>
+                        </div>
+                        <div className="cupon_data">
+                          <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
+                          <strong>Dirección:</strong> {cabecera?.detalle}<br />
+                          <strong>CUIT:</strong> {cabecera?.cuit}
+                        </div>
+                        <div className="cupon_data">
+                          <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
+                          <strong>Total:</strong> ${cabecera?.montoPagar}
+                        </div>
+                        <div className="barcode_container">
+                          <Barcode
+                            value={barcodeData}
+                            width={1.2}
+                            height={40}
+                            format="CODE128"
                           />
                         </div>
                       </div>
-                      <div className="cupon_data">
-                        <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
-                        <strong>Dirección:</strong> {cabecera?.detalle}<br />
-                        <strong>CUIT:</strong> {cabecera?.cuit}
+                    </div>
+
+                    <div className="cupon" style={{ flex: "1", margin: "0 10px", lineHeight: "1.2" }}>
+                      <div className="cupon_header" style={{ marginTop: "20px", marginBottom: "20px" }}>
+                        CUPON MUNICIPALIDAD - TASA AL INMUEBLE
                       </div>
-                      <div className="cupon_data">
-                        <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
-                        <strong>Total:</strong> ${cabecera?.montoPagar}
-                      </div>
-                      <div className="barcode_container">
-                        <Barcode
-                          value={barcodeData}
-                          width={1.2}
-                          height={40}
-                          format="CODE128"
-                        />
+                      <div className="cupon_content">
+                        <div className="cupon_data">
+                          <div className="tm_logo">
+                            <img
+                              src={logoNotas}
+                              alt="Logo Notas"
+                              className="cupon_logo"
+                              width={180}
+                            />
+                          </div>
+                        </div>
+                        <div className="cupon_data">
+                          <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
+                          <strong>Dirección:</strong> {cabecera?.detalle}<br />
+                          <strong>CUIT:</strong> {cabecera?.cuit}
+                        </div>
+                        <div className="cupon_data">
+                          <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
+                          <strong>Total:</strong> ${cabecera?.montoPagar}
+                        </div>
+                        <div className="barcode_container">
+                          <Barcode
+                            value={barcodeData}
+                            width={1.2}
+                            height={40}
+                            format="CODE128"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="cupon">
-                    <div className="cupon_header">
-                      CUPON MUNICIPALIDAD - TASA AL INMUEBLE
-                    </div>
-                    <div className="cupon_content">
-                      <div className="cupon_data">
-                        <div className="tm_logo">
-                          <img
-                            src={logoNotas}
-                            alt="Logo Notas"
-                            className="cupon_logo"
-                          />
-                        </div>
-                      </div>
-                      <div className="cupon_data">
-                        <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
-                        <strong>Dirección:</strong> {cabecera?.detalle}<br />
-                        <strong>CUIT:</strong> {cabecera?.cuit}
-                      </div>
-                      <div className="cupon_data">
-                        <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
-                        <strong>Total:</strong> ${cabecera?.montoPagar}
-                      </div>
-                      <div className="barcode_container">
-                        <Barcode
-                          value={barcodeData}
-                          width={1.2}
-                          height={40}
-                          format="CODE128"
-                        />
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div >
       <div className="fixed bottom-7 right-7 text-xl flex gap-5 no-print">
         <Button variant="outline-secondary" onClick={() => window.history.back()}>
           Ir Atrás
