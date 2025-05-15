@@ -9,9 +9,14 @@ import { convertirFecha, fechaActual } from "../../../utils/GeneralUtils"
 import { useCedulonesContext } from "../../../context/CedulonesProviders"
 import { currencyFormat } from "../../../utils/helper"
 import { CabeceraDeCedulon, DetalleCedulon } from "../../../interfaces/Inmueble"
-import Button from "../../../base-components/Button"
 import html2pdf from "html2pdf.js"
-import logoNotas from '../../../assets/logo-notas.png'
+import logo from '../../../assets/logo2.png'
+import { Box, Container, Paper } from '@mui/material';
+import Button from "@mui/material/Button";
+import "./cedulones.css";
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+
+
 // Crear un componente que representa el documento PDF
 
 const CedulonTasa = () => {
@@ -119,414 +124,319 @@ const CedulonTasa = () => {
     }
   }
 
-  // Estilos CSS adicionales para mejorar la apariencia del cedulón
-  const styles = `
-  .tm_container {
-    width: 210mm; /* A4 width */
-    height: auto;
-    min-height: 297mm; /* A4 height */
-    padding: 20mm; /* Add padding for better spacing */
-    margin: 0 auto; /* Center the content */
-    background: #fff;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    font-size: 13px; /* Reduce font size globally */
-  }
-
-  .tm_invoice_wrap {
-    width: 100%;
-    background: #fff;
-    padding: 0;
-    margin: 0;
-    page-break-inside: avoid;
-  }
-
-  .tm_invoice {
-    width: 100%;
-    padding: 10px;
-    margin: 0;
-    page-break-inside: avoid;
-  }
-
-  .tm_invoice_head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 20px; /* Add spacing below the header */
-  }
-
-  .tm_logo img {
-    max-height: 80px; /* Larger logo */
-    object-fit: contain;
-    margin: 0;
-  }
-
-  .tm_barcode {
-    text-align: right;
-  }
-
-  .tm_barcode_number {
-    margin-top: 5px;
-    font-size: 10px; /* Reduce font size */
-    text-align: center;
-    color: #333;
-  }
-
-  .tm_table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0; /* Add spacing between tables */
-  }
-
-  .tm_table th,
-  .tm_table td {
-    padding: 8px; /* Reduce padding */
-    border: 1px solid #e5e5e5;
-    text-align: left;
-    font-size: 10px; /* Reduce font size */
-  }
-
-  .tm_invoice_footer {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px; /* Add spacing above footer */
-    font-size: 10px; /* Reduce font size */
-  }
-
-  .tm_left_footer {
-    flex: 1;
-  }
-
-  .tm_right_footer {
-    flex: 1;
-    text-align: right;
-  }
-
-  .tm_primary_color {
-    color: #27a3cf;
-  }
-
-  .tm_accent_color {
-    color: #333;
-  }
-
-  .tm_section_heading {
-    margin: 30px 0; /* Add spacing above and below section headings */
-    padding: 10px;
-    background: #f8f9fa;
-    border-left: 4px solid #27a3cf;
-    font-size: 12px; /* Reduce font size */
-  }
-
-  @media print {
-    @page {
-      size: A4;
-      margin: 0;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
-    .tm_container {
-      width: 210mm;
-      height: auto;
-      min-height: 297mm;
-      padding: 20mm;
-      margin: 0 auto;
-    }
-
-    .no-print {
-      display: none;
-    }
-  }
-`
-
-  // Agregar los estilos al documento
-  useEffect(() => {
-    const styleSheet = document.createElement("style")
-    styleSheet.innerText = styles
-    document.head.appendChild(styleSheet)
-    return () => {
-      document.head.removeChild(styleSheet)
-    }
-  }, [])
 
   return (
-    <>
-      <div ref={divRef}>
-        <div className="tm_container">
-          <div className="tm_invoice_wrap">
-            <div className="tm_invoice tm_style2 tm_type1 tm_accent_border tm_radius_0 tm_small_border">
-              <div className="tm_invoice_in">
-                <div className="tm_invoice_head">
-                  {/* Municipality Logo */}
-                  <div className="tm_logo">
-                    <img
-                      src={logoNotas}
-                      alt="Logo Municipalidad"
-                    />
+    <Container maxWidth="lg" sx={{ py: 15 }}>
+
+      {/* Solo botón de PDF */}
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          '@media print': {
+            display: 'none'
+          }
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          startIcon={<PictureAsPdfIcon />}
+          onClick={generatePDF}
+          sx={{
+            backgroundColor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+            boxShadow: 2,
+            borderRadius: 2,
+            px: 3,
+            py: 1,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 500
+          }}
+        >
+          Descargar PDF
+        </Button>
+      </Box>
+
+      <Paper
+        elevation={3}
+        sx={{
+          backgroundColor: 'white',
+          p: 2,
+          mx: 'auto',
+          width: '210mm', // Ancho A4
+          minHeight: '297mm', // Alto A4
+          '@media print': {
+            boxShadow: 'none',
+            p: 0
+          }
+        }}
+      >
+        <div
+          ref={divRef}
+          style={{
+            transform: 'scale(0.9)',
+            transformOrigin: 'top center',
+            width: '100%',
+            height: '100%'
+          }}
+          className="p-5 flex flex-col justify-between h-full"
+        >
+          {/* Contenido principal */}
+          <div className="flex-grow">
+            <div
+              id="tm_download_section"
+              className="bg-white mx-auto max-w-full text-sm"
+            >
+              <div className="flex flex-col">
+                {/* Contenido del cedulón */}
+                <div className="tm_invoice_in">
+                  <div className="flex w-full">
+                    <div className="w-3/12">
+                      <img src={logo} alt="Logo" />
+                    </div>
+                    <div className="w-9/12">
+                      <Barcode
+                        fontSize={14}
+                        width={1.4}
+                        height={50}
+                        textAlign="center"
+                        marginLeft={80}
+                        value="05490000000000000082291020208650026052025000000109"
+                        format="CODE128"
+                      />
+                    </div>
                   </div>
-                  {/* Barcode and Cedulon Number */}
-                  <div className="tm_barcode">
-                    <Barcode
-                      value={nrocedulon || ""}
-                      format="CODE39"
-                      width={1.5}
-                      height={50}
-                      displayValue={false}
-                    />
-                    <div className="tm_barcode_number">C0{nrocedulon}</div>
+
+                  <div className="flex bg-gray-100 p-2 mb-2">
+                    <div className="w-3/4">
+                      <p>Nro. Comprobante: {cabecera?.nroCedulon}</p>
+                      <p>Fecha Emisión: {fechaActual()}</p>
+                      <p>
+                        Fecha Vencimiento:{' '}
+                        {cabecera?.vencimiento
+                          ? convertirFecha(cabecera.vencimiento)
+                          : ''}
+                      </p>
+                    </div>
+
+                    <div className="text-xl -1/3">
+                      Total: {currencyFormat(cabecera?.montoPagar || 0)}
+                    </div>
                   </div>
-                </div>
-                <div className="tm_invoice_info tm_mb30 tm_align_center">
-                  <div className="tm_invoice_info_left tm_mb20_md">
-                    <p className="tm_mb0">
-                      Nro. Comprobante: <b className="tm_primary_color">{cabecera?.nroCedulon}</b>
-                      <br />
-                      Fecha Emisión: <b className="tm_primary_color">{fechaActual()}</b>
-                      <br />
-                      Fecha Vencimiento:{" "}
-                      <b className="tm_primary_color">
-                        {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}
-                      </b>
-                    </p>
-                  </div>
-                  <div className="tm_invoice_info_right">
-                    <div className="tm_border tm_accent_border_20 tm_radius_0 tm_accent_bg_10 tm_curve_35 tm_text_center">
-                      <div>
-                        <b className="tm_accent_color tm_f26 tm_medium tm_body_lineheight">
-                          Total: $ {cabecera?.montoPagar}
-                        </b>
+
+                  <div className="tm_table tm_style1 tm_mb30">
+                    <div className="tm_border  tm_accent_border_20 tm_border_top_0">
+                      <div className="tm_table_responsive">
+                        <table>
+                          <tbody>
+                            <tr>
+                              <td className="tm_width_6 tm_border_top_0">
+                                <b className="tm_primary_color tm_medium">Contribuyente: </b>
+                                {cabecera?.nombre}
+                              </td>
+                              <td className="tm_width_6 tm_border_top_0 tm_border_left tm_accent_border_20">
+                                <b className="tm_primary_color tm_medium">Dirección: </b>{" "}
+                                {cabecera?.detalle}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="tm_width_6 tm_accent_border_20">
+                                <b className="tm_primary_color tm_medium">CUIT: </b>
+                                {cabecera?.cuit}
+                              </td>
+                              <td className="tm_width_6 tm_border_left tm_accent_border_20">
+                                <b className="tm_primary_color tm_medium">Denominación: </b>
+                                {cabecera?.denominacion}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
-                </div>
-                <h2 className="tm_f16 tm_section_heading tm_accent_border_20 tm_mb0">
-                  <span className="tm_accent_bg_10 tm_radius_0 tm_curve_35 tm_border tm_accent_border_20 tm_border_bottom_0 tm_accent_color">
-                    <span>Tasa al inmueble</span>
-                  </span>
-                </h2>
-                <div className="tm_table tm_style1 tm_mb30">
-                  <div className="tm_border  tm_accent_border_20 tm_border_top_0">
-                    <div className="tm_table_responsive">
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td className="tm_width_6 tm_border_top_0">
-                              <b className="tm_primary_color tm_medium">Contribuyente: </b>
-                              {cabecera?.nombre}
-                            </td>
-                            <td className="tm_width_6 tm_border_top_0 tm_border_left tm_accent_border_20">
-                              <b className="tm_primary_color tm_medium">Dirección: </b>{" "}
-                              {cabecera?.detalle}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="tm_width_6 tm_accent_border_20">
-                              <b className="tm_primary_color tm_medium">CUIT: </b>
-                              {cabecera?.cuit}
-                            </td>
-                            <td className="tm_width_6 tm_border_left tm_accent_border_20">
-                              <b className="tm_primary_color tm_medium">Denominación: </b>
-                              {cabecera?.denominacion}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+
+                  <div className="mt-3 mb-3">
+                    <div className="flex flex-col border border-gray-300 mb-2">
+                      {/* Encabezado */}
+                      <div className="flex bg-gray-100">
+                        <div className="w-1/6 p-2 font-semibold text-gray-700">
+                          Periodo
+                        </div>
+                        <div className="w-4/6 p-2 font-semibold text-gray-700 ">
+                          Concepto
+                        </div>
+                        <div className="w-1/6 p-2 font-semibold text-gray-700 text-right">
+                          Sub Total
+                        </div>
+                      </div>
+
+                      {/* Cuerpo */}
+                      {detalle.map((item, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                        >
+                          <div className="w-1/6 p-2 border-t border-gray-300">
+                            {item.periodo}
+                          </div>
+                          <div className="w-4/6 p-2 border-t border-gray-300">
+                            {item.concepto}
+                          </div>
+                          <div className="w-1/6 p-2 border-t border-gray-300 text-right">
+                            {currencyFormat(item.montoPagado)}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                </div>
-                <div className="tm_table tm_style1">
-                  <div className="tm_border tm_accent_border_20">
-                    <div className="tm_table_responsive">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th className="tm_width_1 tm_semi_bold tm_accent_color tm_accent_bg_10">
-                              Periodo
-                            </th>
-                            <th className="tm_width_3 tm_semi_bold tm_accent_color tm_accent_bg_10">
-                              Concepto
-                            </th>
-                            <th className="tm_width_1 tm_semi_bold tm_accent_color tm_accent_bg_10 tm_text_right">
-                              Sub Total
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {detalle.map((item, index) => {
-                            return (
-                              <tr key={index} style={{ lineHeight: "1", padding: "2px 0" }}>
-                                <td className="tm_width_1 tm_accent_border_20">{item.periodo}</td>
-                                <td className="tm_width_3 tm_accent_border_20">{item.concepto}</td>
-                                <td className="tm_width_1 tm_accent_border_20 tm_text_right">
-                                  {currencyFormat(item.montoPagado)}
-                                </td>
-                              </tr>
-                            )
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  <div className="tm_invoice_footer tm_mb15 tm_m0_md">
-                    <div className="tm_left_footer">
-                      <p className="tm_mb2">
-                        <b className="tm_primary_color" style={{ fontSize: "16px" }}>
+
+                    <div className="tm_invoice_footer tm_mb15 tm_m0_md">
+                      <div className="tm_left_footer">
+                        <p className="font-bold mt-2 text-lg">
                           Cedulon valido solo para pago en caja Municipal
-                        </b>
-                      </p>
-                      <p className="tm_m0" style={{ fontSize: "14px", marginTop: "10px" }}>
-                        Medio de Pago <br />
-                        {cedulonParaImpresion?.tarjetaDeCredito}
-                        <br />
-                        en {cedulonParaImpresion?.cantCuotas} Cuotas de{" "}
-                        {currencyFormat(cedulonParaImpresion?.montoCuota || 0)}
-                      </p>
-                    </div>
-                    <div className="tm_right_footer">
-                      <table className="tm_mb15 tm_m0_md">
-                        <tbody>
-                          <tr>
-                            <td className="tm_width_3 tm_primary_color tm_border_none tm_medium">
-                              Sub total
-                            </td>
-                            <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_medium">
-                              {currencyFormat(subTotal)}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="tm_width_3 tm_primary_color tm_border_none tm_pt0">
-                              Interes Mora
-                            </td>
-                            <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              {currencyFormat(interesMoraTotal)}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="tm_width_3 tm_primary_color tm_border_none tm_pt0">
-                              Descuento
-                            </td>
-                            <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              {currencyFormat(descuentoTotal)}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="tm_width_3 tm_primary_color tm_border_none tm_pt0">
-                              Costo financiero:
-                            </td>
-                            <td className="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0">
-                              ${currencyFormat(costoFinancieroTotal)}
-                            </td>
-                          </tr>
-                          <tr className="tm_accent_border_20 tm_border">
-                            <td className="tm_width_3 tm_bold tm_f16 tm_border_top_0 tm_accent_color tm_accent_bg_10">
-                              Total{" "}
-                            </td>
-                            <td className="tm_width_3 tm_bold tm_f16 tm_border_top_0 tm_accent_color tm_text_right tm_accent_bg_10">
-                              {currencyFormat(cabecera?.montoPagar ?? 0)}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="linea_puntos_horizontal"></div>
-                <div className="cupones_container">
-                  <div className="linea_puntos_vertical"></div>
-
-                  <div className="talon" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                    <div className="cupon" style={{ flex: "1", margin: "0 10px", lineHeight: "1.2" }}>
-                      <div className="cupon_header" style={{ marginTop: "20px", marginBottom: "20px" }}>
-                        CUPON MUNICIPALIDAD TASA AL INMUEBLE
+                        </p>
+                        <p className="text-sm mt-2">
+                          Medio de Pago: {cedulonParaImpresion?.tarjetaDeCredito} <br />
+                          en {cedulonParaImpresion?.cantCuotas} Cuotas de{" "}
+                          {currencyFormat(cedulonParaImpresion?.montoCuota || 0)}
+                        </p>
                       </div>
-                      <div className="cupon_content">
-                        <div className="cupon_data">
-                          <div className="tm_logo">
-                            <img
-                              src={logoNotas}
-                              alt="Logo Notas"
-                              className="cupon_logo"
-                              width={180}
-                            />
+
+                      <div className="flex flex-col space-y-2">
+                        {/* Subtotal */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 text-gray-700 font-medium">Sub total</div>
+                          <div className="flex-1 text-right text-gray-700 font-medium">
+                            {currencyFormat(subTotal)}
                           </div>
                         </div>
-                        <div className="cupon_data">
-                          <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
-                          <strong>Dirección:</strong> {cabecera?.detalle}<br />
-                          <strong>CUIT:</strong> {cabecera?.cuit}
-                        </div>
-                        <div className="cupon_data">
-                          <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
-                          <strong>Total:</strong> ${cabecera?.montoPagar}
-                        </div>
-                        <div className="barcode_container">
-                          <Barcode
-                            value={barcodeData}
-                            width={1.2}
-                            height={40}
-                            format="CODE128"
-                          />
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="cupon" style={{ flex: "1", margin: "0 10px", lineHeight: "1.2" }}>
-                      <div className="cupon_header" style={{ marginTop: "20px", marginBottom: "20px" }}>
-                        CUPON MUNICIPALIDAD - TASA AL INMUEBLE
-                      </div>
-                      <div className="cupon_content">
-                        <div className="cupon_data">
-                          <div className="tm_logo">
-                            <img
-                              src={logoNotas}
-                              alt="Logo Notas"
-                              className="cupon_logo"
-                              width={180}
-                            />
+                        {/* Interés Mora */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 text-gray-700">Interes Mora</div>
+                          <div className="flex-1 text-right text-gray-700">
+                            {currencyFormat(interesMoraTotal)}
                           </div>
                         </div>
-                        <div className="cupon_data">
-                          <strong>Contribuyente:</strong> {cabecera?.nombre}<br />
-                          <strong>Dirección:</strong> {cabecera?.detalle}<br />
-                          <strong>CUIT:</strong> {cabecera?.cuit}
+
+                        {/* Descuento */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 text-gray-700">Descuento</div>
+                          <div className="flex-1 text-right text-gray-700">
+                            {currencyFormat(descuentoTotal)}
+                          </div>
                         </div>
-                        <div className="cupon_data">
-                          <strong>Vencimiento:</strong> {cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ""}<br />
-                          <strong>Total:</strong> ${cabecera?.montoPagar}
+
+                        {/* Costo Financiero */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 text-gray-700">Costo financiero:</div>
+                          <div className="flex-1 text-right text-gray-700">
+                            {currencyFormat(costoFinancieroTotal)}
+                          </div>
                         </div>
-                        <div className="barcode_container">
-                          <Barcode
-                            value={barcodeData}
-                            width={1.2}
-                            height={40}
-                            format="CODE128"
-                          />
+
+                        {/* Total */}
+                        <div className="flex justify-between items-center bg-gray-100 border-t border-gray-300 py-2">
+                          <div className="flex-1 font-bold text-lg text-gray-800">Total</div>
+                          <div className="flex-1 text-right font-bold text-lg text-gray-800">
+                            {currencyFormat(cabecera?.montoPagar ?? 0)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Talonario */}
+            <div className="flex text-xs mb-2">
+              <div className="w-1/2 pl-2">CUPON MUNICIPALIDAD</div>
+              <div className="w-1/2 pl-2">CUPON CONTRIBUYENTE</div>
+            </div>
+
+            <div className="mt-auto flex border border-gray-500">
+              {/* Primer cupón */}
+              <div className="flex flex-col w-1/2 border-r border-gray-500">
+                {/* Encabezado con logo y título */}
+                <div className="flex w-full border-b border-gray-500">
+                  <img
+                    style={{ maxHeight: '50px' }}
+                    src={logo}
+                    alt="Logo Notas"
+                  />
+                  <div className="flex flex-col justify-center items-center w-full">
+                    <p>TASA AL INMUEBLE</p>
+                  </div>
+                </div>
+
+                {/* Datos del contribuyente */}
+                <div className="grid grid-cols-2 p-2 text-sm leading-tight">
+                  <div className="font-semibold">Contribuyente:</div>
+                  <div>{cabecera?.nombre}</div>
+                  <div className="font-semibold">Dirección:</div>
+                  <div>{cabecera?.detalle}</div>
+                  <div className="font-semibold">CUIT:</div>
+                  <div>{cabecera?.cuit}</div>
+                  <div className="font-semibold">Vencimiento:</div>
+                  <div>{cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ''}</div>
+                  <div className="font-semibold">Total:</div>
+                  <div>{currencyFormat(cabecera?.montoPagar || 0)}</div>
+                </div>
+
+                {/* Código de barras */}
+                <div className="flex justify-center p-2">
+                  <Barcode
+                    fontSize={14}
+                    width={1.2}
+                    height={40}
+                    value={nrocedulon}
+                    format="CODE128"
+                  />
+                </div>
+              </div>
+
+              {/* Segundo cupón */}
+              <div className="flex flex-col w-1/2">
+                <div className="flex w-full border-b border-gray-500">
+                  <img
+                    style={{ maxHeight: '50px' }}
+                    src={logo}
+                    alt="Logo Notas"
+                  />
+                  <div className="flex flex-col justify-center items-center w-full">
+                    <p>TASA AL INMUEBLE</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 p-2 text-sm leading-tight">
+                  <div className="font-semibold">Contribuyente:</div>
+                  <div>{cabecera?.nombre}</div>
+                  <div className="font-semibold">Dirección:</div>
+                  <div>{cabecera?.detalle}</div>
+                  <div className="font-semibold">CUIT:</div>
+                  <div>{cabecera?.cuit}</div>
+                  <div className="font-semibold">Vencimiento:</div>
+                  <div>{cabecera?.vencimiento ? convertirFecha(cabecera.vencimiento) : ''}</div>
+                  <div className="font-semibold">Total:</div>
+                  <div>{currencyFormat(cabecera?.montoPagar || 0)}</div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </div>
-      </div >
-      <div className="fixed bottom-7 right-7 text-xl flex gap-5 no-print">
-        <Button variant="outline-secondary" onClick={() => window.history.back()}>
-          Ir Atrás
-        </Button>
-        <Button variant="primary" onClick={generatePDF}>
-          Imprimir
-        </Button>
-      </div>
-    </>
+
+      </Paper>
+    </Container>
   )
 }
 export default CedulonTasa
