@@ -27,7 +27,7 @@ const CedulonTasa = () => {
   const [subTotal, setSubTotal] = useState<number>(0)
   const [interesMoraTotal, setInteresMoraTotal] = useState<number>(0)
   const [descuentoTotal, setDescuentoTotal] = useState<number>(0)
-  const [barcodeData, setBarcodeData] = useState<number>()
+  const [barcodeData, setBarcodeData] = useState<string>()
   const [costoFinancieroTotal, setCostoFinancieroTotal] = useState<number>(0)
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const CedulonTasa = () => {
       .get(urlApi)
       .then((response) => {
         setCabecera(response.data)
-        setBarcodeData(response.data?.codigo_barra)
+        setBarcodeData(`C0${nrocedulon}`)
       })
       .catch((error) => {
         console.log(error)
@@ -397,8 +397,8 @@ const CedulonTasa = () => {
                     fontSize={14}
                     width={1.2}
                     height={40}
-                    value={nrocedulon}
-                    format="CODE128"
+                    value={barcodeData}
+                    format="CODE39"
                   />
                 </div>
               </div>
