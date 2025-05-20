@@ -59,7 +59,7 @@ const Tasas = () => {
 
   return (
     <>
-      <div className="flex flex-col h-screen bg-white pt-32">
+      <div className="flex flex-col h-screen bg-white pt-2">
         <SearchBar handleNuevaTasa={handleNuevaTasa} />
         <div className="conScroll pb-24">
           {showConceptos ? (
