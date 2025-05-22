@@ -31,6 +31,8 @@ import { CedulonesProvider } from "../context/CedulonesProviders"
 import { parseCIDICookie } from "../utils/cookieParser"
 import { useUserContext } from "../context/UserProvider"
 
+import TasaTable from "../pages/Tasa/TasaTable"
+
 const RouterContent = () => {
 
   const { user, setUser } = useUserContext();
@@ -52,7 +54,10 @@ const RouterContent = () => {
       <Header />
       <Routes>
         <Route path="/" element={<TopMenu />}>
-          <Route path="/" element={<Tasas />} />
+
+          <Route path="/tasatable" element={<Tasas />} />
+          <Route path="/" element={<TasaTable />} />
+
           <Route path="/detalle/:id" element={<TasaDetalle />} />
           <Route path="/detalle/:circunscripcion/:seccion/:manzana/:parcela/:p_h" element={<TasaDetalle />} />
 

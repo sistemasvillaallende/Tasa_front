@@ -22,7 +22,7 @@ function Main() {
 
   useEffect(() => {
     setFormattedMenu(topMenu())
-    if (location.pathname == "/" || location.pathname == "/nuevaTasa" || paginacion()) {
+    if (location.pathname == "/" || location.pathname == "/tasatable" || location.pathname == "/nuevaTasa" || paginacion()) {
       setShowLista(true)
       setShowEdicion(false)
     } else {

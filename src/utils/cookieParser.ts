@@ -1,7 +1,6 @@
 import { UserType } from "../types/UserTypes"
 
 export const parseCIDICookie = (): UserType | null => {
-  console.log("Parseando cookie CIDI...", document.cookie);
 
   try {
     const cookie = document.cookie
@@ -12,13 +11,10 @@ export const parseCIDICookie = (): UserType | null => {
 
     // Obtenemos todo lo que está después de 'VABack.CIDI='
     const cookieValue = cookie.substring('VABack.CIDI='.length);
-    console.log("Valor de la cookie:", cookieValue);
 
     const decodedValue = decodeURIComponent(cookieValue);
-    console.log("Valor decodificado:", decodedValue);
 
     const pairs = decodedValue.split('&');
-    console.log("Pares:", pairs);
 
     // Inicializamos el objeto con valores por defecto
     const result: UserType = {
@@ -54,7 +50,6 @@ export const parseCIDICookie = (): UserType | null => {
       }
     });
 
-    console.log("Resultado final:", result);
     return result;
 
   } catch (error) {
@@ -64,12 +59,10 @@ export const parseCIDICookie = (): UserType | null => {
 }
 
 export const deleteCookie = (): void => {
-  console.log("Borrando cookie CIDI...");
 
   // Establece la cookie con una fecha de expiración en el pasado
   document.cookie = "VABack.CIDI=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-  console.log("Cookie CIDI borrada.");
 
   // Cierra la pestaña
   window.location.reload();

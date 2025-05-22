@@ -7,7 +7,6 @@ import { Inmueble } from "../../interfaces/Inmueble"
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material"
 import axios from "axios"
 import Swal from "sweetalert2"
-import { format } from "date-fns";
 
 function TasaDetalle() {
   const params = useParams()
@@ -196,10 +195,14 @@ function TasaDetalle() {
     }
   };
 
-  const formatDateToDDMMYYYY = (dateString: string) => {
+  const formatDateToDDMMYYYY = (dateString: string): string => {
     const date = new Date(dateString);
-    return format(date, "dd/MM/yyyy");
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
+
 
   return (
     <form className="mb-10">
