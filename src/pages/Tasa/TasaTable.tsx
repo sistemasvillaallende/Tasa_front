@@ -29,12 +29,14 @@ const TasaTable = () => {
   const [filtro, setFiltro] = useState<string>("");
   const { setSelectedInmueble, setInmuebles } = useTasaContext();
   const navigate = useNavigate();
+  const [cargando, setCargando] = useState<boolean>(true)
 
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_URL_BASE}Inmuebles/readTable`)
       .then((res) => {
         setDatos(res.data);
+        setCargando(false)
       })
       .catch((err) => {
         console.error("Error al obtener los datos", err);
@@ -132,6 +134,9 @@ const TasaTable = () => {
         pagination
         highlightOnHover
         striped
+        fixedHeader
+        progressPending={cargando}
+        progressComponent={<h2>cargando...</h2>}
       />
     </div>
   );
